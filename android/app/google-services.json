@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "185354327561",
+    "project_id": "learn-english-app-79060",
+    "storage_bucket": "learn-english-app-79060.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185354327561:android:1fca6cf57f900486ad0ad8",
+        "android_client_info": {
+          "package_name": "com.ozgurulusoy.superfastenglish"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185354327561-25ibchgucdscoro3hojt06u43jnnf2fb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ozgurulusoy.superfastenglish",
+            "certificate_hash": "fc397959c33166a137413d83e53c975c47a53358"
+          }
+        },
+        {
+          "client_id": "185354327561-kv092a2ppplohabbtvqh7fun2fd0modv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ozgurulusoy.superfastenglish",
+            "certificate_hash": "e4e5a04d30ab31c6143f2d87d8a7f6b94287266f"
+          }
+        },
+        {
+          "client_id": "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHKIwKKPaIX0e6G9zJWx1w-_yWyYCnnac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
