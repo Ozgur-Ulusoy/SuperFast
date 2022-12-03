@@ -21,22 +21,46 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Expanded(flex: 1, child: SizedBox()),
               //* Play Button
-              SizedBox(
-                width: ScreenUtil.width * 0.2,
-                height: ScreenUtil.width * 0.2,
-                child: FittedBox(
-                  child: FloatingActionButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const PlayPage();
-                        }),
-                      );
-                    },
-                    child: const Icon(Icons.play_arrow),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: ScreenUtil.width * 0.2,
+                    height: ScreenUtil.width * 0.2,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return const PlayPage();
+                            }),
+                          );
+                        },
+                        child: const Icon(Icons.play_arrow),
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(
+                    width: ScreenUtil.width * 0.2,
+                    height: ScreenUtil.width * 0.2,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        heroTag: "Sesli Oyun",
+                        backgroundColor: Colors.red,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return const PlayPage();
+                            }),
+                          );
+                        },
+                        child: const Icon(Icons.play_arrow),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const Expanded(flex: 1, child: SizedBox()),
               //* Record

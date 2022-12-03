@@ -68,7 +68,10 @@ class _PlayPageState extends State<PlayPage> {
   }
 
   int ReturnIsPressedIndex(int a) {
-    if (BlocProvider.of<AnswerCubit>(context).state.answerList!.length <= a) {
+    if ((BlocProvider.of<AnswerCubit>(context).state as NormalAnswerState)
+            .answerList!
+            .length <=
+        a) {
       return -1;
     }
 
@@ -76,8 +79,10 @@ class _PlayPageState extends State<PlayPage> {
         i < BlocProvider.of<QuestionCubit>(context).state.letters!.length;
         i++) {
       if (BlocProvider.of<QuestionCubit>(context).state.letters![i] ==
-              BlocProvider.of<AnswerCubit>(context).state.answerList![a] &&
-          BlocProvider.of<AnswerCubit>(context).state.isPressedList![i] ==
+              (BlocProvider.of<AnswerCubit>(context).state as NormalAnswerState)
+                  .answerList![a] &&
+          (BlocProvider.of<AnswerCubit>(context).state as NormalAnswerState)
+                  .isPressedList![i] ==
               true) {
         return i;
       }
@@ -148,6 +153,16 @@ class _PlayPageState extends State<PlayPage> {
                     ),
                   ),
                   const Spacer(),
+                  BlocBuilder<QuestionCubit, QuestionState>(
+                    builder: (context, state) {
+                      return MaterialButton(
+                        color: Colors.red,
+                        onPressed: () async {
+                          await _audioPlayer.play(UrlSource(state.urlPath));
+                        },
+                      );
+                    },
+                  ),
                   //* Soru
                   BlocBuilder<QuestionCubit, QuestionState>(
                     builder: (context, state) {
@@ -237,9 +252,11 @@ class _PlayPageState extends State<PlayPage> {
                                       //! //!
                                       BlocProvider.of<AnswerCubit>(context)
                                           .DeleteAnswer(
-                                              index + ReturnGLIndex(glindex),
-                                              ReturnIsPressedIndex(index +
-                                                  ReturnGLIndex(glindex)));
+                                              index: index +
+                                                  ReturnGLIndex(glindex),
+                                              ispressedIndex:
+                                                  ReturnIsPressedIndex(index +
+                                                      ReturnGLIndex(glindex)));
                                     },
                                     child: FittedBox(
                                       child: Container(
@@ -254,10 +271,10 @@ class _PlayPageState extends State<PlayPage> {
                                             const Expanded(
                                                 flex: 2, child: SizedBox()),
                                             index + ReturnGLIndex(glindex) <
-                                                    BlocProvider.of<
-                                                                AnswerCubit>(
-                                                            context)
-                                                        .state
+                                                    (BlocProvider.of<AnswerCubit>(
+                                                                    context)
+                                                                .state
+                                                            as NormalAnswerState)
                                                         .answerList!
                                                         .length
                                                 ? Expanded(
@@ -265,9 +282,10 @@ class _PlayPageState extends State<PlayPage> {
                                                     child: FittedBox(
                                                       fit: BoxFit.contain,
                                                       child: Text(
-                                                        BlocProvider.of<AnswerCubit>(
-                                                                    context)
-                                                                .state
+                                                        (BlocProvider.of<AnswerCubit>(
+                                                                            context)
+                                                                        .state
+                                                                    as NormalAnswerState)
                                                                 .answerList![
                                                             index +
                                                                 ReturnGLIndex(
@@ -326,8 +344,8 @@ class _PlayPageState extends State<PlayPage> {
                               ),
                               itemBuilder: (__, index) {
                                 //* Eğer şık seçilmişse şık butonunu kapar ( yerine boş bir sizedbox gösterir )
-                                return BlocProvider.of<AnswerCubit>(context)
-                                            .state
+                                return (BlocProvider.of<AnswerCubit>(context)
+                                                .state as NormalAnswerState)
                                             .isPressedList![index] ==
                                         false
                                     ? FittedBox(
@@ -361,9 +379,10 @@ class _PlayPageState extends State<PlayPage> {
                                             // }
 
                                             //* kullanıcının eklediği şık sayısı ( kullanıcının cevabı ) cevabın harf sayısına eşitse bu duruma bakar
-                                            if (BlocProvider.of<AnswerCubit>(
-                                                        context)
-                                                    .state
+                                            if ((BlocProvider.of<AnswerCubit>(
+                                                                context)
+                                                            .state
+                                                        as NormalAnswerState)
                                                     .answerList!
                                                     .length ==
                                                 state.answer
@@ -371,9 +390,11 @@ class _PlayPageState extends State<PlayPage> {
                                                     .length) {
                                               String res =
                                                   ""; //* kullanıcıının seçtiği şıkları ( harfler ) tek bir stringte birleştirir ( örn : a , d , a , m  şıklarını => adam kelimesine çevirir )
-                                              for (var element in BlocProvider
-                                                      .of<AnswerCubit>(context)
-                                                  .state
+                                              for (var element in (BlocProvider
+                                                              .of<AnswerCubit>(
+                                                                  context)
+                                                          .state
+                                                      as NormalAnswerState)
                                                   .answerList!) {
                                                 res += element;
                                               }

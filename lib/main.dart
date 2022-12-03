@@ -1,4 +1,3 @@
-import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +34,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => TimerCubit(),
         ),
-        //* internet kontrolü için
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

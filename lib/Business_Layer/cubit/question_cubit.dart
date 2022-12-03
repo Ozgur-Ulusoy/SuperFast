@@ -99,6 +99,8 @@ class QuestionCubit extends Cubit<QuestionState> {
     int random = rnd.nextInt(questionData
         .length); //* Generate random for question - index for QuestionData Map
 
+    String urlPath = questionData.elementAt(random).mediaLink;
+
     String result = type == QuestionType.english
         ? questionData.elementAt(random).turkish
         : questionData
@@ -124,18 +126,19 @@ class QuestionCubit extends Cubit<QuestionState> {
       resultList.add(result[i]);
     }
 
-    //* add 3 more random letter from alphabet
-    for (var i = 0; i < 3; i++) {
-      var res = type == QuestionType.english ? alfabe : alphabet;
-      int random = rnd.nextInt(res.length);
+    // //* add 3 more random letter from alphabet
+    // for (var i = 0; i < 3; i++) {
+    //   var res = type == QuestionType.english ? alfabe : alphabet;
+    //   int random = rnd.nextInt(res.length);
 
-      // if (resultList.contains(alfabe[random])) {
-      //   continue;
-      // } else {
-      resultList.add(res[random]);
-      // i++;
-      // }
-    }
+    //   // if (resultList.contains(alfabe[random])) {
+    //   //   continue;
+    //   // } else {
+    //   resultList.add(res[random]);
+    //   // i++;
+    //   // }
+    // }
+
     resultList.remove(" ");
     for (var i = 0; i < resultList.length; i++) {
       resultList[i] = type == QuestionType.english
@@ -161,6 +164,7 @@ class QuestionCubit extends Cubit<QuestionState> {
         point: state.point + 200,
         trueAnswer: state.trueAnswer + 1,
         letters: resultList,
+        urlPath: urlPath,
       ),
     );
   }

@@ -3,6 +3,7 @@ part of '../cubit/question_cubit.dart';
 class QuestionState {
   String question; //? soru
   String answer; //? cevap
+  String urlPath; //? ses
 
   int point; //? puan
   int trueAnswer; //? dogru cevap sayısı
@@ -15,5 +16,6 @@ class QuestionState {
     this.point = -200,
     this.trueAnswer = -1,
     this.letters,
+    this.urlPath = " ",
   });
 }
