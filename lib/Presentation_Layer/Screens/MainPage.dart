@@ -25,15 +25,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    try {
-      print(FirebaseAuth.instance.currentUser!.displayName);
-      print(FirebaseAuth.instance.currentUser!.email);
-      print(FirebaseAuth.instance.currentUser!.emailVerified);
-      print(FirebaseAuth.instance.currentUser!.photoURL);
-    } catch (e) {
-      print("user null");
-    }
-
     ScreenUtil.init(context);
     return Scaffold(
       body: StreamBuilder(

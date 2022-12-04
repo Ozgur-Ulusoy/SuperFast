@@ -1,3 +1,4 @@
+import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'Business_Layer/cubit/timer_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  Test(); //? Test
   runApp(const MyApp());
 }
 

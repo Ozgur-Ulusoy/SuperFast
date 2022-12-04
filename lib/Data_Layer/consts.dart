@@ -19,7 +19,7 @@ class ScreenUtil {
     // bottomBarHeight = mediaQueryData.padding.bottom;
     textScaleFactor = mediaQuery.textScaleFactor;
 
-    print(height);
-    print(width);
+    // print(height);
+    // print(width);
   }
 }
