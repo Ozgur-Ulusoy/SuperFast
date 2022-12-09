@@ -15,6 +15,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   Future GoogleLogin() async {
     final googleUser = await GoogleSignIn(
+            // signInOption: SignInOption.games,
             // serverClientId:
             //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
             )

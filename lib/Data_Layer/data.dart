@@ -2198,4 +2198,1324 @@ List<Data> questionData = [
       type: WordType.noun,
       mediaLink:
           "https://drive.google.com/uc?export=download&id=10xFCQPNDvOEPeVSC7NKH0igVk-ZiH-Rz"),
+
+  Data(
+      english: "Closure",
+      turkish: "Kapanma",
+      level: WordLevel.c2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1lDBqugYtvwIh4_YD_cPA_lqT0wvId63p"),
+  Data(
+      english: "Cluster",
+      turkish: "Küme",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1NDH96T9DugwTsk8cMPHUAlSzOxy6dEsl"),
+  Data(
+      english: "Coalition",
+      turkish: "Koalisyon",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1W9ibqdNUHlB79JWXXUgJ49RpheZrl0Ej"),
+  Data(
+      english: "Coastal",
+      turkish: "Kıyı",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1hO9oFgO1qwlzxYm5nnk_gA48w3QTf2m8"),
+  Data(
+      english: "Cognitive",
+      turkish: "Anlama",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1p-jOoA9lhuWJwjuUHkHLdqniG-9gqOwl"),
+  Data(
+      english: "Coincide",
+      turkish: "Denk Gelmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1xzluMKAWxgCbDD5dlDfZWerNC3lu46rg"),
+  Data(
+      english: "Coincidence",
+      turkish: "Tesadüf",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1TuddkBhATi5wjb6ibLwY8gNWDEIQ7LGK"),
+  Data(
+      english: "collaborate",
+      turkish: "İşbirliği Yapmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=10KaQuCJVFC-Iy9IG71yc8tCtVw_PxL_Z"),
+  Data(
+      english: "Collaboration",
+      turkish: "İşbirliği",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zZYQwtxTwKoS9AEvt9_F9AjOJH_OQNwm"),
+  Data(
+      english: "Collective",
+      turkish: "Toplu",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1N-X1-AHVAOjx9JgFLkgZSdsu1ac4NGrj"),
+  Data(
+      english: "Collector",
+      turkish: "Toplayıcı",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1XMBdmpZC8aZucynYdfgGKql9q4Jn1uOB"),
+  Data(
+      english: "Collision",
+      turkish: "Çarpışma",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1_9_PC8iNnKrZuJt4-xgh9Nzn-XFa5w8T"),
+  Data(
+      english: "Colonial",
+      turkish: "Sömürgeci",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1oM4otn5-piG3v0xVfez9U4Y1kG0FUz0z"),
+  Data(
+      english: "Colony",
+      turkish: "Sömürge",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1MUK4KgMCH-Md9DEisFYuHCUKiCLDi3He"),
+  Data(
+      english: "Colorful",
+      turkish: "Renkli",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Z0mDBz8nQezBGF4g8r1mRi6pM9N1SNV4"),
+  Data(
+      english: "Columnist",
+      turkish: "Köşe Yazarı",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1LO_d20DcyIMBaOdI4Uda655sTorxbRsm"),
+  Data(
+      english: "Combat",
+      turkish: "Savaş",
+      level: WordLevel.c2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=14fJ2qrRWNH7K0i3SLNX_OIQvQ29VQHQ5"),
+  Data(
+      english: "Combat",
+      turkish: "Savaşmak",
+      level: WordLevel.c2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=14fJ2qrRWNH7K0i3SLNX_OIQvQ29VQHQ5"),
+  Data(
+      english: "Comic",
+      turkish: "Komik",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1TlBQ4_vgoohO492KbtwPxDZRpAvpwQX5"),
+  Data(
+      english: "Commander",
+      turkish: "Komutan",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=12ZI6W0NTJkrUaK22M98YCrFOUjDbB6mV"),
+  Data(
+      english: "Commence",
+      turkish: "Başlamak",
+      level: WordLevel.c2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=12aHLsSyG4vNVgZBt_-x5CPoz0ryFjz2U"),
+  Data(
+      english: "Commentary",
+      turkish: "Yorum",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1IbL-hjEWH47BmqrGqoJJBVea1BzzuDDm"),
+  Data(
+      english: "Commentator",
+      turkish: "Yorumcu",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1z0HwW8UgLPp3cHOkGTrb8cQtLj2MmHDt"),
+  Data(
+      english: "Commerce",
+      turkish: "Ticaret",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1ZNgFDx6LIo942FrvSlGAGq3DNMdmTu_B"),
+  Data(
+      english: "Commissioner",
+      turkish: "Komisyon Üyesi",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1S4WLSFCN2IweTq-HoXjut_I94okqaeWK"),
+  Data(
+      english: "Commodity",
+      turkish: "Ürün",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1iv6Umo7ijL_Cj9bjzB0nmGcuiOyAZRzi"),
+  Data(
+      english: "Companion",
+      turkish: "Ahbap",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Ax1FH2Xg0oTN0YmScGAfk8p2ftxntFhp"),
+  Data(
+      english: "Comparable",
+      turkish: "Kıyaslanabilir",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1ZaOzpWoEKFGf_T_3Zajs8CQEohcKm3kf"),
+  Data(
+      english: "Comparative",
+      turkish: "Karşılaştırmalı",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1BA1K_YSnkdxR3LORap9z7rUfu503cNI7"),
+  Data(
+      english: "Compassion",
+      turkish: "Merhamet",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1tGc6vQI3j0yuVX4qS-Ic6ZNH8nmQjtVU"),
+  Data(
+      english: "Compel",
+      turkish: "Zorlamak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1OzUvMsuf1I5zmTGHy1HDm7VIJVGZoq0e"),
+  Data(
+      english: "Compelling",
+      turkish: "Zorlayıcı",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1HhhjR6CMruVInORq_8h7lPRCaWg4cYU8"),
+  Data(
+      english: "Compensate",
+      turkish: "Telafi Etmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1kbxQDaRDxlmjLWlSH8ZWXw7O6xGaNga2"),
+  Data(
+      english: "Compensation",
+      turkish: "Tazminat",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=17DBuLievLiAdO9EwL46P9ziHhBGQqSJa"),
+  Data(
+      english: "Competence",
+      turkish: "Ustalık",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Gmn-5mgzP1KFId6oOW6L3E6ikNukuIhH"),
+  Data(
+      english: "Competent",
+      turkish: "Usta",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1FvnCas1aXygW06rCco85zVZgJdEoKFKj"),
+  Data(
+      english: "Compile",
+      turkish: "Derlemek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1YnpmWaxLY3ixiqbbwWef61YjK4h0Cpy3"),
+  Data(
+      english: "Complement",
+      turkish: "Tamamlama",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1QYiEYwKTZKB9Ic_ANFNbmGhi_eC-TStE"),
+  Data(
+      english: "Completion",
+      turkish: "Bitme",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zrpi8E3dMv0G_i6t02BB-BMRSpza3unn"),
+  Data(
+      english: "Complexity",
+      turkish: "Karmaşıklık",
+      level: WordLevel.c2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1vYfaoH7BTjNKo9G0J--wuX_LccXoK7QN"),
+  Data(
+      english: "Compliance",
+      turkish: "Rıza",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1p5Em7uxgBlfMbeWRsiKjKvMw_5B9BwLU"),
+  Data(
+      english: "Complication",
+      turkish: "Zorluk",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1YD1YErX61SIU1_vAmWP0RrCZU2SQGeIJ"),
+  Data(
+      english: "Comply",
+      turkish: "Uymak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1-eFkGrRy5mhxkuxKdgqHWMT8ceb8OjyM"),
+  Data(
+      english: "Compose",
+      turkish: "Oluşturmak",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zB72GGBUr4Ne0fdNPWDUHa5XLCd6IWjt"),
+  Data(
+      english: "Composer",
+      turkish: "Besteci",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1YkBHe-olIOoVVSHVvzp6Tq3LVN3r98jW"),
+  Data(
+      english: "Composition",
+      turkish: "Beste",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1CFK0O515kFyTnZT-qAcuiuy7ojB5vQ5m"),
+  Data(
+      english: "Compound",
+      turkish: "Bileşim",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1FRce3ycAEqzFYMQvwuksLucjc_MCAr8e"),
+  Data(
+      english: "Comprehensive",
+      turkish: "Kapsamlı",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=19Fm8GQDfc6rpJB283-vkjlzpWF5mClcT"),
+
+  Data(
+      english: "Comprise",
+      turkish: "Meydana Gelmek",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1ecF_i1s2aukhufjeL4XY9oPemKDGtA7j"),
+  Data(
+      english: "Compromise",
+      turkish: "Uzlaşma",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1tlFiJQHxT2JHX8Xozxz-x9SFmiF0wU0C"),
+  Data(
+      english: "Compulsory",
+      turkish: "Zorunlu",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1PaRTrv7gMjxQdRDXmCCX_sW6Th5jOMEX"),
+  Data(
+      english: "Compute",
+      turkish: "Hesaplamak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1KI4DZM4pHVmOtnWbu0J_DjGNK0J7IQJH"),
+  Data(
+      english: "Conceal",
+      turkish: "Gizlemek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Ye68Ljer6cRiCo_7XWxSo4iT2ypc_BKB"),
+  Data(
+      english: "Concede",
+      turkish: "Kabul Etmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1uhyMtyxxq0aB2Asp9EmJnmkNA7SDcx1y"),
+  Data(
+      english: "Conceive",
+      turkish: "Gebe Kalmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=14fwxudDKq9ZjsgYdPlW4Yyp0Umtnkc9f"),
+  Data(
+      english: "Conception",
+      turkish: "Düşünce",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1i7MlABYnc76HmyDZgeGru_jMsCte-sEv"),
+  Data(
+      english: "Concession",
+      turkish: "Taviz",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1esmFppZ0NTgU9sy2kMB0Y2t3dB-ffji2"),
+  Data(
+      english: "Concrete",
+      turkish: "Beton",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1QyVEK7qHFzQFxFZUuFrZB9LoxLmzk7-k"),
+  Data(
+      english: "Concrete",
+      turkish: "Somut",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1QyVEK7qHFzQFxFZUuFrZB9LoxLmzk7-k"),
+  Data(
+      english: "Condemn",
+      turkish: "Kınamak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1GqNvrucAcLj3X3U6h8d9Sq2c_IEx3OYw"),
+  Data(
+      english: "Confer",
+      turkish: "Görüşmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1lSlYytOsVTOeU98y5t2HCuHy35CDO2Yb"),
+  Data(
+      english: "Confess",
+      turkish: "İtiraf Etmek",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1PP8hDLZa4XpkxOC6Csg4D39hPDcU4f9h"),
+  Data(
+      english: "Confession",
+      turkish: "İtiraf",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1FyxPyNWOJ6a733fLTqINd0FqBxJZqXje"),
+  Data(
+      english: "Configuration",
+      turkish: "Yapılandırma",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1TZXveBDo--OH1v5tRYlICU5YoTNKAL4C"),
+  Data(
+      english: "Confine",
+      turkish: "Sınırlamak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Ha3k5tDUx9bPQOjpYxs8vVAIYFIXe24G"),
+  Data(
+      english: "Confirmation",
+      turkish: "Doğrulama",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1d_2_fmtHAfZZeZsBJtWazMi35_7qUM5m"),
+  Data(
+      english: "Confront",
+      turkish: "Karşılaşmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1RqpJrAw52_dBvc7wffNjjpaZVR7cTPtx"),
+  Data(
+      english: "Confrontation",
+      turkish: "Tartışma",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zrPTIy52lv2YgEdSUfC-JIgaCUA0MpL8"),
+  Data(
+      english: "Confusion",
+      turkish: "Karışıklık",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=15yZxLlBXcYuD-P3EK2MZRnj4kH7JOj3c"),
+  Data(
+      english: "Congratulate",
+      turkish: "Tebrik Etmek",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1_pvqN1-8b25aJaTe0Bf0G4TC970TEwVI"),
+  Data(
+      english: "Congregation",
+      turkish: "Cemaat",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Ymnpr6Cw2ZTLSWldulxtblNTHxeYRbdS"),
+  Data(
+      english: "Conquer",
+      turkish: "Fethetmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1c1mw9Bxq9MBPxQHAUY_0rVDm-sJUrbYo"),
+  Data(
+      english: "Conscience",
+      turkish: "Vicdan",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zFseFrAWuj91dqv4oXO_DQRV8gLG5trA"),
+  Data(
+      english: "Consciousness",
+      turkish: "Bilinç",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=14q1h9vElWgen-BF6q0KlYoi2DMMvmX5b"),
+  Data(
+      english: "Consecutive",
+      turkish: "Ardışık",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1y2jQIyh0Yk_EBgAiyp22gVTwhNl16eJg"),
+  Data(
+      english: "Consensus",
+      turkish: "Uzlaşma",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1kh1lj8s93uEGybyGaTB0RB5fZdtNEp7R"),
+  Data(
+      english: "Consent",
+      turkish: "Razı Olmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1HAO6BozTVCZeZQ4_E8Fx9FyUTdmJOeqz"),
+  Data(
+      english: "Consequently",
+      turkish: "Bu Nedenle",
+      level: WordLevel.b2,
+      type: WordType.adverb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Fm-qmphQIffX42dS8beY02HzGP80VdCP"),
+  Data(
+      english: "Conservation",
+      turkish: "Koruma",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1BQSMXeoxtAO8y-owUqqE1QpDuL4WOOIz"),
+  Data(
+      english: "Conserve",
+      turkish: "Korumak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=12CIHnbEN6wPE_6tjKMwawpRWvOduIBG1"),
+  Data(
+      english: "Considerable",
+      turkish: "Önemli",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1hfb_UMgHalUixqXlM8ZqAwFGjwiClA-Z"),
+  Data(
+      english: "Considerably",
+      turkish: "Epeyce",
+      level: WordLevel.b2,
+      type: WordType.adverb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1az_TxxEGKYLddxYHBpnfNsK2frpZZT8b"),
+  Data(
+      english: "Consistency",
+      turkish: "Tutarlılık",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1VJ7kTE_BTQXBa2hY6gerZg_hcBiK1TBU"),
+  Data(
+      english: "Consistently",
+      turkish: "Sürekli Olarak",
+      level: WordLevel.c2,
+      type: WordType.adverb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1FOHe7ryu8qgbvfgFO5w3WskhDc5j7XYY"),
+  Data(
+      english: "Consolidate",
+      turkish: "Takviye Etmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1zevQBl5eqoF9ht9Gk6GIS8iewL_w4C-b"),
+  Data(
+      english: "Conspiracy",
+      turkish: "Komplo",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1rTL9M1xOcenAY7nWrcvwJd6TWtAOa6LV"),
+  Data(
+      english: "Constitute",
+      turkish: "Oluşturmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1-rKIotNRiUA_cgrkLMBnqnZnndpU11q9"),
+  Data(
+      english: "Constitution",
+      turkish: "Anayasa",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=176AGMCvghPUPM7YNkjHT3oS9XgAkZKHN"),
+  Data(
+      english: "Constitutional",
+      turkish: "Anayasal",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1-eP7Fm7lvXRDpTPX64MzBN2hym2QQDN6"),
+  Data(
+      english: "Constraint",
+      turkish: "Kısıtlama",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=133PnzCu5E8o1dnnD_ejAn_IxRsh0kPPA"),
+  Data(
+      english: "Consult",
+      turkish: "Danışmak",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=11qibIGE5TxoovfkwblKPxTIEPKcem2jV"),
+  Data(
+      english: "Consultant",
+      turkish: "Danışman",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1ekH1i4u0NiMFtt97oFrPeKX96PHDQPlN"),
+  Data(
+      english: "Consultation",
+      turkish: "Danışma",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=16LSztL75AY63_hKVvh2d4SJCgHhB-Wqi"),
+  Data(
+      english: "Consumption",
+      turkish: "Tüketim",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=13a_tW9wBRWEKkJ7A-elZ6P6QGxX6gOoy"),
+  Data(
+      english: "Contemplate",
+      turkish: "Düşünmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1z1miwThO4FpcWgjy2imhnPXOJBnOGn9I"),
+  Data(
+      english: "Contempt",
+      turkish: "Küçümseme",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1q4eewQjezcszZOAkj2TvMxVOFs4ZqIe2"),
+  Data(
+      english: "Contend",
+      turkish: "İddia Etmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1o6d1sWicMEqla3qxyaflwbODPxIbI5AQ"),
+  Data(
+      english: "Contender",
+      turkish: "Yarışmacı",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1f9SRK6IQ08zPDkAz4R0VHzb-wnwTc9Rd"),
+  Data(
+      english: "Content",
+      turkish: "İçerik",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1xQxTid5Kyo2OknAFHZTaRbPw9sZ27AKb"),
+  Data(
+      english: "Contention",
+      turkish: "Çekişme",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1MSp9F-wt7M45Qi0C82EttSWcUhi8zcCY"),
+  Data(
+      english: "Continually",
+      turkish: "Sürekli Olarak",
+      level: WordLevel.c1,
+      type: WordType.adverb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1G57p2xWiz2_stUyDy70AFVN4p81qdTL9"),
+  Data(
+      english: "Contractor",
+      turkish: "Müteahhit",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=13HbUjmJZDp42GEpBqYOMlzHFuWTEJePJ"),
+  Data(
+      english: "Contradiction",
+      turkish: "Çelişki",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1qCYN4wJ9Rd17Qe0c8y-0d5cnkHxtvyad"),
+  Data(
+      english: "Contrary",
+      turkish: "Zıt",
+      level: WordLevel.c1,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1evN3PccW7s9lrVvyArDZSX7WQ-jvHnZa"),
+  Data(
+      english: "Contrary",
+      turkish: "Aksine",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1evN3PccW7s9lrVvyArDZSX7WQ-jvHnZa"),
+  Data(
+      english: "Contributor",
+      turkish: "Destekçi",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Y4QHQjaD-brNc05v9gPETDMX2Nhtzo6c"),
+  Data(
+      english: "Controversial",
+      turkish: "Tartışmalı",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1eXquZ5dWVzx9Jh3yoG7VA5OyMKiZUgQc"),
+  Data(
+      english: "Controversy",
+      turkish: "Tartışma",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1coH7EsUG7jINutuZdQGT20el-LcEG4Vq"),
+  Data(
+      english: "Convenience",
+      turkish: "Kolaylık",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1AuRkdqRM4agifn-qg2kCHxrZoi-taV26"),
+  Data(
+      english: "Convention",
+      turkish: "Gelenek",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1nn5Xy1ICMtKYvlF3ukJ7gHJVX0TNT4SD"),
+  Data(
+      english: "Conventional",
+      turkish: "Geleneksel",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1bZsjAK4bBm4Uwr6kcIXH6zBtI82ebKbV"),
+  Data(
+      english: "Conversion",
+      turkish: "Dönüşüm",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1glUX2-DpE9JFJdLOm7rK2R0RZPtj29Gr"),
+  Data(
+      english: "Convey",
+      turkish: "Nakletmek",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1EHDJC8BkOXOQzWcWinyhNx29vCXfqSZY"),
+  Data(
+      english: "Convict",
+      turkish: "Suçlu Bulmak",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1tD-twmKQYRPBjPyNBqPaht_6J9su5h2b"),
+  Data(
+      english: "Convict",
+      turkish: "Suçlu",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1tD-twmKQYRPBjPyNBqPaht_6J9su5h2b"),
+  Data(
+      english: "Conviction",
+      turkish: "Mahkumiyet",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1RbwMM6gDPdvh26N23BvnkeUe6SPHX-Ta"),
+  Data(
+      english: "Convincing",
+      turkish: "İkna Edici",
+      level: WordLevel.b2,
+      type: WordType.adjective,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=15pc_v-RqUegDtRHs34b9l9mVxk5xibOm"),
+  Data(
+      english: "Cooperate",
+      turkish: "İşbirliği Yapmak",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1X2dMrh92NZdsebDshSrpkVymjCoO7EMT"),
+  Data(
+      english: "Cooperative",
+      turkish: "Ortak Çalışmak",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1EfRhbr6daV5lPN47JQptkWnkuj1AzIFI"),
+  Data(
+      english: "Coordinate",
+      turkish: "Koordine Etmek",
+      level: WordLevel.c1,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1xuDBC3Z_8zvd9n_apbsJV0eevwUYpKGN"),
+  Data(
+      english: "Coordination",
+      turkish: "Kordinasyon",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1XzCopKpAW7CZr7bzAKm38ms6-8D4iGQP"),
+  Data(
+      english: "Cop",
+      turkish: "Polis",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1ijub-xHVjF09OVVL-buLDJkTDOjfYlHw"),
+  Data(
+      english: "Cope",
+      turkish: "Başa Çıkmak",
+      level: WordLevel.b2,
+      type: WordType.verb,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=1Wzs4wgSNQFijfpiiYxxn0yDoPebYqihp"),
+  Data(
+      english: "Copper",
+      turkish: "Bakır",
+      level: WordLevel.b2,
+      type: WordType.noun,
+      mediaLink:
+          "https://drive.google.com/uc?export=download&id=19ZZ4lXEqzcaOVy8XzLSPlh3iPkJJpYqN"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
+  Data(
+      english: "EN",
+      turkish: "TR",
+      level: WordLevel.c1,
+      type: WordType.noun,
+      mediaLink: "https://"),
 ];
