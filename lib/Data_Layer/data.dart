@@ -1,3 +1,5 @@
+import 'package:hive_flutter/hive_flutter.dart';
+
 class Data {
   String english; //? ingilizce hali
   String turkish; //? turkce hali
@@ -14,6 +16,21 @@ class Data {
     required this.mediaLink,
     this.favType = WordFavType.nlearned,
   });
+}
+
+Future<void> fLoadData() async {
+  await Hive.initFlutter();
+  MainData.localData = await Hive.openBox("SuperFastBox");
+
+  if (MainData.localData!.get("isFirstOpen") == null) {
+    MainData.localData!.put("isFirstOpen", true);
+  }
+  MainData.isFirstOpen = MainData.localData!.get("isFirstOpen");
+}
+
+class MainData {
+  static Box? localData;
+  static bool? isFirstOpen = true;
 }
 
 enum WordLevel {

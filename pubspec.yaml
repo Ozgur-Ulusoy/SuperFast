@@ -43,6 +43,10 @@ dependencies:
   firebase_core: ^1.24.0
   lottie: ^1.4.2
   flutter_native_splash: ^2.1.6 
+  hive: ^2.2.3
+  google_fonts: ^3.0.1
+  material_design_icons_flutter: ^6.0.7096
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:
