@@ -1,8 +1,8 @@
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/widgets.dart';
+import 'package:engame2/Presentation_Layer/Screens/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class FirstOpenPage extends StatefulWidget {
   const FirstOpenPage({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
             child: Padding(
               padding: EdgeInsets.only(
                   top: ScreenUtil.height * 0.02,
-                  right: ScreenUtil.height * 0.02),
+                  right: ScreenUtil.width * 0.03),
               child: Align(
                 alignment: Alignment.topRight,
                 child: LogoWidget(w: ScreenUtil.height * 0.065),
@@ -41,38 +41,15 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
           SafeArea(
             child: Align(
               alignment: const Alignment(0.6, 0.825),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(100)),
-                ),
-                height: ScreenUtil.height * 0.125,
-                width: ScreenUtil.height * 0.125,
-                child: Padding(
-                  padding: const EdgeInsets.all(3.5),
-                  child: GestureDetector(
-                    onTap: () {
-                      //! Login Page Nagivate
-                    },
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color.fromRGBO(76, 81, 198, 1),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(100),
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: FittedBox(
-                          child: Icon(
-                            MdiIcons.arrowRight,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              child: GoArrowButton(
+                toDo: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return const LoginPage();
+                    }),
+                  );
+                },
               ),
             ),
           ),
