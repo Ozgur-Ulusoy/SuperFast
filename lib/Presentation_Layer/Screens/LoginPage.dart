@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
 import 'package:engame2/Data_Layer/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -114,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                       setState(() {
                         FirebaseAuth.instance
                             .signInAnonymously()
-                            .whenComplete(() {
+                            .whenComplete(() async {
                           if (FirebaseAuth.instance.currentUser != null) {
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);
@@ -142,13 +145,55 @@ class _LoginPageState extends State<LoginPage> {
             child: Align(
               alignment: const Alignment(0.6, 0.825),
               child: GoArrowButton(
-                toDo: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) {
-                  //     return const LoginPage();
-                  //   }),
-                  // );
+                toDo: () async {
+                  try {
+                    //
+                    String username = userNameController.text.trim();
+                    String password = passwordController.text.trim();
+
+                    if (userNameController.text.isEmpty) {
+                      print("Kullanıcı Adı Boş Olamaz");
+                    } else if (passwordController.text.isEmpty) {
+                      print("Şifre Boş Olamaz");
+                    } else {
+                      if (BlocProvider.of<LoginPageCubit>(context)
+                          .state
+                          .isSignInUsername) {
+                        var userRef = await FirebaseFirestore.instance
+                            .collection('Users')
+                            .where('username', isEqualTo: username)
+                            .get();
+
+                        if (userRef.size == 0) {
+                          print("Kullanıcı Bulunamadı");
+                          return;
+                        }
+
+                        await FirebaseAuth.instance
+                            .signInWithEmailAndPassword(
+                                email: userRef.docs[0]['email'],
+                                password: password)
+                            .whenComplete(() {
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/homePage', (Route<dynamic> route) => false);
+                            saveSkipFirstOpen();
+                            print("giris yapildi");
+                          }
+                        });
+                      } else {
+                        FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: username, password: password);
+                      }
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    print(e.code);
+                    if (e.code == "wrong-password") {
+                      print("Şifre Hatalı");
+                    } else {
+                      print("Hata !");
+                    }
+                  }
                 },
               ),
             ),
@@ -176,13 +221,17 @@ class _LoginPageState extends State<LoginPage> {
                     height: ScreenUtil.height * 0.02,
                   ),
                   Flexible(
-                    child: Text(
-                      "  Kullanıcı adı",
-                      style: GoogleFonts.poppins(
-                        fontSize: ScreenUtil.textScaleFactor * 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: BlocBuilder<LoginPageCubit, LoginPageState>(
+                      builder: (context, state) {
+                        return Text(
+                          state.signInKey,
+                          style: GoogleFonts.poppins(
+                            fontSize: ScreenUtil.textScaleFactor * 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   Padding(
@@ -197,17 +246,24 @@ class _LoginPageState extends State<LoginPage> {
                             width: 2,
                             color: const Color.fromRGBO(96, 127, 242, 1)),
                       ),
-                      child: TextField(
-                        controller: userNameController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.only(
-                              left: 15, bottom: 11, top: 11, right: 15),
-                        ),
+                      child: BlocBuilder<LoginPageCubit, LoginPageState>(
+                        builder: (context, state) {
+                          return TextField(
+                            keyboardType: state.isSignInUsername == true
+                                ? TextInputType.name
+                                : TextInputType.emailAddress,
+                            controller: userNameController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                  left: 15, bottom: 11, top: 11, right: 15),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -256,45 +312,54 @@ class _LoginPageState extends State<LoginPage> {
                       GestureDetector(
                         onTap: () {
                           //!
+                          BlocProvider.of<LoginPageCubit>(context)
+                              .ChangeSignInMethod();
                         },
-                        child: Container(
-                          width: ScreenUtil.width * 0.4,
-                          height: ScreenUtil.height * 0.05,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 2,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                const Expanded(
-                                  child: Image(
-                                      image: AssetImage(
-                                          "assets/images/d89d897deab62ea991727abe5e8f963e.png")),
+                        child: BlocBuilder<LoginPageCubit, LoginPageState>(
+                          builder: (context, state) {
+                            return Container(
+                              width: ScreenUtil.width * 0.4,
+                              height: ScreenUtil.height * 0.05,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
                                 ),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  flex: 4,
-                                  child: FittedBox(
-                                    child: Text(
-                                      "Mail ile kayıt ol",
-                                      style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Expanded(
+                                      child: Image(
+                                          image: AssetImage(
+                                              "assets/images/d89d897deab62ea991727abe5e8f963e.png")),
                                     ),
-                                  ),
+                                    const SizedBox(width: 5),
+                                    Expanded(
+                                      flex: 4,
+                                      child: FittedBox(
+                                        child: Text(
+                                          state.isSignInUsername
+                                              ? "Mail ile giriş"
+                                              : "Kullanıcı adı ile giriş",
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       GestureDetector(
@@ -332,7 +397,7 @@ class _LoginPageState extends State<LoginPage> {
                                   flex: 4,
                                   child: FittedBox(
                                     child: Text(
-                                      "Google ile kayıt ol",
+                                      "Google ile giriş",
                                       style: GoogleFonts.poppins(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold),

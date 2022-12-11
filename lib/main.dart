@@ -1,3 +1,4 @@
+import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
@@ -41,6 +42,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => TimerCubit(),
         ),
+
+        BlocProvider(create: (context) => LoginPageCubit())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
