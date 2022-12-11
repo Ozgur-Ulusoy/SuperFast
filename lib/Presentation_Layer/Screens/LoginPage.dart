@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../Data_Layer/consts.dart';
+import '../../Data_Layer/data.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -33,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // Once signed in, return the UserCredential
       await FirebaseAuth.instance.signInWithCredential(credential);
+      saveSkipFirstOpen();
     }
   }
 
@@ -108,7 +110,18 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      //!
+                      //! Anonymous Giriş
+                      setState(() {
+                        FirebaseAuth.instance
+                            .signInAnonymously()
+                            .whenComplete(() {
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/homePage', (Route<dynamic> route) => false);
+                            saveSkipFirstOpen();
+                          }
+                        });
+                      });
                     },
                     child: Text(
                       "Kayıt olmadan devam et",
@@ -130,12 +143,12 @@ class _LoginPageState extends State<LoginPage> {
               alignment: const Alignment(0.6, 0.825),
               child: GoArrowButton(
                 toDo: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return const LoginPage();
-                    }),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) {
+                  //     return const LoginPage();
+                  //   }),
+                  // );
                 },
               ),
             ),
@@ -148,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(
-                    flex: 1,
+                    flex: 3,
                   ),
                   Text(
                     "Login",
@@ -158,6 +171,9 @@ class _LoginPageState extends State<LoginPage> {
                       fontSize: ScreenUtil.textScaleFactor * 48,
                       letterSpacing: ScreenUtil.textScaleFactor * 4,
                     ),
+                  ),
+                  SizedBox(
+                    height: ScreenUtil.height * 0.02,
                   ),
                   Flexible(
                     child: Text(
@@ -172,6 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.only(right: ScreenUtil.width * 0.05),
                     child: Container(
+                      height: ScreenUtil.height * 0.085,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius:
@@ -194,10 +211,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(),
+                  // const SizedBox(),
+                  const Spacer(),
                   Padding(
                     padding: EdgeInsets.only(right: ScreenUtil.width * 0.05),
                     child: Container(
+                      height: ScreenUtil.height * 0.085,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius:
@@ -229,7 +248,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(),
+                  // const SizedBox(),
+                  const Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -328,7 +348,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   const Spacer(
-                    flex: 3,
+                    flex: 8,
                   ),
                 ],
               ),

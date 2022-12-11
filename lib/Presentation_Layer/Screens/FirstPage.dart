@@ -1,6 +1,5 @@
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/widgets.dart';
-import 'package:engame2/Presentation_Layer/Screens/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -43,11 +42,9 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
               alignment: const Alignment(0.6, 0.825),
               child: GoArrowButton(
                 toDo: () {
-                  Navigator.push(
+                  Navigator.pushNamed(
                     context,
-                    MaterialPageRoute(builder: (context) {
-                      return const LoginPage();
-                    }),
+                    '/loginPage',
                   );
                 },
               ),

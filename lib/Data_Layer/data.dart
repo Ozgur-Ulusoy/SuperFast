@@ -28,6 +28,11 @@ Future<void> fLoadData() async {
   MainData.isFirstOpen = MainData.localData!.get("isFirstOpen");
 }
 
+Future<void> saveSkipFirstOpen() async {
+  MainData.localData!.put("isFirstOpen", false);
+  MainData.isFirstOpen = false;
+}
+
 class MainData {
   static Box? localData;
   static bool? isFirstOpen = true;

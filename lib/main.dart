@@ -8,6 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'Business_Layer/cubit/answer_cubit.dart';
 import 'Business_Layer/cubit/question_cubit.dart';
 import 'Business_Layer/cubit/timer_cubit.dart';
+import 'Presentation_Layer/Screens/FirstPage.dart';
+import 'Presentation_Layer/Screens/HomePage.dart';
+import 'Presentation_Layer/Screens/LoginPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,11 +44,19 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo', //!
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MainPage(),
+        title: 'SuperFast', //!
+        // theme: ThemeData(
+        //   primarySwatch: Colors.blue,
+        // ),
+        // home: const MainPage(),
+        initialRoute: '/',
+        routes: {
+          // When navigating to the "/" route, build the FirstScreen widget.
+          '/': (context) => const MainPage(),
+          '/firstOpenPage': (context) => const FirstOpenPage(),
+          '/loginPage': (context) => const LoginPage(),
+          '/homePage': (context) => const HomePage(),
+        },
       ),
     );
   }

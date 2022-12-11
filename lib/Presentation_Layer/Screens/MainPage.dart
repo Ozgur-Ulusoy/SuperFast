@@ -14,41 +14,35 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  // FirebaseAuth mAuth = FirebaseAuth.instance;
-  // User? currentUser;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // BlocProvider.of<UserCubit>(context).();
-    // currentUser = mAuth.currentUser;
-  }
-
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
-    return MainData.isFirstOpen == true
-        ? const FirstOpenPage()
-        : Scaffold(
-            body: StreamBuilder(
-              stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasData) {
-                  return const HomePage();
-                } else if (snapshot.hasError) {
-                  return const Center(
-                    child: Center(child: Text("Error !")),
-                  );
-                } else {
-                  return const LoginPage();
-                }
-              },
-            ),
-          );
+    return FirebaseAuth.instance.currentUser != null
+        ? const HomePage()
+        : MainData.isFirstOpen == true
+            ? const FirstOpenPage()
+            : const LoginPage();
+    // Scaffold(
+    //   body: StreamBuilder(
+    //     stream: FirebaseAuth.instance.authStateChanges(),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.waiting) {
+    //         return const Center(
+    //           child: CircularProgressIndicator(),
+    //         );
+    //       } else if (snapshot.hasData) {
+    //         return const HomePage();
+    //       } else if (snapshot.hasError) {
+    //         return const Center(
+    //           child: Center(child: Text("Error !")),
+    //         );
+    //       } else {
+    //         return MainData.isFirstOpen == true
+    //             ? const FirstOpenPage()
+    //             : const LoginPage();
+    //       }
+    //     },
+    //   ),
+    // );
   }
 }
