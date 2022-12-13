@@ -55,48 +55,115 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(233, 244, 255, 1),
+      backgroundColor: cBackgroundColor,
       resizeToAvoidBottomInset: false,
       // backgroundColor: cBackgroundColor,
       body: Stack(
         children: [
           Container(
-            height: ScreenUtil.height,
             width: ScreenUtil.width,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                image: AssetImage("assets/images/Login.png"),
-              ),
-            ),
+            height: MediaQuery.of(context).padding.top,
+            alignment: Alignment.topCenter,
+            color: cBlueBackground,
           ),
           SafeArea(
-            child: Container(
-              height: ScreenUtil.height,
-              width: ScreenUtil.width,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: AssetImage("assets/images/Login.png"),
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: const Alignment(-0.975, 0.935),
-              child: GestureDetector(
-                onTap: () {
-                  //TODO
-                },
-                child: Text(
-                  "Register",
-                  style: GoogleFonts.fredoka(
-                    fontSize: ScreenUtil.textScaleFactor * 29,
-                    fontWeight: FontWeight.w500,
-                    color: const Color.fromRGBO(76, 81, 198, 1),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    color: cBlueBackground,
                   ),
                 ),
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cBlueBackground,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(1500),
+                      ),
+                    ),
+                  ),
+                ),
+                const Expanded(flex: 2, child: SizedBox()),
+              ],
+            ),
+          ),
+          // Container(
+          //   height: ScreenUtil.height,
+          //   width: ScreenUtil.width,
+          //   decoration: const BoxDecoration(
+          //     image: DecorationImage(
+          //       fit: BoxFit.fill,
+          //       image: AssetImage("assets/images/Login.png"),
+          //     ),
+          //   ),
+          // ),
+          // SafeArea(
+          //   child: Container(
+          //     height: ScreenUtil.height,
+          //     width: ScreenUtil.width,
+          //     decoration: const BoxDecoration(
+          //       image: DecorationImage(
+          //         fit: BoxFit.fill,
+          //         image: AssetImage("assets/images/Login.png"),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          SafeArea(
+            child: Align(
+              alignment: const Alignment(-1, 1),
+              child: Stack(
+                alignment: Alignment.bottomLeft,
+                children: [
+                  Container(
+                    width: ScreenUtil.width * 0.32,
+                    height: ScreenUtil.width * 0.29,
+                    decoration: const BoxDecoration(
+                      // color: Color.fromRGBO(233, 244, 255, 1),
+                      color: Color.fromRGBO(76, 81, 198, 1),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(100),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      //
+                      Navigator.pushNamed(context, '/registerPage');
+                    },
+                    child: Container(
+                      width: ScreenUtil.width * 0.3085,
+                      height: ScreenUtil.width * 0.275,
+                      decoration: const BoxDecoration(
+                        // color: Color.fromRGBO(233, 244, 255, 1),
+                        color: Color.fromRGBO(233, 244, 255, 1),
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(100),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: ScreenUtil.height * 0.02,
+                          right: ScreenUtil.width * 0.02,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Register",
+                            style: GoogleFonts.fredoka(
+                              color: const Color.fromRGBO(76, 81, 198, 1),
+                              fontSize: ScreenUtil.textScaleFactor * 26,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -248,19 +315,21 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: BlocBuilder<LoginPageCubit, LoginPageState>(
                         builder: (context, state) {
-                          return TextField(
-                            keyboardType: state.isSignInUsername == true
-                                ? TextInputType.name
-                                : TextInputType.emailAddress,
-                            controller: userNameController,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                  left: 15, bottom: 11, top: 11, right: 15),
+                          return Center(
+                            child: TextField(
+                              keyboardType: state.isSignInUsername == true
+                                  ? TextInputType.name
+                                  : TextInputType.emailAddress,
+                              controller: userNameController,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                    left: 15, bottom: 11, top: 11, right: 15),
+                              ),
                             ),
                           );
                         },
@@ -281,25 +350,27 @@ class _LoginPageState extends State<LoginPage> {
                             width: 2,
                             color: const Color.fromRGBO(96, 127, 242, 1)),
                       ),
-                      child: TextField(
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          hintText: "Kullanıcı Şifresi",
-                          hintStyle: GoogleFonts.poppins(
-                            fontSize: ScreenUtil.textScaleFactor * 18,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: ScreenUtil.textScaleFactor * 1.5,
+                      child: Center(
+                        child: TextField(
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          controller: passwordController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            hintText: "Kullanıcı Şifresi",
+                            hintStyle: GoogleFonts.poppins(
+                              fontSize: ScreenUtil.textScaleFactor * 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: ScreenUtil.textScaleFactor * 1.5,
+                            ),
+                            contentPadding: const EdgeInsets.only(
+                                left: 15, bottom: 11, top: 11, right: 15),
                           ),
-                          contentPadding: const EdgeInsets.only(
-                              left: 15, bottom: 11, top: 11, right: 15),
                         ),
                       ),
                     ),
@@ -423,4 +494,21 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+}
+
+class TriangleClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    // path.moveTo(size.width, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    // path.addArc(Rect.largest, 15, 45);
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(TriangleClipper oldClipper) => true;
 }

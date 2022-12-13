@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-Color cBackgroundColor = const Color.fromARGB(255, 230, 221, 221);
+Color cBackgroundColor = const Color.fromRGBO(233, 244, 255, 1);
+Color cBlueBackground = const Color.fromRGBO(76, 81, 198, 1);
 
 class ScreenUtil {
   static double height = 1920;
