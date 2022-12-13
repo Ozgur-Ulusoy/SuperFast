@@ -91,28 +91,6 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
-          // Container(
-          //   height: ScreenUtil.height,
-          //   width: ScreenUtil.width,
-          //   decoration: const BoxDecoration(
-          //     image: DecorationImage(
-          //       fit: BoxFit.fill,
-          //       image: AssetImage("assets/images/Login.png"),
-          //     ),
-          //   ),
-          // ),
-          // SafeArea(
-          //   child: Container(
-          //     height: ScreenUtil.height,
-          //     width: ScreenUtil.width,
-          //     decoration: const BoxDecoration(
-          //       image: DecorationImage(
-          //         fit: BoxFit.fill,
-          //         image: AssetImage("assets/images/Login.png"),
-          //       ),
-          //     ),
-          //   ),
-          // ),
           SafeArea(
             child: Align(
               alignment: const Alignment(-1, 1),
@@ -121,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Container(
                     width: ScreenUtil.width * 0.32,
-                    height: ScreenUtil.width * 0.29,
+                    height: ScreenUtil.width * 0.25,
                     decoration: const BoxDecoration(
                       // color: Color.fromRGBO(233, 244, 255, 1),
                       color: Color.fromRGBO(76, 81, 198, 1),
@@ -136,8 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.pushNamed(context, '/registerPage');
                     },
                     child: Container(
-                      width: ScreenUtil.width * 0.3085,
-                      height: ScreenUtil.width * 0.275,
+                      width: ScreenUtil.width * 0.3075,
+                      height: ScreenUtil.width * 0.2375,
                       decoration: const BoxDecoration(
                         // color: Color.fromRGBO(233, 244, 255, 1),
                         color: Color.fromRGBO(233, 244, 255, 1),
@@ -147,8 +125,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.only(
-                          top: ScreenUtil.height * 0.02,
-                          right: ScreenUtil.width * 0.02,
+                          // top: ScreenUtil.height * 0.02,
+                          right: ScreenUtil.width * 0.035,
                         ),
                         child: Center(
                           child: Text(
