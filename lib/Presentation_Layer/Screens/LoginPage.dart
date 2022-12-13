@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                       setState(() {
                         FirebaseAuth.instance
                             .signInAnonymously()
-                            .whenComplete(() async {
+                            .whenComplete(() {
                           if (FirebaseAuth.instance.currentUser != null) {
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);

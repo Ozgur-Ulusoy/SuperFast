@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Data_Layer/consts.dart';
+import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Data_Layer/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,18 @@ class _RegisterPageState extends State<RegisterPage> {
                   .set({
                 'username': usernameController.text.trim(),
                 'email': value.user!.email,
-              }));
+              }))
+          .whenComplete(
+        () {
+          //TODO
+          //! Ana Sayfaya Git
+          if (FirebaseAuth.instance.currentUser != null) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/homePage', (Route<dynamic> route) => false);
+            saveSkipFirstOpen();
+          }
+        },
+      );
     } on FirebaseAuthException catch (e) {
       print(e);
     }
