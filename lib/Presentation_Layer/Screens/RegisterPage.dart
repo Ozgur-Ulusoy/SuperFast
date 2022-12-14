@@ -71,20 +71,23 @@ class _RegisterPageState extends State<RegisterPage> {
                   flex: 8,
                   child: RotatedBox(
                     quarterTurns: 2,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: cBlueBackground,
-                          // border: Border.all(
-                          //   color: cBlueBackground,
-                          // ),
-                          border: Border.all(
-                            width: 0,
+                    child: ClipPath(
+                      clipper: TriangleClipper(),
+                      child: Container(
+                        decoration: BoxDecoration(
                             color: cBlueBackground,
-                          )
-                          // borderRadius: const BorderRadius.only(
-                          //   bottomLeft: Radius.circular(1500),
-                          // ),
-                          ),
+                            // border: Border.all(
+                            //   color: cBlueBackground,
+                            // ),
+                            border: Border.all(
+                              width: 0,
+                              color: cBlueBackground,
+                            )
+                            // borderRadius: const BorderRadius.only(
+                            //   bottomLeft: Radius.circular(1500),
+                            // ),
+                            ),
+                      ),
                     ),
                   ),
                 ),
