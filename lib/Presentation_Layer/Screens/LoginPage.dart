@@ -71,23 +71,36 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 6,
-                  child: Container(
-                    color: cBlueBackground,
-                  ),
-                ),
-                Expanded(
-                  flex: 6,
+                  flex: 14,
                   child: Container(
                     decoration: BoxDecoration(
                       color: cBlueBackground,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(1500),
+                      border: Border.all(
+                        width: 0,
+                        color: cBlueBackground,
                       ),
                     ),
                   ),
                 ),
-                const Expanded(flex: 2, child: SizedBox()),
+                Expanded(
+                  flex: 7,
+                  child: ClipPath(
+                    clipper: TriangleClipper(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cBlueBackground,
+                        border: Border.all(
+                          width: 0,
+                          color: cBlueBackground,
+                        ),
+                        // borderRadius: const BorderRadius.only(
+                        //   bottomLeft: Radius.circular(1500),
+                        // ),
+                      ),
+                    ),
+                  ),
+                ),
+                const Expanded(flex: 3, child: SizedBox()),
               ],
             ),
           ),
@@ -188,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           SafeArea(
             child: Align(
-              alignment: const Alignment(0.6, 0.825),
+              alignment: const Alignment(0.5, 0.67),
               child: GoArrowButton(
                 toDo: () async {
                   try {
@@ -462,7 +475,7 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                   const Spacer(
-                    flex: 8,
+                    flex: 10,
                   ),
                 ],
               ),
@@ -472,21 +485,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-class TriangleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    // path.moveTo(size.width, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    // path.addArc(Rect.largest, 15, 45);
-
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(TriangleClipper oldClipper) => true;
 }

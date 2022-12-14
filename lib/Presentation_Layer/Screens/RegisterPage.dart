@@ -65,24 +65,46 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Expanded(flex: 5, child: SizedBox()),
+                const Expanded(flex: 6, child: SizedBox()),
                 Expanded(
                   flex: 8,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: cBlueBackground,
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(1500),
-                      ),
+                  child: RotatedBox(
+                    quarterTurns: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: cBlueBackground,
+                          // border: Border.all(
+                          //   color: cBlueBackground,
+                          // ),
+                          border: Border.all(
+                            width: 0,
+                            color: cBlueBackground,
+                          )
+                          // borderRadius: const BorderRadius.only(
+                          //   bottomLeft: Radius.circular(1500),
+                          // ),
+                          ),
                     ),
                   ),
                 ),
+                // Container(
+                //   height: 50,
+                //   decoration: BoxDecoration(
+                //       color: cBlueBackground,
+                //       border: Border.all(
+                //         color: cBlueBackground,
+                //       )),
+                // ),
                 Expanded(
-                  flex: 6,
+                  flex: 12,
                   child: Container(
-                    color: cBlueBackground,
+                    decoration: BoxDecoration(
+                        color: cBlueBackground,
+                        border: Border.all(
+                          width: 0,
+                          color: cBlueBackground,
+                        )),
                   ),
                 ),
               ],
@@ -189,7 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
           // ),
           SafeArea(
             child: Align(
-              alignment: const Alignment(-0.4, -0.5),
+              alignment: const Alignment(-0.4, -0.40),
               child: GoArrowButton(
                 toDo: () async {
                   await singUp();
@@ -208,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Expanded(flex: 26, child: SizedBox()),
+                  const Expanded(flex: 30, child: SizedBox()),
                   Row(
                     children: [
                       Flexible(
@@ -223,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
 
-                  const Expanded(flex: 2, child: SizedBox()),
+                  Expanded(flex: 2, child: Container()),
 
                   Row(
                     children: [

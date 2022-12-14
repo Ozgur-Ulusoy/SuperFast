@@ -28,9 +28,14 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 6,
+                  flex: 14,
                   child: Container(
-                    color: cBlueBackground,
+                    decoration: BoxDecoration(
+                        color: cBlueBackground,
+                        border: Border.all(
+                          width: 0,
+                          color: cBlueBackground,
+                        )),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -48,18 +53,25 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
                   ),
                 ),
                 Expanded(
-                  flex: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: cBlueBackground,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(1500),
+                  flex: 7,
+                  child: ClipPath(
+                    clipper: TriangleClipper(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: cBlueBackground,
+                        border: Border.all(
+                          width: 0,
+                          color: cBlueBackground,
+                        ),
+                        // borderRadius: const BorderRadius.only(
+                        //   bottomLeft: Radius.circular(1500),
+                        // ),
                       ),
                     ),
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -150,7 +162,7 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
 
           SafeArea(
             child: Align(
-              alignment: const Alignment(0.6, 0.825),
+              alignment: const Alignment(0.5, 0.67),
               child: GoArrowButton(
                 toDo: () {
                   Navigator.pushNamed(
