@@ -24,14 +24,15 @@ class _RegisterPageState extends State<RegisterPage> {
           .createUserWithEmailAndPassword(
               email: emailController.text.trim(),
               password: passwordController.text.trim())
-          .then((value) => FirebaseFirestore.instance
-                  .collection("Users")
-                  .doc(value.credential.toString())
-                  .set({
-                'username': usernameController.text.trim(),
-                'email': value.user!.email,
-              }))
-          .whenComplete(
+          .then((value) {
+        return FirebaseFirestore.instance
+            .collection("Users")
+            .doc(value.user!.uid)
+            .set({
+          'username': usernameController.text.trim(),
+          'email': value.user!.email,
+        });
+      }).whenComplete(
         () {
           //TODO
           //! Ana Sayfaya Git
