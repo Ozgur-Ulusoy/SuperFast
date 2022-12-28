@@ -41,3 +41,8 @@ class ScreenUtil {
     // print(width);
   }
 }
+
+enum WordSelectedStateEnums {
+  learnedWordState,
+  notLearnedWordState,
+}

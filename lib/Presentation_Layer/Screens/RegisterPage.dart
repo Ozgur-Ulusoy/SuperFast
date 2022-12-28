@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
-import 'package:engame2/Data_Layer/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../Widgets/GoArrowButtonWidget.dart';
+import '../Widgets/LogoWidget.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -18,12 +20,10 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-  Future singUp() async {
+  Future singUpWithEmail(String email, String password) async {
     try {
       await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim())
+          .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) {
         return FirebaseFirestore.instance
             .collection("Users")
@@ -31,15 +31,18 @@ class _RegisterPageState extends State<RegisterPage> {
             .set({
           'username': usernameController.text.trim(),
           'email': value.user!.email,
+          'favList': "",
+          'learnedList': "",
         });
       }).whenComplete(
         () {
           //TODO
           //! Ana Sayfaya Git
           if (FirebaseAuth.instance.currentUser != null) {
+            saveSkipFirstOpen(
+                haveUsername: true, username: usernameController.text.trim());
             Navigator.of(context).pushNamedAndRemoveUntil(
                 '/homePage', (Route<dynamic> route) => false);
-            saveSkipFirstOpen();
           }
         },
       );
@@ -218,7 +221,8 @@ class _RegisterPageState extends State<RegisterPage> {
               alignment: const Alignment(-0.4, -0.40),
               child: GoArrowButton(
                 toDo: () async {
-                  await singUp();
+                  await singUpWithEmail(emailController.text.trim(),
+                      passwordController.text.trim());
                   // Navigator.pushNamed(
                   //   context,
                   //   '/loginPage',

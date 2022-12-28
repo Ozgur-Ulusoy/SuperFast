@@ -1,7 +1,10 @@
 import 'package:engame2/Data_Layer/consts.dart';
-import 'package:engame2/Data_Layer/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../Widgets/GoArrowButtonWidget.dart';
+import '../Widgets/LogoWidget.dart';
 
 class FirstOpenPage extends StatefulWidget {
   const FirstOpenPage({Key? key}) : super(key: key);
@@ -23,6 +26,7 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
             alignment: Alignment.topCenter,
             color: cBlueBackground,
           ),
+
           SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -70,26 +74,31 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: ScreenUtil.width * 0.4,
-                        alignment: Alignment.bottomLeft,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              "assets/images/Group 7.png",
-                            ),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const Expanded(flex: 3, child: SizedBox()),
+                // Expanded(
+                //   flex: 3,
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: [
+                //       Container(
+                //         width: ScreenUtil.width * 0.3,
+                //         alignment: Alignment.bottomLeft,
+                //         // decoration: const BoxDecoration(
+                //         //   image: DecorationImage(
+                //         //     image: AssetImage(
+                //         //       "assets/images/Group 7.svg",
+                //         //     ),
+                //         //     fit: BoxFit.contain,
+                //         //   ),
+                //         // ),
+                //         child: SvgPicture.asset(
+                //           "assets/images/Group 7.svg",
+                //           fit: BoxFit.contain,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -159,6 +168,23 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
           //     ),
           //   ),
           // ),
+
+          Container(
+            width: ScreenUtil.width * 0.3,
+            alignment: const Alignment(1, 1.08),
+            // decoration: const BoxDecoration(
+            //   image: DecorationImage(
+            //     image: AssetImage(
+            //       "assets/images/Group 7.svg",
+            //     ),
+            //     fit: BoxFit.contain,
+            //   ),
+            // ),
+            child: SvgPicture.asset(
+              "assets/images/Group 7.svg",
+              fit: BoxFit.contain,
+            ),
+          ),
 
           SafeArea(
             child: Align(

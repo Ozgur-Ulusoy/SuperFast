@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
-import 'package:engame2/Data_Layer/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +8,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../Data_Layer/consts.dart';
 import '../../Data_Layer/data.dart';
+import '../Widgets/GoArrowButtonWidget.dart';
+import '../Widgets/LogoWidget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -35,9 +36,28 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
+      print(credential);
+      print("ilk");
+
       // Once signed in, return the UserCredential
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      saveSkipFirstOpen();
+      var result = await FirebaseAuth.instance
+          .signInWithCredential(credential)
+          .whenComplete(() {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/homePage', (Route<dynamic> route) => false);
+        saveSkipFirstOpen();
+      });
+
+      if (result.additionalUserInfo!.isNewUser) {
+        print("yeni giris");
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'favList': "",
+          'learnedList': "",
+        });
+      }
     }
   }
 
@@ -177,9 +197,9 @@ class _LoginPageState extends State<LoginPage> {
                             .signInAnonymously()
                             .whenComplete(() {
                           if (FirebaseAuth.instance.currentUser != null) {
+                            saveSkipFirstOpen();
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);
-                            saveSkipFirstOpen();
                           }
                         });
                       });
@@ -233,9 +253,12 @@ class _LoginPageState extends State<LoginPage> {
                                 password: password)
                             .whenComplete(() {
                           if (FirebaseAuth.instance.currentUser != null) {
+                            saveSkipFirstOpen(
+                                haveUsername: true,
+                                username: userNameController.text.trim());
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);
-                            saveSkipFirstOpen();
+
                             print("giris yapildi");
                           }
                         });

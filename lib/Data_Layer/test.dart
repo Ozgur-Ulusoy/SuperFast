@@ -47,7 +47,7 @@ void testDebug() {
 
   //*
   int learnedCount = 0;
-  int learningCount = 0;
+  int favoriteCount = 0;
   int nLearnedCount = 0;
 
   for (var element in questionData) {
@@ -102,8 +102,8 @@ void testDebug() {
       case WordFavType.learned:
         learnedCount++;
         break;
-      case WordFavType.learning:
-        learningCount++;
+      case WordFavType.favorite:
+        favoriteCount++;
         break;
       case WordFavType.nlearned:
         nLearnedCount++;
@@ -117,9 +117,10 @@ void testDebug() {
   print("  ______User Info______");
   try {
     print("""
-        User Display Name = ${FirebaseAuth.instance.currentUser!.displayName}
-        User Email = ${FirebaseAuth.instance.currentUser!.email}
-        User Photo Url = ${FirebaseAuth.instance.currentUser!.photoURL}
+User Display Name = ${FirebaseAuth.instance.currentUser!.displayName}
+User Email = ${FirebaseAuth.instance.currentUser!.email}
+User UID = ${FirebaseAuth.instance.currentUser!.uid}
+User Photo Url = ${FirebaseAuth.instance.currentUser!.photoURL}
         """);
     // print("User Email = ${FirebaseAuth.instance.currentUser!.email}");
     // print("User Photo Url = ${FirebaseAuth.instance.currentUser!.photoURL}");
@@ -128,14 +129,21 @@ void testDebug() {
   }
 
   print("""
+  _____Local-Database______
+  Is First Open = ${MainData.isFirstOpen}
+  Fav List = ${MainData.favList}
+  Is Fav List Changed = ${MainData.isFavListChanged}
+  User UID = ${MainData.userUID}
+  Username = ${MainData.username}
   
+
   ______GameModes Info______
   Total Word Length = ${questionData.length}
   Wordle Word Length = $wordleWordCount
 
   ______Word Fav Types______
   Learned Words = $learnedCount
-  Learning Words = $learningCount
+  Favorite Words = $favoriteCount
   Not Learned Words = $nLearnedCount
 
   ______Word Types______
