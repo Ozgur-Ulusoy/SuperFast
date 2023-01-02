@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
+import 'package:engame2/Data_Layer/Extensions/stringExtension.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -71,28 +72,27 @@ class QuestionCubit extends Cubit<QuestionState> {
   ];
   //* türkçe ve ingilizce alfabe
 
-  //* Türkçe kelimeleri türkçede Büyük harfe çevirir
-  String ToUpperTurkish(String a) {
-    String res = a;
-    for (var i = 0; i < res.length; i++) {
-      if (res[i] == "i") {
-        res = res.replaceRange(i, i + 1, "İ");
-      } else if (res[i] == "ç") {
-        res = res.replaceRange(i, i + 1, "Ç");
-      } else if (res[i] == "ö") {
-        res = res.replaceRange(i, i + 1, "Ö");
-      } else if (res[i] == "ş") {
-        res = res.replaceRange(i, i + 1, "Ş");
-      } else if (res[i] == "ü") {
-        res = res.replaceRange(i, i + 1, "Ü");
-      } else if (res[i] == "ğ") {
-        res = res.replaceRange(i, i + 1, "Ğ");
-      } else {
-        res = res.replaceRange(i, i + 1, res[i].toUpperCase());
-      }
-    }
-    return res;
-  }
+  // String ToUpperTurkish(String a) {
+  //   String res = a;
+  //   for (var i = 0; i < res.length; i++) {
+  //     if (res[i] == "i") {
+  //       res = res.replaceRange(i, i + 1, "İ");
+  //     } else if (res[i] == "ç") {
+  //       res = res.replaceRange(i, i + 1, "Ç");
+  //     } else if (res[i] == "ö") {
+  //       res = res.replaceRange(i, i + 1, "Ö");
+  //     } else if (res[i] == "ş") {
+  //       res = res.replaceRange(i, i + 1, "Ş");
+  //     } else if (res[i] == "ü") {
+  //       res = res.replaceRange(i, i + 1, "Ü");
+  //     } else if (res[i] == "ğ") {
+  //       res = res.replaceRange(i, i + 1, "Ğ");
+  //     } else {
+  //       res = res.replaceRange(i, i + 1, res[i].toUpperCase());
+  //     }
+  //   }
+  //   return res;
+  // }
 
   //* Sorulan soruyu değiştirir - oyun başladığında ve doğru cevap verildiğinde çağrılır
   void ChangeQuestion({QuestionType type = QuestionType.turkish}) {
@@ -107,7 +107,7 @@ class QuestionCubit extends Cubit<QuestionState> {
             .elementAt(random)
             .english; //* result of generated random question
     result = type == QuestionType.english
-        ? ToUpperTurkish(result)
+        ? result.ToUpperTurkish()
         : result.toUpperCase();
 
     String question = type == QuestionType.english
@@ -117,7 +117,7 @@ class QuestionCubit extends Cubit<QuestionState> {
             .turkish; //* question of generated random question
     question = type == QuestionType.english
         ? question.toUpperCase()
-        : ToUpperTurkish(question);
+        : question.ToUpperTurkish();
 
     List<String> resultList = <String>[]; //* result list for Question State
 
@@ -142,7 +142,7 @@ class QuestionCubit extends Cubit<QuestionState> {
     resultList.remove(" ");
     for (var i = 0; i < resultList.length; i++) {
       resultList[i] = type == QuestionType.english
-          ? ToUpperTurkish(resultList[i])
+          ? resultList[i].ToUpperTurkish()
           : resultList[i].toUpperCase();
     }
 

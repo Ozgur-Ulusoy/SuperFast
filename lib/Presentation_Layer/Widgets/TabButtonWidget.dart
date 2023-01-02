@@ -3,7 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class TabButtonWidget extends StatefulWidget {
   double height;
-  TabButtonWidget({Key? key, required this.height}) : super(key: key);
+  VoidCallback callback;
+  TabButtonWidget({Key? key, required this.height, required this.callback})
+      : super(key: key);
 
   @override
   State<TabButtonWidget> createState() => _TabButtonWidgetState();
@@ -15,6 +17,8 @@ class _TabButtonWidgetState extends State<TabButtonWidget> {
     return GestureDetector(
       onTap: () {
         //
+        // widget.key!.openDrawer();
+        widget.callback();
       },
       child: SizedBox(
         child: SvgPicture.asset(

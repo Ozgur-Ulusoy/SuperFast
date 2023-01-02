@@ -8,7 +8,12 @@ import '../../Data_Layer/consts.dart';
 class WordCardSelectButton extends StatefulWidget {
   WordSelectedStateEnums type;
   String baslik;
-  WordCardSelectButton({Key? key, required this.type, required this.baslik})
+  VoidCallback callback;
+  WordCardSelectButton(
+      {Key? key,
+      required this.type,
+      required this.baslik,
+      required this.callback})
       : super(key: key);
 
   @override
@@ -24,6 +29,7 @@ class _WordCardSelectButtonState extends State<WordCardSelectButton> {
           onTap: () {
             BlocProvider.of<HomePageSelectedWordCubit>(context)
                 .ChangeState(widget.type);
+            widget.callback();
           },
           child: Container(
             width: ScreenUtil.width * 0.42,
@@ -33,15 +39,20 @@ class _WordCardSelectButtonState extends State<WordCardSelectButton> {
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
             child: Center(
-              child: FittedBox(
-                child: Text(
-                  widget.baslik,
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w700,
-                    color: widget.type == state.type
-                        ? const Color.fromRGBO(34, 35, 39, 1)
-                        : const Color.fromRGBO(34, 35, 39, 1).withOpacity(0.5),
-                    fontSize: ScreenUtil.textScaleFactor * 15,
+              child: Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: ScreenUtil.width * 0.01),
+                child: FittedBox(
+                  child: Text(
+                    widget.baslik,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
+                      color: widget.type == state.type
+                          ? const Color.fromRGBO(34, 35, 39, 1)
+                          : const Color.fromRGBO(34, 35, 39, 1)
+                              .withOpacity(0.5),
+                      fontSize: ScreenUtil.textScaleFactor * 15,
+                    ),
                   ),
                 ),
               ),

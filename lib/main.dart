@@ -21,7 +21,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await refleshUser();
-  await fLoadData();
+  await fLoadData(isInitial: true);
   Test(); //? Test
   runApp(const MyApp());
 }

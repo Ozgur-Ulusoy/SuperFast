@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import 'package:engame2/Data_Layer/consts.dart';
+import 'package:engame2/Presentation_Layer/Widgets/HomePageDrawer.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
@@ -21,6 +22,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -47,6 +50,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: HomePageDrawer(
+        callback: () => _scaffoldKey.currentState!.closeDrawer(),
+      ),
       backgroundColor: cBackgroundColor,
       body: Stack(
         children: [
@@ -76,6 +83,8 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         TabButtonWidget(
                           height: ScreenUtil.height * 0.04,
+                          callback: () =>
+                              _scaffoldKey.currentState!.openDrawer(),
                         ),
                       ],
                     ),
@@ -209,10 +218,22 @@ class _HomePageState extends State<HomePage> {
                         WordCardSelectButton(
                           type: WordSelectedStateEnums.learnedWordState,
                           baslik: "Bildiğim Kelimeler",
+                          callback: () => scrollController.animateTo(
+                            0,
+                            duration: const Duration(
+                                milliseconds: 400), //duration of scroll
+                            curve: Curves.fastOutSlowIn,
+                          ),
                         ),
                         WordCardSelectButton(
                           type: WordSelectedStateEnums.notLearnedWordState,
                           baslik: "Bilmediğim Kelimeler",
+                          callback: () => scrollController.animateTo(
+                            0,
+                            duration: const Duration(
+                                milliseconds: 400), //duration of scroll
+                            curve: Curves.fastOutSlowIn,
+                          ),
                         ),
                       ],
                     ),
@@ -242,6 +263,7 @@ class _HomePageState extends State<HomePage> {
                               builder: (context, state) {
                                 return ListView.separated(
                                   physics: const BouncingScrollPhysics(),
+                                  controller: scrollController,
                                   // physics: const NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, index) {
                                     //
@@ -257,12 +279,17 @@ class _HomePageState extends State<HomePage> {
                                             child: Row(
                                               children: [
                                                 Flexible(
-                                                  child: Text(
-                                                    state
-                                                        .learnedWordsList[index]
-                                                        .english,
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
+                                                  child: FittedBox(
+                                                    child: Text(
+                                                      BlocProvider.of<
+                                                                  HomePageSelectedWordCubit>(
+                                                              context)
+                                                          .returnSelectedDataList()[
+                                                              index]
+                                                          .english,
+                                                      style: const TextStyle(
+                                                        color: Colors.black,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
@@ -276,8 +303,11 @@ class _HomePageState extends State<HomePage> {
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    state
-                                                        .learnedWordsList[index]
+                                                    BlocProvider.of<
+                                                                HomePageSelectedWordCubit>(
+                                                            context)
+                                                        .returnSelectedDataList()[
+                                                            index]
                                                         .level
                                                         .name
                                                         .toUpperCase(),
@@ -296,7 +326,11 @@ class _HomePageState extends State<HomePage> {
                                             onTap: () async {
                                               //
                                               await _audioPlayer.play(UrlSource(
-                                                  state.learnedWordsList[index]
+                                                  BlocProvider.of<
+                                                              HomePageSelectedWordCubit>(
+                                                          context)
+                                                      .returnSelectedDataList()[
+                                                          index]
                                                       .mediaLink));
                                             },
                                             child: SvgPicture.asset(
@@ -307,18 +341,20 @@ class _HomePageState extends State<HomePage> {
                                           const Spacer(),
                                           SizedBox(
                                             width: ScreenUtil.width * 0.15,
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    state
-                                                        .learnedWordsList[index]
-                                                        .turkish,
-                                                    style: const TextStyle(
-                                                        color: Colors.black),
-                                                  ),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Text(
+                                                BlocProvider.of<
+                                                            HomePageSelectedWordCubit>(
+                                                        context)
+                                                    .returnSelectedDataList()[
+                                                        index]
+                                                    .turkish,
+                                                style: const TextStyle(
+                                                  color: Colors.black,
                                                 ),
-                                              ],
+                                                maxLines: 2,
+                                              ),
                                             ),
                                           ),
                                           const Spacer(),
@@ -331,7 +367,11 @@ class _HomePageState extends State<HomePage> {
                                       painter: DrawDottedhorizontalline(),
                                     );
                                   },
-                                  itemCount: state.learnedWordsList.length,
+                                  // itemCount: state.learnedWordsList.length,
+                                  itemCount: BlocProvider.of<
+                                          HomePageSelectedWordCubit>(context)
+                                      .returnSelectedDataList()
+                                      .length,
                                 );
                               },
                             ),

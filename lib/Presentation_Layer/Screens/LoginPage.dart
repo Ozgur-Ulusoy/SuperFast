@@ -42,10 +42,10 @@ class _LoginPageState extends State<LoginPage> {
       // Once signed in, return the UserCredential
       var result = await FirebaseAuth.instance
           .signInWithCredential(credential)
-          .whenComplete(() {
+          .whenComplete(() async {
         Navigator.of(context).pushNamedAndRemoveUntil(
             '/homePage', (Route<dynamic> route) => false);
-        saveSkipFirstOpen();
+        await saveSkipFirstOpen(context: context);
       });
 
       if (result.additionalUserInfo!.isNewUser) {
@@ -195,9 +195,9 @@ class _LoginPageState extends State<LoginPage> {
                       setState(() {
                         FirebaseAuth.instance
                             .signInAnonymously()
-                            .whenComplete(() {
+                            .whenComplete(() async {
                           if (FirebaseAuth.instance.currentUser != null) {
-                            saveSkipFirstOpen();
+                            await saveSkipFirstOpen(context: context);
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);
                           }
@@ -251,15 +251,18 @@ class _LoginPageState extends State<LoginPage> {
                             .signInWithEmailAndPassword(
                                 email: userRef.docs[0]['email'],
                                 password: password)
-                            .whenComplete(() {
+                            .whenComplete(() async {
                           if (FirebaseAuth.instance.currentUser != null) {
-                            saveSkipFirstOpen(
-                                haveUsername: true,
-                                username: userNameController.text.trim());
+                            await saveSkipFirstOpen(
+                              haveUsername: true,
+                              username: userNameController.text.trim(),
+                              context: context,
+                            );
                             Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/homePage', (Route<dynamic> route) => false);
 
                             print("giris yapildi");
+                            print(MainData.learnedList);
                           }
                         });
                       } else {

@@ -35,12 +35,15 @@ class _RegisterPageState extends State<RegisterPage> {
           'learnedList': "",
         });
       }).whenComplete(
-        () {
+        () async {
           //TODO
           //! Ana Sayfaya Git
           if (FirebaseAuth.instance.currentUser != null) {
             saveSkipFirstOpen(
-                haveUsername: true, username: usernameController.text.trim());
+                haveUsername: true,
+                username: usernameController.text.trim(),
+                context: context);
+            await fLoadData();
             Navigator.of(context).pushNamedAndRemoveUntil(
                 '/homePage', (Route<dynamic> route) => false);
           }

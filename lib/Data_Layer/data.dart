@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class Data {
@@ -22,7 +25,7 @@ class Data {
   });
 }
 
-Future<void> fLoadData() async {
+Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox("SuperFastBox");
 
@@ -93,15 +96,56 @@ Future<void> fLoadData() async {
       " AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
   //
+  if (isInitial == false) {}
+
   if (MainData.learnedList != "") {
+    // MainData.notLearnedDatas = questionData;
     MainData.learnedList!.split(" ").forEach((e) {
-      questionData.elementAt(int.tryParse(e)!).favType = WordFavType.learned;
-      MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)!));
+      questionData.elementAt(int.tryParse(e)! - 1).favType =
+          WordFavType.learned;
+      // MainData.notLearnedDatas!.removeAt(int.tryParse(e)! - 1);
+      MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
     });
+    MainData.notLearnedDatas = questionData
+        .where((element) => element.favType == WordFavType.nlearned)
+        .toList();
+  }
+  if (isInitial == false) {
+    BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
   }
   //
 }
 
+Future<void> fResetData({required BuildContext context}) async {
+  await Hive.initFlutter();
+  MainData.localData = await Hive.openBox("SuperFastBox");
+  //
+  MainData.isFavListChanged = true;
+  MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
+  //
+  MainData.isLearnedListChanged = true;
+  MainData.localData!
+      .put("isLearnedListChanged", MainData.isLearnedListChanged);
+  //
+  MainData.favList = "";
+  MainData.localData!.put("favList", MainData.favList);
+  //
+  MainData.learnedList = "";
+  MainData.localData!.put("learnedList", MainData.learnedList);
+  //
+  MainData.userUID = "";
+  MainData.localData!.put("userUID", MainData.userUID);
+  //
+  MainData.username = "";
+  MainData.localData!.put("username", MainData.username);
+  //
+
+  MainData.learnedDatas = [];
+  MainData.notLearnedDatas = [];
+
+  print(MainData.learnedList);
+  BlocProvider.of<HomePageSelectedWordCubit>(context).ResetState();
+}
 // Future<void> a() async {
 
 //   MainData.learnedList!.split(" ").forEach((e) {
@@ -111,7 +155,9 @@ Future<void> fLoadData() async {
 // }
 
 Future<void> saveSkipFirstOpen(
-    {bool haveUsername = false, String username = ""}) async {
+    {bool haveUsername = false,
+    String username = "",
+    required BuildContext context}) async {
   MainData.localData!.put("isFirstOpen", false);
   MainData.localData!.put("UserUID", FirebaseAuth.instance.currentUser!.uid);
   MainData.isFirstOpen = false;
@@ -122,7 +168,8 @@ Future<void> saveSkipFirstOpen(
     MainData.localData!.put('username', MainData.username);
   }
 
-  await fLoadData();
+  await fLoadData(context: context);
+  BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
 }
 
 class MainData {
