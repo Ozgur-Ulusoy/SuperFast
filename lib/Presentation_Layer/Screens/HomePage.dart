@@ -4,6 +4,7 @@ import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageDrawer.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
+import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,8 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     refleshData();
+    BlocProvider.of<HomePageSelectedWordCubit>(context)
+        .ChangeState(WordSelectedStateEnums.learnedWordState);
   }
 
   Future<void> refleshData() async {
@@ -55,6 +58,7 @@ class _HomePageState extends State<HomePage> {
         callback: () => _scaffoldKey.currentState!.closeDrawer(),
       ),
       backgroundColor: cBackgroundColor,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SafeArea(
@@ -197,6 +201,7 @@ class _HomePageState extends State<HomePage> {
                         GestureDetector(
                           onTap: () {
                             // TODO
+                            Navigator.of(context).pushNamed('/myWordsPage');
                           },
                           child: Text(
                             "Tümünü Gör",
@@ -242,144 +247,10 @@ class _HomePageState extends State<HomePage> {
                     // CustomPaint(
                     //   painter: DrawDottedhorizontalline(),
                     // ),
-                    Expanded(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(45),
-                            topRight: Radius.circular(45),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            top: ScreenUtil.height * 0.045,
-                            left: ScreenUtil.width * 0.02,
-                            right: ScreenUtil.width * 0.02,
-                          ),
-                          child: ClipRRect(
-                            child: BlocBuilder<HomePageSelectedWordCubit,
-                                HomePageSelectedWordState>(
-                              builder: (context, state) {
-                                return ListView.separated(
-                                  physics: const BouncingScrollPhysics(),
-                                  controller: scrollController,
-                                  // physics: const NeverScrollableScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    //
-                                    return SizedBox(
-                                      height: 50,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Spacer(),
-                                          SizedBox(
-                                            width: ScreenUtil.width * 0.18,
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: FittedBox(
-                                                    child: Text(
-                                                      BlocProvider.of<
-                                                                  HomePageSelectedWordCubit>(
-                                                              context)
-                                                          .returnSelectedDataList()[
-                                                              index]
-                                                          .english,
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          SizedBox(
-                                            width: ScreenUtil.width * 0.05,
-                                            child: Row(
-                                              children: [
-                                                Flexible(
-                                                  child: Text(
-                                                    BlocProvider.of<
-                                                                HomePageSelectedWordCubit>(
-                                                            context)
-                                                        .returnSelectedDataList()[
-                                                            index]
-                                                        .level
-                                                        .name
-                                                        .toUpperCase(),
-                                                    // "dsaşdsaşdsdadsasd",
-                                                    maxLines: 1,
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          GestureDetector(
-                                            onTap: () async {
-                                              //
-                                              await _audioPlayer.play(UrlSource(
-                                                  BlocProvider.of<
-                                                              HomePageSelectedWordCubit>(
-                                                          context)
-                                                      .returnSelectedDataList()[
-                                                          index]
-                                                      .mediaLink));
-                                            },
-                                            child: SvgPicture.asset(
-                                              "assets/images/playSoundVector.svg",
-                                              // fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          SizedBox(
-                                            width: ScreenUtil.width * 0.15,
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: Text(
-                                                BlocProvider.of<
-                                                            HomePageSelectedWordCubit>(
-                                                        context)
-                                                    .returnSelectedDataList()[
-                                                        index]
-                                                    .turkish,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                ),
-                                                maxLines: 2,
-                                              ),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) {
-                                    return CustomPaint(
-                                      painter: DrawDottedhorizontalline(),
-                                    );
-                                  },
-                                  // itemCount: state.learnedWordsList.length,
-                                  itemCount: BlocProvider.of<
-                                          HomePageSelectedWordCubit>(context)
-                                      .returnSelectedDataList()
-                                      .length,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
+                    MyWordsWidget(
+                      scrollController: scrollController,
+                      audioPlayer: _audioPlayer,
+                    )
                     //!
                     // const Expanded(flex: 8, child: Placeholder()),
                   ],
@@ -390,30 +261,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-}
-
-class DrawDottedhorizontalline extends CustomPainter {
-  Paint _paint = Paint();
-  DrawDottedhorizontalline() {
-    _paint = Paint();
-    _paint.color = const Color.fromRGBO(76, 81, 198, 0.46); //dots color
-    _paint.strokeWidth = 2; //dots thickness
-    _paint.strokeCap = StrokeCap.square; //dots corner edges
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (double i = -ScreenUtil.width; i < ScreenUtil.width; i = i + 15) {
-      // 15 is space between dots
-      // if (i % 3 == 0) {
-      canvas.drawLine(Offset(i, 0.0), Offset(i + 10, 0.0), _paint);
-      // }
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
   }
 }

@@ -53,6 +53,11 @@ void testDebug() {
   for (var element in questionData) {
     if (element.english.length == 5) wordleWordCount++;
 
+    //* is Favorite
+    if (element.isFav) {
+      favoriteCount++;
+    }
+
     //* Word Type
     switch (element.type) {
       case WordType.verb:
@@ -102,9 +107,9 @@ void testDebug() {
       case WordFavType.learned:
         learnedCount++;
         break;
-      case WordFavType.favorite:
-        favoriteCount++;
-        break;
+      // case WordFavType.favorite:
+      //   favoriteCount++;
+      //   break;
       case WordFavType.nlearned:
         nLearnedCount++;
         break;
@@ -132,6 +137,7 @@ User Photo Url = ${FirebaseAuth.instance.currentUser!.photoURL}
   _____Local-Database______
   Is First Open = ${MainData.isFirstOpen}
   Fav List = ${MainData.favList}
+  Learned List = ${MainData.learnedList}
   Is Fav List Changed = ${MainData.isFavListChanged}
   User UID = ${MainData.userUID}
   Username = ${MainData.username}

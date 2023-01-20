@@ -9,12 +9,14 @@ class WordCardSelectButton extends StatefulWidget {
   WordSelectedStateEnums type;
   String baslik;
   VoidCallback callback;
-  WordCardSelectButton(
-      {Key? key,
-      required this.type,
-      required this.baslik,
-      required this.callback})
-      : super(key: key);
+  bool isMyWordsPage;
+  WordCardSelectButton({
+    Key? key,
+    required this.type,
+    required this.baslik,
+    required this.callback,
+    this.isMyWordsPage = false,
+  }) : super(key: key);
 
   @override
   State<WordCardSelectButton> createState() => _WordCardSelectButtonState();
@@ -34,10 +36,15 @@ class _WordCardSelectButtonState extends State<WordCardSelectButton> {
           child: Container(
             width: ScreenUtil.width * 0.42,
             height: 50,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                border: widget.isMyWordsPage && state.type == widget.type
+                    ? Border.all(
+                        color: cBlueBackground,
+                        width: ScreenUtil.textScaleFactor * 1.25,
+                      )
+                    : null),
             child: Center(
               child: Padding(
                 padding:
@@ -47,10 +54,14 @@ class _WordCardSelectButtonState extends State<WordCardSelectButton> {
                     widget.baslik,
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
-                      color: widget.type == state.type
-                          ? const Color.fromRGBO(34, 35, 39, 1)
-                          : const Color.fromRGBO(34, 35, 39, 1)
-                              .withOpacity(0.5),
+                      color: widget.isMyWordsPage
+                          ? (widget.type == state.type
+                              ? cBlueBackground
+                              : const Color.fromRGBO(34, 35, 39, 1))
+                          : (widget.type == state.type
+                              ? const Color.fromRGBO(34, 35, 39, 1)
+                              : const Color.fromRGBO(34, 35, 39, 1)
+                                  .withOpacity(0.5)),
                       fontSize: ScreenUtil.textScaleFactor * 15,
                     ),
                   ),

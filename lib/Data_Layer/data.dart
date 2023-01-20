@@ -3,6 +3,7 @@ import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart'
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class Data {
@@ -11,8 +12,12 @@ class Data {
   WordType type; //? tip'i ( isim zamir fiil vb. )
   WordLevel level; //? ingilizce level seviyesi
   String mediaLink; //? ses dosyasi linki
+  String mediaLinkTr; //? türkce ses dosyasi linki
   WordFavType favType;
-  int id;
+  bool isFav; //? favori mi
+  int id; //? listedeki id si
+  String link; //? cambdridge kelime sayfasının linki
+  String exampleSentence; //? örnek cümle
 
   Data({
     required this.english,
@@ -21,8 +26,67 @@ class Data {
     required this.type,
     required this.mediaLink,
     required this.id,
+    this.mediaLinkTr = "Tr Link",
     this.favType = WordFavType.nlearned,
+    this.isFav = false,
+    this.link = "link",
+    this.exampleSentence = "Example Sentence",
   });
+}
+
+Future<void> fLoadSvgPictures() async {
+  await Future.wait([
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/Group 7.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/gamepadicon.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/firstplayphoto.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/secondplayphoto.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/thirdplayphoto.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/fourthplayphoto.svg",
+      ),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(
+        SvgPicture.svgStringDecoderBuilder, // See UPDATE below!
+        "assets/images/playSoundVector.svg",
+      ),
+      null,
+    ),
+    // other SVGs or images here
+  ]);
 }
 
 Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
@@ -35,7 +99,8 @@ Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
   MainData.isLearnedListChanged =
       MainData.localData!.get("isLearnedListChanged", defaultValue: true);
 
-  if (FirebaseAuth.instance.currentUser != null) {
+  if (FirebaseAuth.instance.currentUser != null &&
+      !FirebaseAuth.instance.currentUser!.isAnonymous) {
     if (MainData.isFavListChanged || MainData.isLearnedListChanged) {
       await FirebaseFirestore.instance
           .collection("Users")
@@ -92,24 +157,25 @@ Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
 
   MainData.favList = MainData.localData!.get('favList', defaultValue: "");
 
-  print(MainData.learnedList! +
-      " AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-  //
-  if (isInitial == false) {}
-
   if (MainData.learnedList != "") {
-    // MainData.notLearnedDatas = questionData;
     MainData.learnedList!.split(" ").forEach((e) {
       questionData.elementAt(int.tryParse(e)! - 1).favType =
           WordFavType.learned;
-      // MainData.notLearnedDatas!.removeAt(int.tryParse(e)! - 1);
       MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
     });
-    MainData.notLearnedDatas = questionData
-        .where((element) => element.favType == WordFavType.nlearned)
-        .toList();
   }
+
+  if (MainData.favList != "") {
+    MainData.favList!.split(" ").forEach((e) {
+      questionData.elementAt(int.tryParse(e)! - 1).isFav = true;
+      MainData.favDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
+    });
+  }
+  MainData.notLearnedDatas = questionData
+      .where((element) => element.favType == WordFavType.nlearned)
+      .toList();
+
+  //
   if (isInitial == false) {
     BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
   }
@@ -183,6 +249,7 @@ class MainData {
   static String? username; //!
   static List<Data>? learnedDatas = [];
   static List<Data>? notLearnedDatas = [];
+  static List<Data>? favDatas = [];
 }
 
 enum WordLevel {

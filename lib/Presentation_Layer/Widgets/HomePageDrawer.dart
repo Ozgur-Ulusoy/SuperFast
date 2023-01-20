@@ -57,6 +57,66 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
                         ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            const Spacer(
+                              flex: 2,
+                            ),
+                            Flexible(
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Text(
+                                  "HESABIM",
+                                  style: GoogleFonts.bebasNeue(
+                                    color: cBlueBackground,
+                                    fontSize: ScreenUtil.textScaleFactor * 35,
+                                    letterSpacing: ScreenUtil.letterSpacing * 5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Text(
+                                "KELİMELER",
+                                style: GoogleFonts.bebasNeue(
+                                  color: cBlueBackground,
+                                  fontSize: ScreenUtil.textScaleFactor * 35,
+                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Text(
+                                "LİDERLİK SIRALAMASI",
+                                style: GoogleFonts.bebasNeue(
+                                  color: cBlueBackground,
+                                  fontSize: ScreenUtil.textScaleFactor * 35,
+                                  letterSpacing: ScreenUtil.letterSpacing * 2.8,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Text(
+                                "AYARLAR",
+                                style: GoogleFonts.bebasNeue(
+                                  color: cBlueBackground,
+                                  fontSize: ScreenUtil.textScaleFactor * 35,
+                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                ),
+                              ),
+                            ),
+                            const Spacer(
+                              flex: 2,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

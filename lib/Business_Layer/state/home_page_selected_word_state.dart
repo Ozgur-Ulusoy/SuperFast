@@ -4,11 +4,18 @@ class HomePageSelectedWordState {
   WordSelectedStateEnums type;
   List<Data> learnedWordsList;
   List<Data> notLearnedWordsList;
+  List<Data> favWordsList;
+  bool isSearching;
+  String searchValue;
 
-  HomePageSelectedWordState(
-      {required this.type,
-      required this.learnedWordsList,
-      required this.notLearnedWordsList});
+  HomePageSelectedWordState({
+    required this.type,
+    required this.learnedWordsList,
+    required this.notLearnedWordsList,
+    required this.favWordsList,
+    required this.isSearching,
+    required this.searchValue,
+  });
 }
 
 // class LearnedWordState extends HomePageSelectedWordState {

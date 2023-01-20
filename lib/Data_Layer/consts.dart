@@ -45,4 +45,5 @@ class ScreenUtil {
 enum WordSelectedStateEnums {
   learnedWordState,
   notLearnedWordState,
+  favoriteWordState,
 }

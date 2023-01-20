@@ -2,12 +2,15 @@ import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
+import 'package:engame2/Presentation_Layer/Screens/MyWordsPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/PlayPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/RegisterPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'Business_Layer/cubit/answer_cubit.dart';
 import 'Business_Layer/cubit/home_page_selected_word_cubit.dart';
@@ -22,6 +25,7 @@ void main() async {
   await Firebase.initializeApp();
   await refleshUser();
   await fLoadData(isInitial: true);
+  await fLoadSvgPictures();
   Test(); //? Test
   runApp(const MyApp());
 }
@@ -80,6 +84,7 @@ class MyApp extends StatelessWidget {
           '/homePage': (context) => const HomePage(),
           '/registerPage': (context) => const RegisterPage(),
           '/playClassicMode': (context) => const PlayPage(),
+          '/myWordsPage': (context) => MyWordsPage(),
         },
       ),
     );
