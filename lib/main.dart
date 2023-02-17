@@ -1,16 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/MyWordsPage.dart';
-import 'package:engame2/Presentation_Layer/Screens/PlayPage.dart';
-import 'package:engame2/Presentation_Layer/Screens/RegisterPage.dart';
+import 'package:engame2/Presentation_Layer/Screens/Play/EngamePage.dart';
+import 'package:engame2/Presentation_Layer/Screens/Play/PlayPage.dart';
+import 'package:engame2/Presentation_Layer/Screens/Auth/RegisterPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_svg/svg.dart';
 
 import 'Business_Layer/cubit/answer_cubit.dart';
 import 'Business_Layer/cubit/home_page_selected_word_cubit.dart';
@@ -18,7 +18,7 @@ import 'Business_Layer/cubit/question_cubit.dart';
 import 'Business_Layer/cubit/timer_cubit.dart';
 import 'Presentation_Layer/Screens/FirstPage.dart';
 import 'Presentation_Layer/Screens/HomePage.dart';
-import 'Presentation_Layer/Screens/LoginPage.dart';
+import 'Presentation_Layer/Screens/Auth/LoginPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,8 +38,72 @@ Future refleshUser() async {
   } catch (e) {}
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("resume");
+        //Execute the code here when user come back the app.
+        //In my case, I needed to show if user active or not,
+        // FirebaseMethods().updateLiveStatus(_authInstance.currentUser.uid, true);
+        break;
+      case AppLifecycleState.paused:
+        print("pause");
+        //Execute the code the when user leave the app
+        // FirebaseMethods()
+        //     .updateLiveStatus(_authInstance.currentUser.uid, false);
+        break;
+
+      case AppLifecycleState.inactive:
+        print("inactive");
+        if (FirebaseAuth.instance.currentUser != null) {
+          if (MainData.isFavListChanged == true) {
+            await FirebaseFirestore.instance
+                .collection("Users")
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({'favList': MainData.favList});
+            MainData.isFavListChanged = false;
+          }
+          if (MainData.isLearnedListChanged == true) {
+            await FirebaseFirestore.instance
+                .collection("Users")
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .update({'learnedList': MainData.learnedList});
+            MainData.isLearnedListChanged = false;
+          }
+        }
+
+        break;
+
+      case AppLifecycleState.detached:
+        print("detached");
+
+        break;
+
+      default:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +147,9 @@ class MyApp extends StatelessWidget {
           '/loginPage': (context) => const LoginPage(),
           '/homePage': (context) => const HomePage(),
           '/registerPage': (context) => const RegisterPage(),
-          '/playClassicMode': (context) => const PlayPage(),
-          '/myWordsPage': (context) => MyWordsPage(),
+          // '/playClassicMode': (context) => const PlayPage(), //! sonradan düzeltilicek
+          '/playEngameMode': (context) => const EngamePage(),
+          '/myWordsPage': (context) => const MyWordsPage(),
         },
       ),
     );

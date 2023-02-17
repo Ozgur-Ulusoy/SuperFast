@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part '../state/question_state.dart';
 
 class QuestionCubit extends Cubit<QuestionState> {
-  QuestionCubit() : super(QuestionState());
+  QuestionCubit() : super(QuestionState(data: questionData[0]));
 
   Random rnd = Random(); //* rastgele yapacağımız işlemler için
   List<String> alfabe = [
@@ -96,25 +96,36 @@ class QuestionCubit extends Cubit<QuestionState> {
 
   //* Sorulan soruyu değiştirir - oyun başladığında ve doğru cevap verildiğinde çağrılır
   void ChangeQuestion({QuestionType type = QuestionType.turkish}) {
-    int random = rnd.nextInt(questionData
-        .length); //* Generate random for question - index for QuestionData Map
+    List<Data> randomDatas = <Data>[]; //* şıklar
+    while (randomDatas.length < 5) {
+      int random = Random().nextInt(questionData.length);
+      for (var i = 0; i < randomDatas.length; i++) {
+        if (randomDatas[i].english == questionData[random].english ||
+            randomDatas[i].turkish == questionData[random].turkish) {
+          continue;
+        }
+      }
+      if (!randomDatas.contains(questionData[random])) {
+        randomDatas.add(questionData[random]);
+      }
+    }
+    int random = rnd.nextInt(
+        5); //* Generate random for question - index for QuestionData Map
 
-    String urlPath = questionData.elementAt(random).mediaLink;
+    Data resultData = randomDatas[random];
+    // String urlPath = questionData.elementAt(resultIndex).mediaLink;
 
     String result = type == QuestionType.english
-        ? questionData.elementAt(random).turkish
-        : questionData
-            .elementAt(random)
-            .english; //* result of generated random question
+        ? resultData.turkish
+        : resultData.english; //* result of generated random question
+
     result = type == QuestionType.english
         ? result.ToUpperTurkish()
         : result.toUpperCase();
 
     String question = type == QuestionType.english
-        ? questionData.elementAt(random).english
-        : questionData
-            .elementAt(random)
-            .turkish; //* question of generated random question
+        ? resultData.english
+        : resultData.turkish; //* question of generated random question
     question = type == QuestionType.english
         ? question.toUpperCase()
         : question.ToUpperTurkish();
@@ -152,24 +163,24 @@ class QuestionCubit extends Cubit<QuestionState> {
     resultList.shuffle(); //* randomize the list
 
     //! Test
-    print("test : " + result + " " + resultList.length.toString());
-    for (var item in resultList) {
-      print(item);
-    }
-
+    // print("test : " + result + " " + resultList.length.toString());
+    // for (var item in resultList) {
+    //   print(item);
+    // }
     return emit(
       QuestionState(
+        data: resultData,
         question: question,
         answer: result,
         point: state.point + 200,
         trueAnswer: state.trueAnswer + 1,
         letters: resultList,
-        urlPath: urlPath,
+        choices: randomDatas,
+        questionType: type,
       ),
     );
   }
   //
-
 }
 
 enum QuestionType {
@@ -179,5 +190,6 @@ enum QuestionType {
 
 enum GameType {
   normal,
+  engame,
   sound,
 }

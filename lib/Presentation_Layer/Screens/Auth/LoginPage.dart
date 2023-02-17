@@ -6,10 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../Data_Layer/consts.dart';
-import '../../Data_Layer/data.dart';
-import '../Widgets/GoArrowButtonWidget.dart';
-import '../Widgets/LogoWidget.dart';
+import '../../../Data_Layer/consts.dart';
+import '../../../Data_Layer/data.dart';
+import '../../Widgets/GoArrowButtonWidget.dart';
+import '../../Widgets/LogoWidget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -333,19 +333,21 @@ class _LoginPageState extends State<LoginPage> {
                       child: BlocBuilder<LoginPageCubit, LoginPageState>(
                         builder: (context, state) {
                           return Center(
-                            child: TextField(
-                              keyboardType: state.isSignInUsername == true
-                                  ? TextInputType.name
-                                  : TextInputType.emailAddress,
-                              controller: userNameController,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                    left: 15, bottom: 11, top: 11, right: 15),
+                            child: Flexible(
+                              child: TextField(
+                                keyboardType: state.isSignInUsername == true
+                                    ? TextInputType.name
+                                    : TextInputType.emailAddress,
+                                controller: userNameController,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                      left: 15, bottom: 11, top: 11, right: 15),
+                                ),
                               ),
                             ),
                           );

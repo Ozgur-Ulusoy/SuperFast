@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Data_Layer/consts.dart';
 
-class MyWordsWidget extends StatefulWidget {
+class MyWordsWidget extends StatefulWidget with PopUpMixin {
   ScrollController scrollController;
   AudioPlayer audioPlayer;
   MyWordsWidget(
@@ -45,90 +46,109 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                   // physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     //
-                    return SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Spacer(),
-                          SizedBox(
-                            width: ScreenUtil.width * 0.18,
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: FittedBox(
+                    return GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTap: () => widget.OpenWordPopUp(
+                          context,
+                          BlocProvider.of<HomePageSelectedWordCubit>(context)
+                              .returnDataList()[index],
+                          widget.audioPlayer),
+                      child: SizedBox(
+                        height: 50,
+                        width: ScreenUtil.width,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Spacer(),
+                            // Flexible(
+                            //   child: GestureDetector(
+                            //     behavior: HitTestBehavior.translucent,
+                            //     onTap: () => widget.OpenWordPopUp(context),
+                            //     child: Container(
+                            //       width: 500,
+                            //     ),
+                            //   ),
+                            // ),
+                            SizedBox(
+                              width: ScreenUtil.width * 0.18,
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: FittedBox(
+                                      child: Text(
+                                        BlocProvider.of<
+                                                    HomePageSelectedWordCubit>(
+                                                context)
+                                            .returnDataList()[index]
+                                            .english,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            SizedBox(
+                              width: ScreenUtil.width * 0.05,
+                              child: Row(
+                                children: [
+                                  Flexible(
                                     child: Text(
                                       BlocProvider.of<
                                                   HomePageSelectedWordCubit>(
                                               context)
                                           .returnDataList()[index]
-                                          .english,
+                                          .level
+                                          .name
+                                          .toUpperCase(),
+                                      // "dsaşdsaşdsdadsasd",
+                                      maxLines: 1,
                                       style: const TextStyle(
                                         color: Colors.black,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            width: ScreenUtil.width * 0.05,
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () async {
+                                //
+                                await widget.audioPlayer.play(UrlSource(
                                     BlocProvider.of<HomePageSelectedWordCubit>(
                                             context)
                                         .returnDataList()[index]
-                                        .level
-                                        .name
-                                        .toUpperCase(),
-                                    // "dsaşdsaşdsdadsasd",
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                        .mediaLink));
+                              },
+                              child: SvgPicture.asset(
+                                "assets/images/playSoundVector.svg",
+                                // fit: BoxFit.contain,
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () async {
-                              //
-                              await widget.audioPlayer.play(UrlSource(
+                            const Spacer(),
+                            SizedBox(
+                              width: ScreenUtil.width * 0.15,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
                                   BlocProvider.of<HomePageSelectedWordCubit>(
                                           context)
                                       .returnDataList()[index]
-                                      .mediaLink));
-                            },
-                            child: SvgPicture.asset(
-                              "assets/images/playSoundVector.svg",
-                              // fit: BoxFit.contain,
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            width: ScreenUtil.width * 0.15,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                BlocProvider.of<HomePageSelectedWordCubit>(
-                                        context)
-                                    .returnDataList()[index]
-                                    .turkish,
-                                style: const TextStyle(
-                                  color: Colors.black,
+                                      .turkish,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                  maxLines: 2,
                                 ),
-                                maxLines: 2,
                               ),
                             ),
-                          ),
-                          const Spacer(),
-                        ],
+                            const Spacer(),
+                          ],
+                        ),
                       ),
                     );
                   },

@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> refleshData() async {
     await Future.delayed(const Duration(seconds: 2));
-    // BlocProvider.of<HomePageSelectedWordCubit>(context).
     setState(() {
       print("refleshed");
     });
@@ -163,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                           text: "Sesli Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
-                            Navigator.pushNamed(context, '/playClassicMode');
+                            Navigator.pushNamed(context, '/playEngameMode');
                           },
                         ),
                         PlayGameCard(

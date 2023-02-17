@@ -128,10 +128,6 @@ Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
             .put("isLearnedListChanged", MainData.isLearnedListChanged);
       }
     }
-
-    // if (MainData.isLearnedListChanged) {
-
-    // }
   }
 
   MainData.learnedList =
@@ -158,6 +154,7 @@ Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
   MainData.favList = MainData.localData!.get('favList', defaultValue: "");
 
   if (MainData.learnedList != "") {
+    print(MainData.learnedList);
     MainData.learnedList!.split(" ").forEach((e) {
       questionData.elementAt(int.tryParse(e)! - 1).favType =
           WordFavType.learned;

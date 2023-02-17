@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
+import 'package:flutter/material.dart';
 
 part '../state/home_page_selected_word_state.dart';
 
@@ -123,6 +124,80 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         ),
       );
     }
+  }
+
+  void updateState(Data data, String type, BuildContext context) {
+    switch (type) {
+      case "Learned":
+        if (MainData.learnedDatas!.contains(data)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Zaten Bu Kelime Öğrenilen Kelimelerde"),
+            ),
+          );
+          return;
+        }
+        data.favType = WordFavType.learned;
+        MainData.learnedDatas!.add(data);
+        MainData.notLearnedDatas!.remove(data);
+        MainData.learnedList = MainData.learnedList! + " ${data.id}";
+        MainData.isLearnedListChanged = true;
+        MainData.localData!
+            .put("isLearnedListChanged", MainData.isLearnedListChanged);
+        break;
+      case "NotLearned":
+        if (MainData.notLearnedDatas!.contains(data)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Zaten Bu Kelime Bilmediğim Kelimelerde"),
+            ),
+          );
+          return;
+        }
+        data.favType = WordFavType.nlearned;
+        MainData.notLearnedDatas!.add(data);
+        MainData.learnedDatas!.remove(data);
+        MainData.learnedList =
+            MainData.learnedList!.replaceAll(" ${data.id}", "");
+        MainData.isLearnedListChanged = true;
+        MainData.localData!
+            .put("isLearnedListChanged", MainData.isLearnedListChanged);
+        break;
+      case "Fav":
+        if (MainData.favDatas!.contains(data)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Zaten Bu Kelime Favori Kelimelerde"),
+            ),
+          );
+          return;
+        }
+        data.isFav = true;
+        MainData.favDatas!.add(data);
+        MainData.favList = MainData.favList! + " ${data.id}";
+        MainData.isFavListChanged = true;
+        MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
+        break;
+      case "UnFav":
+        data.isFav = false;
+        MainData.favDatas!.remove(data);
+        MainData.favList = MainData.favList!.replaceAll(" ${data.id}", "");
+        MainData.isFavListChanged = true;
+        MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
+        break;
+      default:
+        break;
+    }
+    emit(
+      HomePageSelectedWordState(
+        type: state.type,
+        learnedWordsList: MainData.learnedDatas!,
+        notLearnedWordsList: MainData.notLearnedDatas!,
+        favWordsList: MainData.favDatas!,
+        isSearching: state.isSearching,
+        searchValue: state.searchValue,
+      ),
+    );
   }
 
   List<Data> returnDataList() {
