@@ -126,7 +126,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
     }
   }
 
-  void updateState(Data data, String type, BuildContext context) {
+  void updateState(var data, String type, BuildContext context) {
     switch (type) {
       case "Learned":
         if (MainData.learnedDatas!.contains(data)) {

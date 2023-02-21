@@ -70,49 +70,57 @@ class QuestionCubit extends Cubit<QuestionState> {
     "y",
     "z",
   ];
-  //* türkçe ve ingilizce alfabe
 
-  // String ToUpperTurkish(String a) {
-  //   String res = a;
-  //   for (var i = 0; i < res.length; i++) {
-  //     if (res[i] == "i") {
-  //       res = res.replaceRange(i, i + 1, "İ");
-  //     } else if (res[i] == "ç") {
-  //       res = res.replaceRange(i, i + 1, "Ç");
-  //     } else if (res[i] == "ö") {
-  //       res = res.replaceRange(i, i + 1, "Ö");
-  //     } else if (res[i] == "ş") {
-  //       res = res.replaceRange(i, i + 1, "Ş");
-  //     } else if (res[i] == "ü") {
-  //       res = res.replaceRange(i, i + 1, "Ü");
-  //     } else if (res[i] == "ğ") {
-  //       res = res.replaceRange(i, i + 1, "Ğ");
-  //     } else {
-  //       res = res.replaceRange(i, i + 1, res[i].toUpperCase());
-  //     }
-  //   }
-  //   return res;
-  // }
+  void ResetState() {
+    emit(
+      QuestionState(
+        data: questionData[0],
+        question: "",
+        answer: "",
+        point: 0,
+        trueAnswer: 0,
+        falseAnswer: 0,
+        isAnswered: false,
+        selectedId: 0,
+        letters: [],
+        questionType: QuestionType.english,
+        choices: [],
+      ),
+    );
+  }
+
+  void UpdateState() {
+    emit(state.copyWith());
+  }
 
   //* Sorulan soruyu değiştirir - oyun başladığında ve doğru cevap verildiğinde çağrılır
-  void ChangeQuestion({QuestionType type = QuestionType.turkish}) {
+  void ChangeQuestion({QuestionType type = QuestionType.english}) {
     List<Data> randomDatas = <Data>[]; //* şıklar
-    while (randomDatas.length < 5) {
-      int random = Random().nextInt(questionData.length);
+    List<Data> datas = MainData.learnedDatas! + MainData.notLearnedDatas!;
+    while (randomDatas.length < 4) {
+      int random = Random().nextInt(datas.length);
+      bool canAdd = true;
       for (var i = 0; i < randomDatas.length; i++) {
-        if (randomDatas[i].english == questionData[random].english ||
-            randomDatas[i].turkish == questionData[random].turkish) {
-          continue;
+        if (randomDatas[i].english == datas[random].english ||
+            randomDatas[i].turkish == datas[random].turkish) {
+          canAdd = false;
         }
       }
-      if (!randomDatas.contains(questionData[random])) {
-        randomDatas.add(questionData[random]);
+      if (!randomDatas.contains(datas[random]) && canAdd) {
+        randomDatas.add(datas[random]);
       }
     }
+    for (var element in randomDatas) {
+      print(element.turkish);
+    }
+
     int random = rnd.nextInt(
-        5); //* Generate random for question - index for QuestionData Map
+        4); //* Generate random for question - index for QuestionData Map
+    print(random);
 
     Data resultData = randomDatas[random];
+    print(resultData.english);
+    print(resultData.turkish);
     // String urlPath = questionData.elementAt(resultIndex).mediaLink;
 
     String result = type == QuestionType.english
@@ -167,20 +175,49 @@ class QuestionCubit extends Cubit<QuestionState> {
     // for (var item in resultList) {
     //   print(item);
     // }
-    return emit(
-      QuestionState(
-        data: resultData,
-        question: question,
-        answer: result,
-        point: state.point + 200,
-        trueAnswer: state.trueAnswer + 1,
-        letters: resultList,
-        choices: randomDatas,
-        questionType: type,
-      ),
-    );
+    return emit(state.copyWith(
+      data: resultData,
+      question: question,
+      answer: result,
+      isAnswered: false,
+      selectedId: -1,
+      letters: resultList,
+      choices: randomDatas,
+      questionType: type,
+    )
+
+        // QuestionState(
+        //   data: resultData,
+        //   question: question,
+        //   answer: result,
+        //   point: state.point + 200,
+        //   trueAnswer: state.tr,
+        //   falseAnswer: state.falseAnswer,
+        //   letters: resultList,
+        //   choices: randomDatas,
+        //   questionType: type,
+        // ),
+        );
   }
-  //
+
+  void ChangeSelectedId(int id) {
+    emit(state.copyWith(selectedId: id));
+  }
+
+  void CheckAnswer() {
+    if (state.data.id == state.selectedId) {
+      emit(state.copyWith(
+          trueAnswer: state.trueAnswer + 1, point: state.point + 150));
+      print(
+          "dogru cevaplandırılan soru sayısı = " + state.trueAnswer.toString());
+    } else {
+      emit(state.copyWith(
+          falseAnswer: state.falseAnswer + 1, point: state.point - 150));
+      print("yanlış cevaplandırılan soru sayısı = " +
+          state.falseAnswer.toString());
+    }
+    emit(state.copyWith(isAnswered: true));
+  }
 }
 
 enum QuestionType {

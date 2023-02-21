@@ -7,7 +7,9 @@ class TimerCubit extends Cubit<TimerState> {
 
   //* Zamanı azaltma - her saniye zaman azalır
   void DecreaseTime() {
-    emit(TimerState(remainTime: state.remainTime - 1));
+    if (state.getRemainTime <= 0) return;
+    state.remainTime -= 1;
+    emit(TimerState(remainTime: state.remainTime));
   }
 
   //* Zamanı resetleme - oyun başladığında zaman her zaman resetlenir

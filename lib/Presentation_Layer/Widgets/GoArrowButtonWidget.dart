@@ -4,8 +4,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../../Data_Layer/consts.dart';
 
 class GoArrowButton extends StatelessWidget {
-  Function? toDo;
-  GoArrowButton({Key? key, this.toDo}) : super(key: key);
+  VoidCallback toDo;
+  GoArrowButton({Key? key, required this.toDo}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class GoArrowButton extends StatelessWidget {
         padding: const EdgeInsets.all(3.5),
         child: GestureDetector(
           onTap: () {
-            toDo!();
+            toDo();
             // //! Login Page Nagivate
             // Navigator.push(
             //   context,

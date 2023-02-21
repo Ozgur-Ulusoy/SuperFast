@@ -2,9 +2,11 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Data_Layer/consts.dart';
 import '../../Data_Layer/data.dart';
 
@@ -127,6 +129,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                   height: ScreenUtil.height * 0.06,
                   child: ElevatedButton(
                     onPressed: () async {
+                      BlocProvider.of<HomePageSelectedWordCubit>(context)
+                          .StateBuild();
                       FirebaseAuth.instance.signOut().whenComplete(() async {
                         if (FirebaseAuth.instance.currentUser == null) {
                           Navigator.of(context).pushNamedAndRemoveUntil(
@@ -177,11 +181,15 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                 child: Padding(
                   padding: EdgeInsets.all(ScreenUtil.width * 0.015),
                   child: CircleAvatar(
-                    backgroundImage: Image.network(
-                      FirebaseAuth.instance.currentUser!.photoURL ??
-                          "http://cdn.onlinewebfonts.com/svg/img_181369.png",
-                      fit: BoxFit.contain,
-                    ).image,
+                    backgroundImage:
+                        FirebaseAuth.instance.currentUser!.photoURL != null
+                            ? Image.network(
+                                // FirebaseAuth.instance.currentUser!.photoURL ??
+                                //     "http://cdn.onlinewebfonts.com/svg/img_181369.png",
+                                FirebaseAuth.instance.currentUser!.photoURL!,
+                                fit: BoxFit.contain,
+                              ).image
+                            : Image.asset("assets/images/profilepic.png").image,
                     radius: ScreenUtil.height * 0.06,
                   ),
                 ),

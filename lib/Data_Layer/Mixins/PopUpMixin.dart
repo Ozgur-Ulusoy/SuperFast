@@ -244,6 +244,92 @@ mixin PopUpMixin {
       },
     );
   }
+
+  void showCustomDialog({
+    required BuildContext context,
+    String? message,
+  }) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Container(
+              height: ScreenUtil.height * 0.2,
+              width: ScreenUtil.width * 0.6,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              child: Center(
+                  child: Text(
+                message ?? "",
+                textAlign: TextAlign.center,
+              )),
+            ),
+          );
+        });
+  }
+
+  // Future showCircularProgressingBar(BuildContext context) async {
+  //   showDialog(
+  //     context: context,
+  //     barrierColor: Colors.transparent,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return Center(
+  //         child: SizedBox(
+  //           height: ScreenUtil.height * 0.1,
+  //           width: ScreenUtil.width * 0.1,
+  //           child: const Center(
+  //             child: CircularProgressIndicator(
+  //               color: Color.fromARGB(255, 66, 241, 72),
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+  void showCustomSnackbar(BuildContext context, String message,
+      {int duration = 2, Color color = const Color.fromRGBO(76, 81, 198, 1)}) {
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: color,
+          // isOpaque ? cBlueBackground.withOpacity(0.80) : cBlueBackground,
+          action: SnackBarAction(
+            textColor: Colors.white,
+            label: "Kapat",
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            },
+          ),
+          duration: Duration(seconds: duration),
+        ),
+      );
+  }
+
+  void showAfterEngameDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Center(
+          child: Container(
+            width: ScreenUtil.width * 0.65,
+            height: ScreenUtil.height * 0.65,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Column(
+              children: const [],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 Widget popUpTextWidget(String key, String value) {

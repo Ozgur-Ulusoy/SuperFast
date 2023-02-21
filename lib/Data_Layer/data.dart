@@ -89,7 +89,8 @@ Future<void> fLoadSvgPictures() async {
   ]);
 }
 
-Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
+Future<void> fLoadData({BuildContext? context}) async {
+  // bool isInitial = false,  parametre
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox("SuperFastBox");
 
@@ -173,9 +174,9 @@ Future<void> fLoadData({bool isInitial = false, BuildContext? context}) async {
       .toList();
 
   //
-  if (isInitial == false) {
-    BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
-  }
+  // if (isInitial == false) {
+  //   BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
+  // }
   //
 }
 
@@ -204,6 +205,7 @@ Future<void> fResetData({required BuildContext context}) async {
   //
 
   MainData.learnedDatas = [];
+  MainData.favDatas = [];
   MainData.notLearnedDatas = [];
 
   print(MainData.learnedList);
@@ -247,6 +249,16 @@ class MainData {
   static List<Data>? learnedDatas = [];
   static List<Data>? notLearnedDatas = [];
   static List<Data>? favDatas = [];
+
+  //! oyunlarla ilgili
+  static int? engameGameRecord = 0;
+  static bool isEngameGameRecordChanged = false;
+  static int? soundGameRecord = 0;
+  static bool isSoundGameRecordChanged = false;
+  static int? wordleGameRecord = 0;
+  static bool isWordleGameRecordChanged = false;
+  static int? letterGameRecord = 0;
+  static bool isLetterGameRecordChanged = false;
 }
 
 enum WordLevel {
