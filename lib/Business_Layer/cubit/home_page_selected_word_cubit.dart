@@ -15,6 +15,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
             favWordsList: MainData.favDatas!,
             isSearching: false,
             searchValue: "",
+            currentData: null,
           ),
         );
   //
@@ -28,6 +29,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         favWordsList: [],
         isSearching: false,
         searchValue: "",
+        currentData: null,
       ),
     );
   }
@@ -41,6 +43,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         favWordsList: MainData.favDatas!,
         isSearching: false,
         searchValue: "",
+        currentData: null,
       ),
     );
   }
@@ -55,6 +58,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           favWordsList: state.favWordsList,
           isSearching: true,
           searchValue: state.searchValue,
+          currentData: state.currentData,
         ),
       );
     } else {
@@ -66,6 +70,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           favWordsList: state.favWordsList,
           isSearching: false,
           searchValue: state.searchValue,
+          currentData: state.currentData,
         ),
       );
     }
@@ -80,6 +85,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         favWordsList: state.favWordsList,
         isSearching: state.isSearching,
         searchValue: input,
+        currentData: state.currentData,
       ),
     );
   }
@@ -95,6 +101,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           favWordsList: state.favWordsList,
           isSearching: state.isSearching,
           searchValue: state.searchValue,
+          currentData: state.currentData,
         ),
       );
     }
@@ -109,6 +116,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           favWordsList: state.favWordsList,
           isSearching: state.isSearching,
           searchValue: state.searchValue,
+          currentData: state.currentData,
         ),
       );
     } else if (type == WordSelectedStateEnums.favoriteWordState &&
@@ -121,6 +129,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           favWordsList: state.favWordsList,
           isSearching: state.isSearching,
           searchValue: state.searchValue,
+          currentData: state.currentData,
         ),
       );
     }
@@ -196,8 +205,13 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         favWordsList: MainData.favDatas!,
         isSearching: state.isSearching,
         searchValue: state.searchValue,
+        currentData: state.currentData,
       ),
     );
+  }
+
+  void changeCurrentData(Data data) {
+    emit(state.copyWith(currentData: data));
   }
 
   List<Data> returnDataList() {

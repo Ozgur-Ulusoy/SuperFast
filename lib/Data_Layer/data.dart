@@ -173,6 +173,73 @@ Future<void> fLoadData({BuildContext? context}) async {
       .where((element) => element.favType == WordFavType.nlearned)
       .toList();
 
+  if (FirebaseAuth.instance.currentUser != null &&
+      !FirebaseAuth.instance.currentUser!.isAnonymous) {
+    if (MainData.isEngameGameRecordChanged ||
+        MainData.isLetterGameRecordChanged ||
+        MainData.isSoundGameRecordChanged ||
+        MainData.isWordleGameRecordChanged) {
+      Map<String, dynamic> map = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get()
+          .then(
+            (value) => value["GameRecords"],
+          );
+      print(map);
+
+      MainData.engameGameRecord = map["engameGameRecord"];
+      MainData.soundGameRecord = map["soundGameRecord"];
+      MainData.wordleGameRecord = map["wordleGameRecord"];
+      MainData.letterGameRecord = map["letterGameRecord"];
+      await MainData.localData!
+          .put("engameGameRecord", MainData.engameGameRecord);
+      await MainData.localData!
+          .put("soundGameRecord", MainData.soundGameRecord);
+      await MainData.localData!
+          .put("wordleGameRecord", MainData.wordleGameRecord);
+      await MainData.localData!
+          .put("letterGameRecord", MainData.letterGameRecord);
+      MainData.isEngameGameRecordChanged = false;
+      MainData.isSoundGameRecordChanged = false;
+      MainData.isWordleGameRecordChanged = false;
+      MainData.isLetterGameRecordChanged = false;
+      await MainData.localData!.put("isEngameGameRecordChanged", false);
+      await MainData.localData!.put("isSoundGameRecordChanged", false);
+      await MainData.localData!.put("isWordleGameRecordChanged", false);
+      await MainData.localData!.put("isLetterGameRecordChanged", false);
+    }
+  }
+
+  MainData.engameGameRecord =
+      MainData.localData!.get("engameGameRecord", defaultValue: 0);
+  MainData.isEngameGameRecordChanged =
+      MainData.localData!.get("isEngameGameRecordChanged", defaultValue: true);
+
+  MainData.soundGameRecord =
+      MainData.localData!.get("soundGameRecord", defaultValue: 0);
+  MainData.isSoundGameRecordChanged =
+      MainData.localData!.get("isSoundGameRecordChanged", defaultValue: true);
+
+  MainData.wordleGameRecord =
+      MainData.localData!.get("wordleGameRecord", defaultValue: 0);
+  MainData.isWordleGameRecordChanged =
+      MainData.localData!.get("isWordleGameRecordChanged", defaultValue: true);
+
+  MainData.letterGameRecord =
+      MainData.localData!.get("letterGameRecord", defaultValue: 0);
+  MainData.isLetterGameRecordChanged =
+      MainData.localData!.get("isLetterGameRecordChanged", defaultValue: true);
+
+  print(MainData.engameGameRecord);
+  print(MainData.soundGameRecord);
+  print(MainData.wordleGameRecord);
+  print(MainData.letterGameRecord);
+  print(MainData.isEngameGameRecordChanged);
+  print(MainData.isSoundGameRecordChanged);
+  print(MainData.isWordleGameRecordChanged);
+  print(MainData.isLetterGameRecordChanged);
+
   //
   // if (isInitial == false) {
   //   BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
@@ -207,6 +274,30 @@ Future<void> fResetData({required BuildContext context}) async {
   MainData.learnedDatas = [];
   MainData.favDatas = [];
   MainData.notLearnedDatas = [];
+
+  MainData.engameGameRecord = 0;
+  MainData.localData!.put("engameGameRecord", MainData.engameGameRecord);
+  MainData.isEngameGameRecordChanged = false;
+  MainData.localData!
+      .put("isEngameGameRecordChanged", MainData.isEngameGameRecordChanged);
+  //
+  MainData.soundGameRecord = 0;
+  MainData.localData!.put("soundGameRecord", MainData.soundGameRecord);
+  MainData.isSoundGameRecordChanged = false;
+  MainData.localData!
+      .put("isSoundGameRecordChanged", MainData.isSoundGameRecordChanged);
+  //
+  MainData.wordleGameRecord = 0;
+  MainData.localData!.put("wordleGameRecord", MainData.wordleGameRecord);
+  MainData.isWordleGameRecordChanged = false;
+  MainData.localData!
+      .put("isWordleGameRecordChanged", MainData.isWordleGameRecordChanged);
+  //
+  MainData.letterGameRecord = 0;
+  MainData.localData!.put("letterGameRecord", MainData.letterGameRecord);
+  MainData.isLetterGameRecordChanged = false;
+  MainData.localData!
+      .put("isLetterGameRecordChanged", MainData.isLetterGameRecordChanged);
 
   print(MainData.learnedList);
   BlocProvider.of<HomePageSelectedWordCubit>(context).ResetState();
@@ -298,6 +389,7 @@ List<Data> questionData = [
     mediaLink:
         "https://drive.google.com/uc?export=download&id=1X7KSD2WwdBUIkLxrGzgq_zjYtKr2Ur86",
     // favType: WordFavType.learned,
+    link: "https://dictionary.cambridge.org/dictionary/english-turkish/abolish",
     id: 1,
   ),
   Data(
@@ -1475,7 +1567,7 @@ List<Data> questionData = [
   ),
   Data(
     english: "Asset",
-    turkish: "Servet",
+    turkish: "Varlık",
     level: WordLevel.b2,
     type: WordType.noun,
     mediaLink:

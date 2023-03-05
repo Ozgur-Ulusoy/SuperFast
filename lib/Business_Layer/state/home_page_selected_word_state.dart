@@ -7,6 +7,7 @@ class HomePageSelectedWordState {
   List<Data> favWordsList;
   bool isSearching;
   String searchValue;
+  Data? currentData;
 
   HomePageSelectedWordState({
     required this.type,
@@ -15,7 +16,29 @@ class HomePageSelectedWordState {
     required this.favWordsList,
     required this.isSearching,
     required this.searchValue,
+    required this.currentData,
   });
+
+  // create a copy of the state
+  HomePageSelectedWordState copyWith({
+    WordSelectedStateEnums? type,
+    List<Data>? learnedWordsList,
+    List<Data>? notLearnedWordsList,
+    List<Data>? favWordsList,
+    bool? isSearching,
+    String? searchValue,
+    Data? currentData,
+  }) {
+    return HomePageSelectedWordState(
+      type: type ?? this.type,
+      learnedWordsList: learnedWordsList ?? this.learnedWordsList,
+      notLearnedWordsList: notLearnedWordsList ?? this.notLearnedWordsList,
+      favWordsList: favWordsList ?? this.favWordsList,
+      isSearching: isSearching ?? this.isSearching,
+      searchValue: searchValue ?? this.searchValue,
+      currentData: currentData ?? this.currentData,
+    );
+  }
 }
 
 // class LearnedWordState extends HomePageSelectedWordState {

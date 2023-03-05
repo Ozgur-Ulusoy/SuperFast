@@ -13,8 +13,8 @@ class QuestionState {
   bool isAnswered = false; //? cevaplandı mı
   int selectedId = 0; //? seçilen şık id
 
-  List<String>? letters; //? şıklar
-  List<Data>? choices;
+  List<String>? letters; //? harfler
+  List<Data>? choices; //? şıkların verileri
 
   QuestionState({
     required this.data,

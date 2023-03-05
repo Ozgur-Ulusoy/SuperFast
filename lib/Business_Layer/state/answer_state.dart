@@ -1,16 +1,23 @@
 part of '../cubit/answer_cubit.dart';
 
-abstract class AnswerState {}
+class AnswerState {
+  List<AnswerClass> answerList = [];
+  String answer;
+  AnswerState({required this.answerList, required this.answer});
 
-class NormalAnswerState extends AnswerState {
-  List<String>? answerList =
-      []; //? kullanıcının seçtiği harfleri tutan liste => kullanıcı cevabı
-  List<bool>? isPressedList = []; //? şıkların basılma durumunu tutan litse
-
-  NormalAnswerState({this.answerList, this.isPressedList});
+  AnswerState copyWith({
+    List<AnswerClass>? answerList,
+    String? answer,
+  }) {
+    return AnswerState(
+      answerList: answerList ?? this.answerList,
+      answer: answer ?? this.answer,
+    );
+  }
 }
 
-class SoundAnswerState extends AnswerState {
+class AnswerClass {
   String? answer;
-  SoundAnswerState({this.answer});
+  int? id;
+  AnswerClass({required this.answer, required this.id});
 }

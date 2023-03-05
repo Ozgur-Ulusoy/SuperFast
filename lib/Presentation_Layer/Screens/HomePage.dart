@@ -167,9 +167,11 @@ class _HomePageState extends State<HomePage> {
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/secondplayphoto.svg",
-                          text: "Sesli Kelime Oyunu",
+                          text: "Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
-                          func: () {},
+                          func: () {
+                            Navigator.pushNamed(context, '/playWordGameMode');
+                          },
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/thirdplayphoto.svg",

@@ -48,11 +48,18 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                     //
                     return GestureDetector(
                       behavior: HitTestBehavior.translucent,
-                      onTap: () => widget.OpenWordPopUp(
-                          context,
+                      onTap: () {
+                        BlocProvider.of<HomePageSelectedWordCubit>(context)
+                            .changeCurrentData(
                           BlocProvider.of<HomePageSelectedWordCubit>(context)
                               .returnDataList()[index],
-                          widget.audioPlayer),
+                        );
+                        widget.OpenWordPopUp(
+                            context,
+                            BlocProvider.of<HomePageSelectedWordCubit>(context)
+                                .returnDataList()[index],
+                            widget.audioPlayer);
+                      },
                       child: SizedBox(
                         height: 50,
                         width: ScreenUtil.width,

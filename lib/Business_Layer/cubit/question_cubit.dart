@@ -206,17 +206,25 @@ class QuestionCubit extends Cubit<QuestionState> {
 
   void CheckAnswer() {
     if (state.data.id == state.selectedId) {
-      emit(state.copyWith(
-          trueAnswer: state.trueAnswer + 1, point: state.point + 150));
+      TrueAnswerEvent(150);
       print(
           "dogru cevaplandırılan soru sayısı = " + state.trueAnswer.toString());
     } else {
-      emit(state.copyWith(
-          falseAnswer: state.falseAnswer + 1, point: state.point - 150));
+      FalseAnswerEvent(125);
       print("yanlış cevaplandırılan soru sayısı = " +
           state.falseAnswer.toString());
     }
     emit(state.copyWith(isAnswered: true));
+  }
+
+  void TrueAnswerEvent(int point) {
+    emit(state.copyWith(
+        trueAnswer: state.trueAnswer + 1, point: state.point + point));
+  }
+
+  void FalseAnswerEvent(int point) {
+    emit(state.copyWith(
+        falseAnswer: state.falseAnswer + 1, point: state.point - point));
   }
 }
 

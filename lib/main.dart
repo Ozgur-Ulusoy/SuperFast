@@ -8,9 +8,12 @@ import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/MyWordsPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/Play/EngamePage.dart';
 import 'package:engame2/Presentation_Layer/Screens/Auth/RegisterPage.dart';
+import 'package:engame2/Presentation_Layer/Screens/Play/WordGamePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -29,6 +32,11 @@ void main() async {
   await fLoadData();
   await fLoadSvgPictures();
   Test(); //? Test
+  LicenseRegistry.addLicense(() async* {
+    //? google fonts license
+    final license = await rootBundle.loadString('google_fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
   runApp(const MyApp());
 }
 
@@ -78,7 +86,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
       case AppLifecycleState.inactive:
         print("inactive");
-        if (FirebaseAuth.instance.currentUser != null) {
+        if (FirebaseAuth.instance.currentUser != null &&
+            FirebaseAuth.instance.currentUser!.isAnonymous == false) {
           if (MainData.isFavListChanged == true) {
             await FirebaseFirestore.instance
                 .collection("Users")
@@ -162,6 +171,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             '/registerPage': (context) => const RegisterPage(),
             // '/playClassicMode': (context) => const PlayPage(), //! sonradan düzeltilicek
             '/playEngameMode': (context) => const EngamePage(),
+            '/playWordGameMode': (context) => const WordGamePage(),
             '/myWordsPage': (context) => const MyWordsPage(),
           },
         ),
