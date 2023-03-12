@@ -19,7 +19,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return FirebaseAuth.instance.currentUser != null
-        ? const HomePage()
+        ? HomePage()
         : MainData.isFirstOpen == true
             ? const FirstOpenPage()
             : const LoginPage();

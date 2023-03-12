@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/CheckAnswerButton.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../Business_Layer/cubit/question_cubit.dart';
 import '../../../Business_Layer/cubit/timer_cubit.dart';
 
+import '../../../Data_Layer/data.dart';
 import '../../Widgets/ChoiceCard.dart';
 
 class EngamePage extends StatefulWidget with PopUpMixin {
@@ -20,12 +22,23 @@ class EngamePage extends StatefulWidget with PopUpMixin {
   State<EngamePage> createState() => _EngamePageState();
 }
 
-class _EngamePageState extends State<EngamePage> {
+class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
   Timer? timer;
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 1),
+    vsync: this,
+  )..repeat(reverse: true);
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.fastOutSlowIn,
+  );
 
   void StartTimer() {
     BlocProvider.of<TimerCubit>(context).ResetTime();
     startTimer();
+    // _controller.forward();,
+    // _controller.stop();
+    // _controller.reset();
   }
 
   startTimer() {
@@ -53,13 +66,28 @@ class _EngamePageState extends State<EngamePage> {
             context) //! tipi kullanıcının seçtiği türden olacak
         .ChangeQuestion(type: QuestionType.english); //* ilk soruyu sordu
     StartTimer();
+    _controller.stop();
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          isAnimationPlaying = false;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    _controller.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
+
+  bool isAnimationPlaying = false;
+  bool isTrueAnswer = false;
+  AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +96,25 @@ class _EngamePageState extends State<EngamePage> {
       body: Stack(
         children: [
           const PlayBackground(),
+          SafeArea(
+            child: Align(
+              alignment: const Alignment(0.75, -0.94),
+              child: Visibility(
+                child: ScaleTransition(
+                  scale: _animation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: isTrueAnswer
+                        ? const Text("+1",
+                            style: TextStyle(fontSize: 30, color: Colors.green))
+                        : const Text("-1",
+                            style: TextStyle(fontSize: 30, color: Colors.red)),
+                  ),
+                ),
+                visible: isAnimationPlaying,
+              ),
+            ),
+          ),
           SafeArea(
             child: Center(
               child: Column(
@@ -156,7 +203,33 @@ class _EngamePageState extends State<EngamePage> {
                                   .state
                                   .selectedId !=
                               -1) {
-                        BlocProvider.of<QuestionCubit>(context).CheckAnswer();
+                        BlocProvider.of<QuestionCubit>(context).CheckAnswer(
+                          () {
+                            //? true
+                            setState(() {
+                              isAnimationPlaying = true;
+                              isTrueAnswer = true;
+                              _controller.forward(from: 0);
+                              if (MainData.isSoundOn) {
+                                audioPlayer.stop();
+                                audioPlayer
+                                    .play(AssetSource("sounds/true.mp3"));
+                              }
+                            });
+                          },
+                          () {
+                            //? false
+                            setState(() {
+                              isAnimationPlaying = true;
+                              isTrueAnswer = false;
+                              _controller.forward(from: 0);
+                            });
+                            if (MainData.isSoundOn) {
+                              audioPlayer.stop();
+                              audioPlayer.play(AssetSource("sounds/false.mp3"));
+                            }
+                          },
+                        );
                         stopTimer();
                       } else {
                         widget.showCustomSnackbar(

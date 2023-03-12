@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
+import 'package:auto_start_flutter/auto_start_flutter.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
+import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageDrawer.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart';
@@ -8,23 +12,42 @@ import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../Data_Layer/data.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget with PopUpMixin {
+  HomePage({Key? key}) : super(key: key);
+  static GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  static GlobalKey<_HomePageState> createKey() => GlobalKey<_HomePageState>();
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+extension WidgetAKeyExt on GlobalKey<_HomePageState> {
+  void getRandomDailyWordd() => currentState?.getRandomDailyWord();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController scrollController = ScrollController();
+
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 1),
+    vsync: this,
+    lowerBound: 0.25,
+    upperBound: 1,
+  )..repeat(reverse: true);
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.fastOutSlowIn,
+  );
 
   @override
   void initState() {
@@ -33,6 +56,21 @@ class _HomePageState extends State<HomePage> {
     refleshData();
     BlocProvider.of<HomePageSelectedWordCubit>(context)
         .ChangeState(WordSelectedStateEnums.learnedWordState);
+    getRandomDailyWord();
+  }
+
+  Future<void> getRandomDailyWord() async {
+    // Box box = await Hive.openBox("SuperFastBox");
+    int? randomIndex =
+        await MainData.localData!.get("dailyWordIndex", defaultValue: 1);
+
+    print("---- " + randomIndex.toString());
+    if (randomIndex != null && MainData.showAlwaysDailyWord) {
+      BlocProvider.of<HomePageSelectedWordCubit>(context).changeCurrentData(
+        MainData.dailyData!,
+      );
+      widget.openDailyWordPopUp(context, MainData.dailyData!, _audioPlayer);
+    }
   }
 
   Future<void> refleshData() async {
@@ -47,14 +85,29 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement dispose
     super.dispose();
     _audioPlayer.dispose();
+    _controller.dispose();
+  }
+
+  //! AutoStart - izin alma
+  Future<void> initAutoStart() async {
+    try {
+      //check auto-start availability.
+      var test = await (isAutoStartAvailable as FutureOr<bool>);
+      print(test);
+      //if available then navigate to auto-start setting page.
+      if (test) await getAutoStartPermission();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+    if (!mounted) return;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: HomePage.scaffoldKey,
       drawer: HomePageDrawer(
-        callback: () => _scaffoldKey.currentState!.closeDrawer(),
+        callback: () => HomePage.scaffoldKey.currentState!.closeDrawer(),
       ),
       backgroundColor: cBackgroundColor,
       resizeToAvoidBottomInset: false,
@@ -87,8 +140,68 @@ class _HomePageState extends State<HomePage> {
                         TabButtonWidget(
                           height: ScreenUtil.height * 0.04,
                           callback: () =>
-                              _scaffoldKey.currentState!.openDrawer(),
+                              HomePage.scaffoldKey.currentState!.openDrawer(),
                         ),
+                        const Spacer(),
+                        Visibility(
+                          visible: MainData.homePageNotifiAlert &&
+                              (MainData.isBatteryOptimizeDisabled == false ||
+                                  MainData.isAutoRestartEnabledForBackground ==
+                                      false),
+                          child: ScaleTransition(
+                            scale: _animation,
+                            child: GestureDetector(
+                              onTap: () async {
+                                widget.showPopUpForBackgroundHandles(
+                                  context,
+                                  () async {
+                                    //? Battery optimize
+                                    if (await Permission
+                                        .ignoreBatteryOptimizations.isGranted) {
+                                      widget.showCustomSnackbar(context,
+                                          "Zaten izin verilmiş durumda");
+                                      return;
+                                    }
+
+                                    final PermissionStatus permissionStatus =
+                                        await Permission
+                                            .ignoreBatteryOptimizations
+                                            .request();
+
+                                    if (permissionStatus.isGranted) {
+                                      setState(() {
+                                        MainData.isBatteryOptimizeDisabled =
+                                            true;
+                                        print("setstated - " +
+                                            MainData.isBatteryOptimizeDisabled
+                                                .toString());
+                                      });
+                                      MainData.localData!.put(
+                                          "isBatteryOptimizeDisabled", true);
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  //? Autorestart
+                                  () async {
+                                    if (await isAutoStartAvailable == true) {
+                                      print("true");
+                                      await getAutoStartPermission();
+                                    } else {
+                                      print("false");
+                                    }
+                                  },
+                                );
+                              },
+                              child: Icon(
+                                MainData.isBatteryOptimizeDisabled == false
+                                    ? Icons.battery_alert
+                                    : Icons.restart_alt,
+                                color: Colors.red,
+                                size: ScreenUtil.textScaleFactor * 30,
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                     SizedBox(height: ScreenUtil.height * 0.015),

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:engame2/Data_Layer/Extensions/stringExtension.dart';
 import 'package:engame2/Data_Layer/data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part '../state/question_state.dart';
@@ -204,15 +205,17 @@ class QuestionCubit extends Cubit<QuestionState> {
     emit(state.copyWith(selectedId: id));
   }
 
-  void CheckAnswer() {
+  void CheckAnswer(VoidCallback callbackTrue, VoidCallback callbackFalse) {
     if (state.data.id == state.selectedId) {
       TrueAnswerEvent(150);
       print(
           "dogru cevaplandırılan soru sayısı = " + state.trueAnswer.toString());
+      callbackTrue();
     } else {
       FalseAnswerEvent(125);
       print("yanlış cevaplandırılan soru sayısı = " +
           state.falseAnswer.toString());
+      callbackFalse();
     }
     emit(state.copyWith(isAnswered: true));
   }

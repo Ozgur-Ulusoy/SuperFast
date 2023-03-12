@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:engame2/Business_Layer/cubit/answer_cubit.dart';
+import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameBackground.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameUpSection.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +20,18 @@ class WordGamePage extends StatefulWidget {
   State<WordGamePage> createState() => _WordGamePageState();
 }
 
-class _WordGamePageState extends State<WordGamePage> {
+class _WordGamePageState extends State<WordGamePage>
+    with TickerProviderStateMixin {
+  AudioPlayer audioPlayer = AudioPlayer();
   Timer? timer;
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 1),
+    vsync: this,
+  )..repeat(reverse: true);
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.fastOutSlowIn,
+  );
 
   void StartTimer() {
     BlocProvider.of<TimerCubit>(context).ResetTime();
@@ -59,56 +71,60 @@ class _WordGamePageState extends State<WordGamePage> {
             context) //! tipi kullanıcının seçtiği türden olacak
         .ChangeQuestion(type: QuestionType.turkish); //* ilk soruyu sordu
     StartTimer();
+
+    _controller.stop();
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          isAnimationPlaying = false;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     timer?.cancel();
-    super.dispose();
     _controller.dispose();
+    audioPlayer.dispose();
+    super.dispose();
+    _textController.dispose();
   }
 
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
-  // int ReturnGLIndex(int a) {
-  //   int res = 0;
-  //   for (var i = 0; i < a; i++) {
-  //     res += BlocProvider.of<QuestionCubit>(context)
-  //         .state
-  //         .answer
-  //         .split(" ")[i]
-  //         .length;
-  //   }
-  //   return res;
-  // }
-
-  // int ReturnIsPressedIndex(int a) {
-  //   if (BlocProvider.of<AnswerCubit>(context).state.answerList!.length <= a) {
-  //     return -1;
-  //   }
-
-  //   for (var i = 0;
-  //       i < BlocProvider.of<QuestionCubit>(context).state.letters!.length;
-  //       i++) {
-  //     if (BlocProvider.of<QuestionCubit>(context).state.letters![i] ==
-  //             BlocProvider.of<AnswerCubit>(context).state.answerList![a] &&
-  //         BlocProvider.of<AnswerCubit>(context).state.isPressedList![i] ==
-  //             true) {
-  //       return i;
-  //     }
-  //   }
-  //   return -1;
-  // }
+  bool isAnimationPlaying = false;
+  bool isTrueAnswer = false;
 
   @override
   Widget build(BuildContext context) {
-    _controller.text = context.watch<AnswerCubit>().state.answer;
+    _textController.text = context.watch<AnswerCubit>().state.answer;
 
     return Scaffold(
       backgroundColor: cBackgroundColor,
       body: Stack(
         children: [
           const PlayBackground(),
+          SafeArea(
+            child: Align(
+              alignment: const Alignment(0.75, -0.94),
+              child: Visibility(
+                child: ScaleTransition(
+                  scale: _animation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: isTrueAnswer
+                        ? const Text("+1",
+                            style: TextStyle(fontSize: 30, color: Colors.green))
+                        : const Text("-1",
+                            style: TextStyle(fontSize: 30, color: Colors.red)),
+                  ),
+                ),
+                visible: isAnimationPlaying,
+              ),
+            ),
+          ),
           SafeArea(
             child: Center(
               child: Column(
@@ -120,7 +136,7 @@ class _WordGamePageState extends State<WordGamePage> {
                           horizontal: ScreenUtil.width * 0.05),
                       child: TextField(
                         readOnly: true,
-                        controller: _controller,
+                        controller: _textController,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           suffixIcon: GestureDetector(
@@ -246,6 +262,16 @@ class _WordGamePageState extends State<WordGamePage> {
                                                     context)
                                                 .ChangeQuestion(
                                                     type: QuestionType.turkish);
+                                            setState(() {
+                                              isAnimationPlaying = true;
+                                              isTrueAnswer = true;
+                                              _controller.forward(from: 0);
+                                            });
+                                            if (MainData.isSoundOn) {
+                                              audioPlayer.stop();
+                                              audioPlayer.play(AssetSource(
+                                                  "sounds/true.mp3"));
+                                            }
                                           }
                                           //* kullanıcının ve sorunun cevabı eşleşmiyorsa ( yanlışsa ) sadece seçili şıkları ve kullanıcı cevap kısmını resetler - ekran soru ilk geldiği ekran gibi olur
                                           else {
@@ -257,6 +283,16 @@ class _WordGamePageState extends State<WordGamePage> {
                                             BlocProvider.of<QuestionCubit>(
                                                     context)
                                                 .FalseAnswerEvent(125);
+                                            setState(() {
+                                              isAnimationPlaying = true;
+                                              isTrueAnswer = false;
+                                              _controller.forward(from: 0);
+                                              if (MainData.isSoundOn) {
+                                                audioPlayer.stop();
+                                                audioPlayer.play(AssetSource(
+                                                    "sounds/false.mp3"));
+                                              }
+                                            });
                                           }
                                         }
                                       },

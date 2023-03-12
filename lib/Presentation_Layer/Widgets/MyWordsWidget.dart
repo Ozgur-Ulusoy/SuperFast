@@ -54,7 +54,7 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                           BlocProvider.of<HomePageSelectedWordCubit>(context)
                               .returnDataList()[index],
                         );
-                        widget.OpenWordPopUp(
+                        widget.openWordPopUp(
                             context,
                             BlocProvider.of<HomePageSelectedWordCubit>(context)
                                 .returnDataList()[index],

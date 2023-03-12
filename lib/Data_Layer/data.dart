@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Data {
   String english; //? ingilizce hali
@@ -94,6 +96,42 @@ Future<void> fLoadData({BuildContext? context}) async {
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox("SuperFastBox");
 
+  //! Settings
+  MainData.isSoundOn = MainData.localData!.get("isSoundOn", defaultValue: true);
+
+  MainData.getNotification =
+      MainData.localData!.get("getNotification", defaultValue: true);
+
+  MainData.removeControlButtonEngame =
+      MainData.localData!.get("removeControlButtonEngame", defaultValue: false);
+
+  if (await Permission.ignoreBatteryOptimizations.isGranted == true) {
+    MainData.localData!.put("isBatteryOptimizeDisabled", true);
+  } else {
+    MainData.localData!.put("isBatteryOptimizeDisabled", false);
+  }
+
+  MainData.isBatteryOptimizeDisabled =
+      MainData.localData!.get("isBatteryOptimizeDisabled", defaultValue: false);
+
+  MainData.isAutoRestartEnabledForBackground = MainData.localData!
+      .get("isAutoRestartEnabledForBackground", defaultValue: false);
+
+  try {
+    if (MainData.getNotification) {
+      await FirebaseMessaging.instance.subscribeToTopic("Notification");
+    } else {
+      await FirebaseMessaging.instance.unsubscribeFromTopic("Notification");
+    }
+  } catch (e) {}
+
+  MainData.showAlwaysDailyWord =
+      MainData.localData!.get("showAlwaysDailyDay", defaultValue: true);
+
+  MainData.homePageNotifiAlert =
+      MainData.localData!.get("homePageNotifiAlert", defaultValue: true);
+
+  // !
   MainData.isFavListChanged =
       MainData.localData!.get("isFavListChanged", defaultValue: true);
 
@@ -173,6 +211,16 @@ Future<void> fLoadData({BuildContext? context}) async {
       .where((element) => element.favType == WordFavType.nlearned)
       .toList();
 
+  MainData.dailyData = (MainData.learnedDatas! + MainData.notLearnedDatas!)
+      .where((element) =>
+          element.id ==
+          MainData.localData!.get("dailyWordIndex", defaultValue: 1))
+      .first;
+
+  print(MainData.dailyData!.id);
+  print(MainData.localData!.get("dailyWordIndex", defaultValue: 1));
+
+  //! değişecek - app live crycle da olucak bu
   if (FirebaseAuth.instance.currentUser != null &&
       !FirebaseAuth.instance.currentUser!.isAnonymous) {
     if (MainData.isEngameGameRecordChanged ||
@@ -250,6 +298,16 @@ Future<void> fLoadData({BuildContext? context}) async {
 Future<void> fResetData({required BuildContext context}) async {
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox("SuperFastBox");
+
+  MainData.isSoundOn = true;
+  MainData.localData!.put("isSoundOn", true);
+
+  MainData.getNotification = true;
+  MainData.localData!.put("getNotification", true);
+
+  MainData.removeControlButtonEngame = false;
+  MainData.localData!.put("removeControlButtonEngame", false);
+
   //
   MainData.isFavListChanged = true;
   MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
@@ -300,6 +358,32 @@ Future<void> fResetData({required BuildContext context}) async {
       .put("isLetterGameRecordChanged", MainData.isLetterGameRecordChanged);
 
   print(MainData.learnedList);
+
+  //! settings
+  await MainData.localData!.put("isSoundOn", true);
+
+  await MainData.localData!.put("getNotification", true);
+
+  await MainData.localData!.put("removeControlButtonEngame", false);
+
+  if (await Permission.ignoreBatteryOptimizations.isGranted == true) {
+    MainData.localData!.put("isBatteryOptimizeDisabled", true);
+  } else {
+    MainData.localData!.put("isBatteryOptimizeDisabled", false);
+  }
+
+  await MainData.localData!.put("isBatteryOptimizeDisabled", false);
+
+  await MainData.localData!.put("isAutoRestartEnabledForBackground", false);
+
+  try {
+    await FirebaseMessaging.instance.subscribeToTopic("Notification");
+  } catch (e) {}
+
+  await MainData.localData!.put("showAlwaysDailyDay", true);
+
+  await MainData.localData!.put("homePageNotifiAlert", true);
+
   BlocProvider.of<HomePageSelectedWordCubit>(context).ResetState();
 }
 // Future<void> a() async {
@@ -340,6 +424,7 @@ class MainData {
   static List<Data>? learnedDatas = [];
   static List<Data>? notLearnedDatas = [];
   static List<Data>? favDatas = [];
+  static Data? dailyData;
 
   //! oyunlarla ilgili
   static int? engameGameRecord = 0;
@@ -350,6 +435,19 @@ class MainData {
   static bool isWordleGameRecordChanged = false;
   static int? letterGameRecord = 0;
   static bool isLetterGameRecordChanged = false;
+
+  //! settings
+  static bool isSoundOn = true; //? ses
+  static bool getNotification = true; //? bildirim
+  static bool removeControlButtonEngame =
+      false; //? engamede kontrol butonunu kaldır
+  static bool showAlwaysDailyWord =
+      true; //? her zaman ilk açılışta günlük kelimeyi göster
+  static bool isBatteryOptimizeDisabled =
+      false; //? pil optimize ayarı yapıldı mı
+  static bool isAutoRestartEnabledForBackground =
+      false; //? arkaplanda otomatik yeniden başlatma ayarı yapıdlı mı - yapıldıgı kontrol edilemiyor
+  static bool homePageNotifiAlert = true; //? anasayfada bildirim uyarısı
 }
 
 enum WordLevel {

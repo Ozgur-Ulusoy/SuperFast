@@ -1,6 +1,4 @@
-import 'package:engame2/Business_Layer/cubit/question_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Data_Layer/consts.dart';
@@ -62,6 +60,17 @@ String getAddToCardTypeTitle(WordFavType wordFavType) {
       return "Bilmediklerime Ekle";
     case WordFavType.nlearned:
       return "Bildiklerime Ekle";
+    default:
+      return "";
+  }
+}
+
+String getAddToCardTypeSnackbarTitle(WordFavType wordFavType) {
+  switch (wordFavType) {
+    case WordFavType.learned:
+      return "Bildiklerime Eklendi";
+    case WordFavType.nlearned:
+      return "Bilmediklerime Eklendi";
     default:
       return "";
   }

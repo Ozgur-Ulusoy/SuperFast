@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +12,7 @@ import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Data_Layer/consts.dart';
 import '../../Data_Layer/data.dart';
 
-class HomePageDrawer extends StatefulWidget {
+class HomePageDrawer extends StatefulWidget with PopUpMixin {
   VoidCallback callback;
 
   HomePageDrawer({Key? key, required this.callback}) : super(key: key);
@@ -92,9 +94,13 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             ),
                             const Spacer(),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                widget.callback();
+                                widget.openDailyWordPopUp(context,
+                                    MainData.dailyData!, AudioPlayer());
+                              },
                               child: Text(
-                                "LİDERLİK SIRALAMASI",
+                                "GÜNÜN KELİMESİ",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
                                   fontSize: ScreenUtil.textScaleFactor * 35,
@@ -104,7 +110,10 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             ),
                             const Spacer(),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context)
+                                    .pushNamed('/settingsPage');
+                              },
                               child: Text(
                                 "AYARLAR",
                                 style: GoogleFonts.bebasNeue(

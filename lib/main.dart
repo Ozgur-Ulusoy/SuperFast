@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
@@ -11,11 +13,15 @@ import 'package:engame2/Presentation_Layer/Screens/Auth/RegisterPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/Play/WordGamePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'Business_Layer/cubit/answer_cubit.dart';
 import 'Business_Layer/cubit/home_page_selected_word_cubit.dart';
@@ -24,12 +30,42 @@ import 'Business_Layer/cubit/timer_cubit.dart';
 import 'Presentation_Layer/Screens/FirstPage.dart';
 import 'Presentation_Layer/Screens/HomePage.dart';
 import 'Presentation_Layer/Screens/Auth/LoginPage.dart';
+import 'Presentation_Layer/Screens/SettingsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await refleshUser();
+  //! WorkManager
+
+  await Workmanager().initialize(
+    // The top level function, aka callbackDispatcher
+    callbackDispatcher,
+
+    // If enabled it will post a notification whenever
+    // the task is running. Handy for debugging tasks
+    isInDebugMode: true,
+  );
+
+  await Workmanager().registerPeriodicTask(
+      "2",
+
+      //This is the value that will be
+      // returned in the callbackDispatcher
+      "dailyRandomWordTask",
+      // initialDelay: const Duration(minutes: 15), //! 1 gün olucak
+      // When no frequency is provided
+      // the default 15 minutes is set.
+      // Minimum frequency is 15 min.
+      // Android will automatically change
+      // your frequency to 15 min
+      // if you have configured a lower frequency.
+      frequency: const Duration(minutes: 15), //! 1 gün olucak
+      existingWorkPolicy: ExistingWorkPolicy.append);
+
   await fLoadData();
+
+  await setMainDataDailyWord(); //? set daily word
   await fLoadSvgPictures();
   Test(); //? Test
   LicenseRegistry.addLicense(() async* {
@@ -37,8 +73,239 @@ void main() async {
     final license = await rootBundle.loadString('google_fonts/OFL.txt');
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
+
+  //! FirebaseMessaging
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print('User granted permission');
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    print('User granted provisional permission');
+  } else {
+    print('User declined or has not accepted permission');
+  }
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  //!
+
   runApp(const MyApp());
 }
+
+//! WorkManager
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    //?
+    if (task == "dailyRandomWordTask") {
+      await setRandomDailyWord();
+    }
+    return Future.value(true);
+  });
+}
+
+Future<void> setRandomDailyWord() async {
+  await Hive.initFlutter();
+  Box box = await Hive.openBox("SuperFastBox");
+  Random rnd = Random();
+  int random = rnd.nextInt(questionData.length);
+  await box.put("dailyWordIndex", random);
+
+  print(box.get("dailyWordIndex", defaultValue: 1).toString() + "a");
+  print(random.toString() + "b");
+  String learnedList = box.get("learnedList", defaultValue: "");
+  List<Data> learnedDatas = [];
+  List<Data> notLearnedDatas = [];
+
+  if (learnedList != "") {
+    learnedList.split(" ").forEach((e) {
+      questionData.elementAt(int.tryParse(e)! - 1).favType =
+          WordFavType.learned;
+      learnedDatas.add(questionData.elementAt(int.tryParse(e)! - 1));
+    });
+  }
+
+  notLearnedDatas = questionData
+      .where((element) => element.favType == WordFavType.nlearned)
+      .toList();
+
+  List<Data> datas = learnedDatas + notLearnedDatas;
+  Data dailyData = datas.where((element) => element.id == random).first;
+  bool isNotificationsOn = await box.get("getNotification", defaultValue: true);
+  if (isNotificationsOn) {
+    await Firebase.initializeApp();
+
+    await setupFlutterNotifications();
+
+    await setNotificationSettings();
+
+    await flutterLocalNotificationsPlugin.show(
+      1,
+      "Günün Kelimesi : ${dailyData.english}",
+      "Türkçesi : ${dailyData.turkish}",
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: Importance.high,
+          // TODO add a proper drawable resource to android, for now using
+          //      one that already exists in example app.
+          // icon: '@mipmap/ic_launcher',
+        ),
+      ),
+      // payload: jsonEncode({
+      //   "type": "openDailyWord",
+      //   "action": "FLUTTER_NOTIFICATION_CLICK",
+      // }),
+    );
+  }
+
+  MainData.dailyData = dailyData;
+  print(MainData.dailyData);
+  // await setMainDataDailyWord();
+  // HomePage.createKey().currentState!.getRandomDailyWord();
+}
+
+Future<void> setNotificationSettings() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  // const IOSInitializationSettings initializationSettingsIOS =
+  //     IOSInitializationSettings(
+  //   requestSoundPermission: false,
+  //   requestBadgePermission: false,
+  //   requestAlertPermission: false,
+  //   // onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+  // );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      // iOS: initializationSettingsIOS,
+      macOS: null);
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    // onDidReceiveNotificationResponse: selectNotification,
+  );
+}
+
+// Future selectNotification(String? payload) async {
+//   //Handle notification tapped logic here
+//   print("selected");
+//   Map data = jsonDecode(payload!);
+//   print("payload : $data");
+//   if (data["type"] == "openDailyWord" &&
+//       FirebaseAuth.instance.currentUser != null) {
+//     await setMainDataDailyWord();
+//     HomePage.createKey().currentState!.getRandomDailyWord();
+//     // HomePage.scaffoldKey.currentState!.setState(() {
+//     //   HomePage.scaffoldKey.currentState
+//     // });
+//   }
+// }
+
+Future<void> setMainDataDailyWord() async {
+  await Hive.initFlutter();
+  Box box = await Hive.openBox("SuperFastBox");
+  int randomIndex = box.get("dailyWordIndex", defaultValue: 1);
+  List<Data> allList = MainData.learnedDatas! + MainData.notLearnedDatas!;
+  MainData.dailyData =
+      allList.where((element) => element.id == randomIndex).first;
+  // MainData.dailyData = questionData[MainData.localData!.get("dailyWordIndex")];
+}
+
+//! Notification
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  await setupFlutterNotifications();
+  // showFlutterNotification(message);
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  print('Handling a background message ${message.messageId}');
+}
+
+/// Create a [AndroidNotificationChannel] for heads up notifications
+late AndroidNotificationChannel channel;
+
+bool isFlutterLocalNotificationsInitialized = false;
+
+Future<void> setupFlutterNotifications() async {
+  if (isFlutterLocalNotificationsInitialized) {
+    return;
+  }
+  channel = const AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    description:
+        'This channel is used for important notifications.', // description
+    importance: Importance.high,
+  );
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  /// Create an Android Notification Channel.
+  ///
+  /// We use this channel in the `AndroidManifest.xml` file to override the
+  /// default FCM channel to enable heads up notifications.
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  /// Update the iOS foreground notification presentation options to allow
+  /// heads up notifications.
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  isFlutterLocalNotificationsInitialized = true;
+}
+
+void showFlutterNotification(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+  if (notification != null && android != null && !kIsWeb) {
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          // TODO add a proper drawable resource to android, for now using
+          //      one that already exists in example app.
+          // icon: 'launch_background',
+        ),
+      ),
+    );
+  }
+}
+
+/// Initialize the [FlutterLocalNotificationsPlugin] package.
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+//
 
 Future refleshUser() async {
   try {
@@ -60,6 +327,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    getNotifiInApp();
+    // initAutoStart();
+    // _runWhileAppIsTerminated();
   }
 
   @override
@@ -116,6 +386,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
+  // void _runWhileAppIsTerminated() async {
+  //   var details =
+  //       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+  //   if (details!.didNotificationLaunchApp) {
+  //     if (details.payload != null) {
+  //       print('notification payload: ' + details.payload!);
+  //       var payload = jsonDecode(details.payload!);
+  //       if (payload!["action"] == "openDailyWord") {
+  //         await setMainDataDailyWord();
+  //         await HomePage.createKey().currentState!.getRandomDailyWord();
+  //       }
+  //     }
+  //   }
+  // }
+
+  Future<void> getNotifiInApp() async {
+    await setupFlutterNotifications();
+    FirebaseMessaging.onMessage.listen((event) {
+      showFlutterNotification(event);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -167,12 +460,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             '/': (context) => const MainPage(),
             '/firstOpenPage': (context) => const FirstOpenPage(),
             '/loginPage': (context) => const LoginPage(),
-            '/homePage': (context) => const HomePage(),
+            '/homePage': (context) => HomePage(),
             '/registerPage': (context) => const RegisterPage(),
             // '/playClassicMode': (context) => const PlayPage(), //! sonradan düzeltilicek
             '/playEngameMode': (context) => const EngamePage(),
             '/playWordGameMode': (context) => const WordGamePage(),
             '/myWordsPage': (context) => const MyWordsPage(),
+            '/settingsPage': (context) => const SettingsPage(),
           },
         ),
       ),
