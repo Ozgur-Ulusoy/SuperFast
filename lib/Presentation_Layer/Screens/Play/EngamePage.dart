@@ -189,8 +189,9 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                           .getRemainTime;
                       if (time <= 0) return;
                       if (BlocProvider.of<QuestionCubit>(context)
-                          .state
-                          .isAnswered) {
+                              .state
+                              .isAnswered &&
+                          MainData.removeControlButtonEngame == false) {
                         BlocProvider.of<QuestionCubit>(context)
                             .ChangeQuestion();
                         // startTimer();
@@ -230,6 +231,11 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                             }
                           },
                         );
+                        if (MainData.removeControlButtonEngame == true) {
+                          BlocProvider.of<QuestionCubit>(context)
+                              .ChangeQuestion();
+                          return;
+                        }
                         stopTimer();
                       } else {
                         widget.showCustomSnackbar(

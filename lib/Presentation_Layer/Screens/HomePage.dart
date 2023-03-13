@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_start_flutter/auto_start_flutter.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
+import 'package:engame2/Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageDrawer.dart';
@@ -60,9 +61,8 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> getRandomDailyWord() async {
-    // Box box = await Hive.openBox("SuperFastBox");
     int? randomIndex =
-        await MainData.localData!.get("dailyWordIndex", defaultValue: 1);
+        await MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1);
 
     print("---- " + randomIndex.toString());
     if (randomIndex != null && MainData.showAlwaysDailyWord) {
@@ -83,9 +83,10 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     // TODO: implement dispose
-    super.dispose();
     _audioPlayer.dispose();
     _controller.dispose();
+    super.dispose();
+    // ticker
   }
 
   //! AutoStart - izin alma
@@ -144,7 +145,10 @@ class _HomePageState extends State<HomePage>
                         ),
                         const Spacer(),
                         Visibility(
-                          visible: MainData.homePageNotifiAlert &&
+                          visible: context
+                                  .watch<HomepageNotifiAlertCubit>()
+                                  .state
+                                  .isNotifiAlert &&
                               (MainData.isBatteryOptimizeDisabled == false ||
                                   MainData.isAutoRestartEnabledForBackground ==
                                       false),
@@ -177,7 +181,8 @@ class _HomePageState extends State<HomePage>
                                                 .toString());
                                       });
                                       MainData.localData!.put(
-                                          "isBatteryOptimizeDisabled", true);
+                                          KeyUtils.isBatteryOptimizeDisabledKey,
+                                          true);
                                       Navigator.pop(context);
                                     }
                                   },
@@ -218,9 +223,9 @@ class _HomePageState extends State<HomePage>
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: MainData.username ??
-                                        FirebaseAuth
-                                            .instance.currentUser!.displayName,
+                                    text: FirebaseAuth.instance.currentUser!
+                                            .displayName ??
+                                        MainData.username,
                                     style: GoogleFonts.fredoka(
                                       color: cBlueBackground,
                                       fontSize: ScreenUtil.textScaleFactor * 35,

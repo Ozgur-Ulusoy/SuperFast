@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) {
         return FirebaseFirestore.instance
-            .collection("Users")
+            .collection(KeyUtils.usersCollectionKey)
             .doc(value.user!.uid)
             .set({
           'username': usernameController.text.trim(),
@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 haveUsername: true,
                 username: usernameController.text.trim(),
                 context: context);
-            await fLoadData();
+            // await fLoadData();
             Navigator.of(context).pushNamedAndRemoveUntil(
                 '/homePage', (Route<dynamic> route) => false);
           }

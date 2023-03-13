@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
+import '../../Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
 import '../../Presentation_Layer/Screens/WebviewPage.dart';
 import '../../Presentation_Layer/Widgets/PlayAddToWordCard.dart';
 
@@ -479,7 +480,7 @@ mixin PopUpMixin {
             body: Center(
               child: Container(
                 width: ScreenUtil.width * 0.85,
-                height: ScreenUtil.height * 0.4,
+                height: ScreenUtil.height * 0.45,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
@@ -550,6 +551,23 @@ mixin PopUpMixin {
                         ),
                       ),
                       const Spacer(),
+                      TextButton(
+                        onPressed: () async {
+                          BlocProvider.of<HomepageNotifiAlertCubit>(context)
+                              .ChangeNotifiAlert(false);
+                          await MainData.localData!.put(
+                              KeyUtils.isShowHomePageNotifiAlertOnKey, false);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Bu uyarıyı gösterme",
+                          style: GoogleFonts.poppins(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: ScreenUtil.textScaleFactor * 20,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

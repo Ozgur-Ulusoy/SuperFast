@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -138,14 +139,38 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                   height: ScreenUtil.height * 0.06,
                   child: ElevatedButton(
                     onPressed: () async {
+                      if (FirebaseAuth.instance.currentUser != null &&
+                          FirebaseAuth.instance.currentUser!.isAnonymous ==
+                              false) {
+                        if (MainData.isFavListChanged == true) {
+                          await FirebaseFirestore.instance
+                              .collection(KeyUtils.usersCollectionKey)
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .update({'favList': MainData.favList});
+                          MainData.isFavListChanged = false;
+                        }
+                        if (MainData.isLearnedListChanged == true) {
+                          await FirebaseFirestore.instance
+                              .collection(KeyUtils.usersCollectionKey)
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .update({'learnedList': MainData.learnedList});
+                          MainData.isLearnedListChanged = false;
+                        }
+                      }
                       BlocProvider.of<HomePageSelectedWordCubit>(context)
                           .StateBuild();
-                      FirebaseAuth.instance.signOut().whenComplete(() async {
+                      await FirebaseAuth.instance
+                          .signOut()
+                          .whenComplete(() async {
                         if (FirebaseAuth.instance.currentUser == null) {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/loginPage', (Route<dynamic> route) => false);
                           await fResetData(context: context);
+                          await Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/loginPage', (Route<dynamic> route) => false);
                         }
+                        // questionData.forEach((element) {
+                        //   element.isFav = false;
+                        //   element.favType = WordFavType.nlearned;
+                        // });
                       });
                     },
                     style: ButtonStyle(
@@ -190,6 +215,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                 child: Padding(
                   padding: EdgeInsets.all(ScreenUtil.width * 0.015),
                   child: CircleAvatar(
+                    backgroundColor: Colors.white,
                     backgroundImage:
                         FirebaseAuth.instance.currentUser!.photoURL != null
                             ? Image.network(
@@ -198,7 +224,10 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 FirebaseAuth.instance.currentUser!.photoURL!,
                                 fit: BoxFit.contain,
                               ).image
-                            : Image.asset("assets/images/profilepic.png").image,
+                            : Image.asset(
+                                "assets/images/profilepic.png",
+                                color: Colors.white,
+                              ).image,
                     radius: ScreenUtil.height * 0.06,
                   ),
                 ),

@@ -47,3 +47,45 @@ enum WordSelectedStateEnums {
   notLearnedWordState,
   favoriteWordState,
 }
+
+class KeyUtils {
+  //! Hive
+  static const String boxName = "SuperFastBox";
+  //? Settings
+  static const String isSoundOnKey = "isSoundOn";
+  static const String isGetNotificationOnKey =
+      "isGetNotificationOn"; // isGetNotificationOn
+  static const String isEngameControlButtonOnKey = "isEngameControlButtonOn";
+  static const String isBatteryOptimizeDisabledKey =
+      "isBatteryOptimizeDisabled";
+  static const String isAutoRestartEnabledForBackgroundKey =
+      "isAutoRestartEnabledForBackground";
+  static const String isShowDailyWordOnKey = "isShowDailyWordOn";
+  static const String isShowHomePageNotifiAlertOnKey = "isShowHomePageNotifiOn";
+  //?
+  static const String isFirstOpenKey = "isFirstOpen";
+  static const String dailyWordIdKey = "dailyWordId";
+  static const String isEngameGameRecordChangedKey =
+      "isEngameGameRecordChanged";
+  static const String isSoundGameRecordChangedKey = "isSoundGameRecordChanged";
+  static const String isWordleGameRecordChangedKey =
+      "isWordleGameRecordChanged";
+  static const String isLetterGameRecordChangedKey =
+      "isLetterGameRecordChanged";
+  //? Firebase
+  static const String isFavListChangedKey = "isFavListChanged";
+  static const String isLearnedListChangedKey = "isLearnedListChanged";
+  static const String usersCollectionKey = "Users";
+  static const String favListValueKey = "favList";
+  static const String learnedListValueKey = "learnedList";
+  static const String userUIDKey = "UserUID";
+  static const String usernameKey = "username";
+  static const String gameRecordsMapKey = "GameRecors";
+  static const String engameGameRecordKey = "engameGameRecord";
+  static const String soundGameRecordKey = "soundGameRecord";
+  static const String wordleGameRecordKey = "wordleGameRecord";
+  static const String letterGameRecordKey = "letterGameRecord";
+
+  //! Firebase Notification
+  static String notificationTopicKey = "notificationTopic";
+}

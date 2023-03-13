@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../../Data_Layer/consts.dart';
 import '../../../Data_Layer/data.dart';
 import '../../Widgets/GoArrowButtonWidget.dart';
@@ -37,22 +38,19 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
-      print(credential);
-      print("ilk");
-
       // Once signed in, return the UserCredential
-      var result = await FirebaseAuth.instance
-          .signInWithCredential(credential)
-          .whenComplete(() async {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            '/homePage', (Route<dynamic> route) => false);
-        await saveSkipFirstOpen(context: context);
-      });
+      var result = await FirebaseAuth.instance.signInWithCredential(credential);
+      //     .whenComplete(() async {
+      //   // await saveSkipFirstOpen(context: context);
+      //   // BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
 
+      // });
+
+      print("a");
       if (result.additionalUserInfo!.isNewUser) {
         print("yeni giris");
         await FirebaseFirestore.instance
-            .collection("Users")
+            .collection(KeyUtils.usersCollectionKey)
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
           'favList': "",
@@ -65,6 +63,15 @@ class _LoginPageState extends State<LoginPage> {
           }
         });
       }
+      MainData.isFirstOpen = false;
+      await MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
+      MainData.localData!
+          .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
+      MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
+      await fLoadData(context: context);
+      BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          '/homePage', (Route<dynamic> route) => false);
     }
   }
 
@@ -296,6 +303,11 @@ class _LoginPageState extends State<LoginPage> {
                                 username: userNameController.text.trim(),
                                 context: context,
                               );
+                              BlocProvider.of<HomePageSelectedWordCubit>(
+                                      context)
+                                  .StateBuild();
+
+                              // state build
 
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                   '/homePage', (Route<dynamic> route) => false);
@@ -319,7 +331,7 @@ class _LoginPageState extends State<LoginPage> {
                           "Şifre Hatalı",
                           color: Colors.red,
                         );
-                        return;
+                        // return;
                       } else {
                         print("Hata !");
                         widget.showCustomSnackbar(
@@ -327,7 +339,7 @@ class _LoginPageState extends State<LoginPage> {
                           "Hata !",
                           color: Colors.red,
                         );
-                        return;
+                        // return;
                       }
                     }
 

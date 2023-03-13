@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
+import 'package:engame2/Data_Layer/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
@@ -94,107 +95,104 @@ Future<void> fLoadSvgPictures() async {
 Future<void> fLoadData({BuildContext? context}) async {
   // bool isInitial = false,  parametre
   await Hive.initFlutter();
-  MainData.localData = await Hive.openBox("SuperFastBox");
+  MainData.localData = await Hive.openBox(KeyUtils.boxName);
 
   //! Settings
-  MainData.isSoundOn = MainData.localData!.get("isSoundOn", defaultValue: true);
+  MainData.isSoundOn =
+      MainData.localData!.get(KeyUtils.isSoundOnKey, defaultValue: true);
 
-  MainData.getNotification =
-      MainData.localData!.get("getNotification", defaultValue: true);
+  MainData.getNotification = MainData.localData!
+      .get(KeyUtils.isGetNotificationOnKey, defaultValue: true);
 
-  MainData.removeControlButtonEngame =
-      MainData.localData!.get("removeControlButtonEngame", defaultValue: false);
+  MainData.removeControlButtonEngame = MainData.localData!
+      .get(KeyUtils.isEngameControlButtonOnKey, defaultValue: false);
 
   if (await Permission.ignoreBatteryOptimizations.isGranted == true) {
-    MainData.localData!.put("isBatteryOptimizeDisabled", true);
+    MainData.localData!.put(KeyUtils.isBatteryOptimizeDisabledKey, true);
   } else {
-    MainData.localData!.put("isBatteryOptimizeDisabled", false);
+    MainData.localData!.put(KeyUtils.isBatteryOptimizeDisabledKey, false);
   }
 
-  MainData.isBatteryOptimizeDisabled =
-      MainData.localData!.get("isBatteryOptimizeDisabled", defaultValue: false);
+  MainData.isBatteryOptimizeDisabled = MainData.localData!
+      .get(KeyUtils.isBatteryOptimizeDisabledKey, defaultValue: false);
 
   MainData.isAutoRestartEnabledForBackground = MainData.localData!
-      .get("isAutoRestartEnabledForBackground", defaultValue: false);
+      .get(KeyUtils.isAutoRestartEnabledForBackgroundKey, defaultValue: false);
 
   try {
     if (MainData.getNotification) {
-      await FirebaseMessaging.instance.subscribeToTopic("Notification");
+      await FirebaseMessaging.instance
+          .subscribeToTopic(KeyUtils.notificationTopicKey);
     } else {
-      await FirebaseMessaging.instance.unsubscribeFromTopic("Notification");
+      await FirebaseMessaging.instance
+          .unsubscribeFromTopic(KeyUtils.notificationTopicKey);
     }
   } catch (e) {}
 
-  MainData.showAlwaysDailyWord =
-      MainData.localData!.get("showAlwaysDailyDay", defaultValue: true);
+  MainData.showAlwaysDailyWord = MainData.localData!
+      .get(KeyUtils.isShowDailyWordOnKey, defaultValue: true);
 
-  MainData.homePageNotifiAlert =
-      MainData.localData!.get("homePageNotifiAlert", defaultValue: true);
+  MainData.homePageNotifiAlert = MainData.localData!
+      .get(KeyUtils.isShowHomePageNotifiAlertOnKey, defaultValue: true);
 
   // !
   MainData.isFavListChanged =
-      MainData.localData!.get("isFavListChanged", defaultValue: true);
+      MainData.localData!.get(KeyUtils.isFavListChangedKey, defaultValue: true);
 
-  MainData.isLearnedListChanged =
-      MainData.localData!.get("isLearnedListChanged", defaultValue: true);
+  MainData.isLearnedListChanged = MainData.localData!
+      .get(KeyUtils.isLearnedListChangedKey, defaultValue: true);
 
   if (FirebaseAuth.instance.currentUser != null &&
       !FirebaseAuth.instance.currentUser!.isAnonymous) {
     if (MainData.isFavListChanged || MainData.isLearnedListChanged) {
       await FirebaseFirestore.instance
-          .collection("Users")
+          .collection(KeyUtils.usersCollectionKey)
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get()
           .then((value) {
         if (MainData.isFavListChanged) {
-          MainData.favList = value['favList'];
+          MainData.favList = value[KeyUtils.favListValueKey];
           MainData.localData!.put('favList', MainData.favList);
         }
         if (MainData.isLearnedListChanged) {
-          MainData.learnedList = value["learnedList"];
-          MainData.localData!.put("learnedList", MainData.learnedList);
+          MainData.learnedList = value[KeyUtils.learnedListValueKey];
+          MainData.localData!
+              .put(KeyUtils.learnedListValueKey, MainData.learnedList);
         }
       });
 
       if (MainData.isFavListChanged) {
         MainData.isFavListChanged = false;
-        MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
+        MainData.localData!
+            .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
       }
 
       if (MainData.isLearnedListChanged) {
         MainData.isLearnedListChanged = false;
-        MainData.localData!
-            .put("isLearnedListChanged", MainData.isLearnedListChanged);
+        MainData.localData!.put(
+            KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
       }
     }
   }
 
   MainData.learnedList =
-      MainData.localData!.get("learnedList", defaultValue: "");
+      MainData.localData!.get(KeyUtils.learnedListValueKey, defaultValue: "");
 
-  // if (MainData.localData!.get("UserUID") !=
-  //     FirebaseAuth.instance.currentUser!.uid) {
-  //   MainData.localData!.put("UserUID", FirebaseAuth.instance.currentUser!.uid);
-  // }
-  MainData.userUID = MainData.localData!.get("UserUID", defaultValue: "");
+  MainData.userUID =
+      MainData.localData!.get(KeyUtils.userUIDKey, defaultValue: "");
 
-  // if (MainData.localData!.get("isFirstOpen") == null) {
-  //   MainData.localData!.put("isFirstOpen", true);
-  // }
   MainData.isFirstOpen =
-      MainData.localData!.get("isFirstOpen", defaultValue: true);
+      MainData.localData!.get(KeyUtils.isFirstOpenKey, defaultValue: true);
 
-  // if (MainData.localData!.get("isFavListChanged") == null) {
-  //   MainData.localData!.put("isFavListChanged", true);
-  // }
+  MainData.username =
+      MainData.localData!.get(KeyUtils.usernameKey, defaultValue: null);
 
-  MainData.username = MainData.localData!.get("username", defaultValue: null);
-
-  MainData.favList = MainData.localData!.get('favList', defaultValue: "");
+  MainData.favList =
+      MainData.localData!.get(KeyUtils.favListValueKey, defaultValue: "");
 
   if (MainData.learnedList != "") {
     print(MainData.learnedList);
-    MainData.learnedList!.split(" ").forEach((e) {
+    MainData.learnedList!.trim().split(" ").forEach((e) {
       questionData.elementAt(int.tryParse(e)! - 1).favType =
           WordFavType.learned;
       MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
@@ -202,7 +200,7 @@ Future<void> fLoadData({BuildContext? context}) async {
   }
 
   if (MainData.favList != "") {
-    MainData.favList!.split(" ").forEach((e) {
+    MainData.favList!.trim().split(" ").forEach((e) {
       questionData.elementAt(int.tryParse(e)! - 1).isFav = true;
       MainData.favDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
     });
@@ -214,11 +212,8 @@ Future<void> fLoadData({BuildContext? context}) async {
   MainData.dailyData = (MainData.learnedDatas! + MainData.notLearnedDatas!)
       .where((element) =>
           element.id ==
-          MainData.localData!.get("dailyWordIndex", defaultValue: 1))
+          MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1))
       .first;
-
-  print(MainData.dailyData!.id);
-  print(MainData.localData!.get("dailyWordIndex", defaultValue: 1));
 
   //! değişecek - app live crycle da olucak bu
   if (FirebaseAuth.instance.currentUser != null &&
@@ -228,56 +223,60 @@ Future<void> fLoadData({BuildContext? context}) async {
         MainData.isSoundGameRecordChanged ||
         MainData.isWordleGameRecordChanged) {
       Map<String, dynamic> map = await FirebaseFirestore.instance
-          .collection("Users")
+          .collection(KeyUtils.usersCollectionKey)
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get()
           .then(
-            (value) => value["GameRecords"],
+            (value) => value[KeyUtils.gameRecordsMapKey],
           );
       print(map);
 
-      MainData.engameGameRecord = map["engameGameRecord"];
-      MainData.soundGameRecord = map["soundGameRecord"];
-      MainData.wordleGameRecord = map["wordleGameRecord"];
-      MainData.letterGameRecord = map["letterGameRecord"];
+      MainData.engameGameRecord = map[KeyUtils.engameGameRecordKey];
+      MainData.soundGameRecord = map[KeyUtils.soundGameRecordKey];
+      MainData.wordleGameRecord = map[KeyUtils.wordleGameRecordKey];
+      MainData.letterGameRecord = map[KeyUtils.letterGameRecordKey];
       await MainData.localData!
-          .put("engameGameRecord", MainData.engameGameRecord);
+          .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
       await MainData.localData!
-          .put("soundGameRecord", MainData.soundGameRecord);
+          .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
       await MainData.localData!
-          .put("wordleGameRecord", MainData.wordleGameRecord);
+          .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
       await MainData.localData!
-          .put("letterGameRecord", MainData.letterGameRecord);
+          .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
       MainData.isEngameGameRecordChanged = false;
       MainData.isSoundGameRecordChanged = false;
       MainData.isWordleGameRecordChanged = false;
       MainData.isLetterGameRecordChanged = false;
-      await MainData.localData!.put("isEngameGameRecordChanged", false);
-      await MainData.localData!.put("isSoundGameRecordChanged", false);
-      await MainData.localData!.put("isWordleGameRecordChanged", false);
-      await MainData.localData!.put("isLetterGameRecordChanged", false);
+      await MainData.localData!
+          .put(KeyUtils.isEngameGameRecordChangedKey, false);
+      await MainData.localData!
+          .put(KeyUtils.isSoundGameRecordChangedKey, false);
+      await MainData.localData!
+          .put(KeyUtils.isWordleGameRecordChangedKey, false);
+      await MainData.localData!
+          .put(KeyUtils.isLetterGameRecordChangedKey, false);
     }
   }
 
   MainData.engameGameRecord =
-      MainData.localData!.get("engameGameRecord", defaultValue: 0);
-  MainData.isEngameGameRecordChanged =
-      MainData.localData!.get("isEngameGameRecordChanged", defaultValue: true);
+      MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0);
+  MainData.isEngameGameRecordChanged = MainData.localData!
+      .get(KeyUtils.isEngameGameRecordChangedKey, defaultValue: true);
 
   MainData.soundGameRecord =
-      MainData.localData!.get("soundGameRecord", defaultValue: 0);
-  MainData.isSoundGameRecordChanged =
-      MainData.localData!.get("isSoundGameRecordChanged", defaultValue: true);
+      MainData.localData!.get(KeyUtils.soundGameRecordKey, defaultValue: 0);
+  MainData.isSoundGameRecordChanged = MainData.localData!
+      .get(KeyUtils.isSoundGameRecordChangedKey, defaultValue: true);
 
   MainData.wordleGameRecord =
-      MainData.localData!.get("wordleGameRecord", defaultValue: 0);
-  MainData.isWordleGameRecordChanged =
-      MainData.localData!.get("isWordleGameRecordChanged", defaultValue: true);
+      MainData.localData!.get(KeyUtils.wordleGameRecordKey, defaultValue: 0);
+  MainData.isWordleGameRecordChanged = MainData.localData!
+      .get(KeyUtils.isWordleGameRecordChangedKey, defaultValue: true);
 
   MainData.letterGameRecord =
-      MainData.localData!.get("letterGameRecord", defaultValue: 0);
-  MainData.isLetterGameRecordChanged =
-      MainData.localData!.get("isLetterGameRecordChanged", defaultValue: true);
+      MainData.localData!.get(KeyUtils.letterGameRecordKey, defaultValue: 0);
+  MainData.isLetterGameRecordChanged = MainData.localData!
+      .get(KeyUtils.isLetterGameRecordChangedKey, defaultValue: true);
 
   print(MainData.engameGameRecord);
   print(MainData.soundGameRecord);
@@ -297,36 +296,27 @@ Future<void> fLoadData({BuildContext? context}) async {
 
 Future<void> fResetData({required BuildContext context}) async {
   await Hive.initFlutter();
-  MainData.localData = await Hive.openBox("SuperFastBox");
+  MainData.localData = await Hive.openBox(KeyUtils.boxName);
 
-  MainData.isSoundOn = true;
-  MainData.localData!.put("isSoundOn", true);
-
-  MainData.getNotification = true;
-  MainData.localData!.put("getNotification", true);
-
-  MainData.removeControlButtonEngame = false;
-  MainData.localData!.put("removeControlButtonEngame", false);
-
-  //
   MainData.isFavListChanged = true;
-  MainData.localData!.put("isFavListChanged", MainData.isFavListChanged);
+  MainData.localData!
+      .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
   //
   MainData.isLearnedListChanged = true;
   MainData.localData!
-      .put("isLearnedListChanged", MainData.isLearnedListChanged);
+      .put(KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
   //
   MainData.favList = "";
-  MainData.localData!.put("favList", MainData.favList);
+  MainData.localData!.put(KeyUtils.favListValueKey, MainData.favList);
   //
   MainData.learnedList = "";
-  MainData.localData!.put("learnedList", MainData.learnedList);
+  MainData.localData!.put(KeyUtils.learnedListValueKey, MainData.learnedList);
   //
   MainData.userUID = "";
-  MainData.localData!.put("userUID", MainData.userUID);
+  MainData.localData!.put(KeyUtils.userUIDKey, MainData.userUID);
   //
   MainData.username = "";
-  MainData.localData!.put("username", MainData.username);
+  MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
   //
 
   MainData.learnedDatas = [];
@@ -334,78 +324,84 @@ Future<void> fResetData({required BuildContext context}) async {
   MainData.notLearnedDatas = [];
 
   MainData.engameGameRecord = 0;
-  MainData.localData!.put("engameGameRecord", MainData.engameGameRecord);
-  MainData.isEngameGameRecordChanged = false;
   MainData.localData!
-      .put("isEngameGameRecordChanged", MainData.isEngameGameRecordChanged);
+      .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
+  MainData.isEngameGameRecordChanged = false;
+  MainData.localData!.put(KeyUtils.isEngameGameRecordChangedKey,
+      MainData.isEngameGameRecordChanged);
   //
   MainData.soundGameRecord = 0;
-  MainData.localData!.put("soundGameRecord", MainData.soundGameRecord);
-  MainData.isSoundGameRecordChanged = false;
   MainData.localData!
-      .put("isSoundGameRecordChanged", MainData.isSoundGameRecordChanged);
+      .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
+  MainData.isSoundGameRecordChanged = false;
+  MainData.localData!.put(
+      KeyUtils.isSoundGameRecordChangedKey, MainData.isSoundGameRecordChanged);
   //
   MainData.wordleGameRecord = 0;
-  MainData.localData!.put("wordleGameRecord", MainData.wordleGameRecord);
-  MainData.isWordleGameRecordChanged = false;
   MainData.localData!
-      .put("isWordleGameRecordChanged", MainData.isWordleGameRecordChanged);
+      .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
+  MainData.isWordleGameRecordChanged = false;
+  MainData.localData!.put(KeyUtils.isWordleGameRecordChangedKey,
+      MainData.isWordleGameRecordChanged);
   //
   MainData.letterGameRecord = 0;
-  MainData.localData!.put("letterGameRecord", MainData.letterGameRecord);
-  MainData.isLetterGameRecordChanged = false;
   MainData.localData!
-      .put("isLetterGameRecordChanged", MainData.isLetterGameRecordChanged);
+      .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
+  MainData.isLetterGameRecordChanged = false;
+  MainData.localData!.put(KeyUtils.isLetterGameRecordChangedKey,
+      MainData.isLetterGameRecordChanged);
 
   print(MainData.learnedList);
 
   //! settings
-  await MainData.localData!.put("isSoundOn", true);
-
-  await MainData.localData!.put("getNotification", true);
-
-  await MainData.localData!.put("removeControlButtonEngame", false);
+  MainData.isSoundOn = true;
+  await MainData.localData!.put(KeyUtils.isSoundOnKey, true);
+  MainData.getNotification = true;
+  await MainData.localData!.put(KeyUtils.isGetNotificationOnKey, true);
+  MainData.removeControlButtonEngame = false;
+  await MainData.localData!.put(KeyUtils.isEngameControlButtonOnKey, false);
 
   if (await Permission.ignoreBatteryOptimizations.isGranted == true) {
-    MainData.localData!.put("isBatteryOptimizeDisabled", true);
+    MainData.localData!.put(KeyUtils.isBatteryOptimizeDisabledKey, true);
   } else {
-    MainData.localData!.put("isBatteryOptimizeDisabled", false);
+    MainData.localData!.put(KeyUtils.isBatteryOptimizeDisabledKey, false);
   }
 
-  await MainData.localData!.put("isBatteryOptimizeDisabled", false);
+  await MainData.localData!.put(KeyUtils.isBatteryOptimizeDisabledKey, false);
 
-  await MainData.localData!.put("isAutoRestartEnabledForBackground", false);
+  await MainData.localData!
+      .put(KeyUtils.isAutoRestartEnabledForBackgroundKey, false);
 
   try {
-    await FirebaseMessaging.instance.subscribeToTopic("Notification");
+    await FirebaseMessaging.instance
+        .subscribeToTopic(KeyUtils.notificationTopicKey);
   } catch (e) {}
 
-  await MainData.localData!.put("showAlwaysDailyDay", true);
+  MainData.showAlwaysDailyWord = true;
+  await MainData.localData!.put(KeyUtils.isShowDailyWordOnKey, true);
+  // MainData.
+  MainData.homePageNotifiAlert = true;
+  await MainData.localData!.put(KeyUtils.isShowHomePageNotifiAlertOnKey, true);
 
-  await MainData.localData!.put("homePageNotifiAlert", true);
+  MainData.isFirstOpen = true;
+  await MainData.localData!.put(KeyUtils.isFirstOpenKey, true);
 
   BlocProvider.of<HomePageSelectedWordCubit>(context).ResetState();
 }
-// Future<void> a() async {
-
-//   MainData.learnedList!.split(" ").forEach((e) {
-//     questionData.elementAt(int.tryParse(e)!).favType = WordFavType.learned;
-//     MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)!));
-//   });
-// }
 
 Future<void> saveSkipFirstOpen(
     {bool haveUsername = false,
     String username = "",
     required BuildContext context}) async {
-  MainData.localData!.put("isFirstOpen", false);
-  MainData.localData!.put("UserUID", FirebaseAuth.instance.currentUser!.uid);
+  MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
+  MainData.localData!
+      .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
   MainData.isFirstOpen = false;
   MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
 
   if (haveUsername) {
     MainData.username = username;
-    MainData.localData!.put('username', MainData.username);
+    MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
   }
 
   await fLoadData(context: context);

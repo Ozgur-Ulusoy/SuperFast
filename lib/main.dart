@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:engame2/Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
 import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
+import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
@@ -126,16 +128,16 @@ Future<void> setRandomDailyWord() async {
   Box box = await Hive.openBox("SuperFastBox");
   Random rnd = Random();
   int random = rnd.nextInt(questionData.length);
-  await box.put("dailyWordIndex", random);
+  await box.put("dailyWordId", random);
 
-  print(box.get("dailyWordIndex", defaultValue: 1).toString() + "a");
+  print(box.get("dailyWordId", defaultValue: 1).toString() + "a");
   print(random.toString() + "b");
-  String learnedList = box.get("learnedList", defaultValue: "");
+  String learnedList = box.get(KeyUtils.learnedListValueKey, defaultValue: "");
   List<Data> learnedDatas = [];
   List<Data> notLearnedDatas = [];
 
   if (learnedList != "") {
-    learnedList.split(" ").forEach((e) {
+    learnedList.trim().split(" ").forEach((e) {
       questionData.elementAt(int.tryParse(e)! - 1).favType =
           WordFavType.learned;
       learnedDatas.add(questionData.elementAt(int.tryParse(e)! - 1));
@@ -148,7 +150,8 @@ Future<void> setRandomDailyWord() async {
 
   List<Data> datas = learnedDatas + notLearnedDatas;
   Data dailyData = datas.where((element) => element.id == random).first;
-  bool isNotificationsOn = await box.get("getNotification", defaultValue: true);
+  bool isNotificationsOn =
+      await box.get(KeyUtils.isGetNotificationOnKey, defaultValue: true);
   if (isNotificationsOn) {
     await Firebase.initializeApp();
 
@@ -224,12 +227,11 @@ Future<void> setNotificationSettings() async {
 
 Future<void> setMainDataDailyWord() async {
   await Hive.initFlutter();
-  Box box = await Hive.openBox("SuperFastBox");
-  int randomIndex = box.get("dailyWordIndex", defaultValue: 1);
+  Box box = await Hive.openBox(KeyUtils.boxName);
+  int randomIndex = box.get(KeyUtils.dailyWordIdKey, defaultValue: 1);
   List<Data> allList = MainData.learnedDatas! + MainData.notLearnedDatas!;
   MainData.dailyData =
       allList.where((element) => element.id == randomIndex).first;
-  // MainData.dailyData = questionData[MainData.localData!.get("dailyWordIndex")];
 }
 
 //! Notification
@@ -357,17 +359,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         print("inactive");
         if (FirebaseAuth.instance.currentUser != null &&
-            FirebaseAuth.instance.currentUser!.isAnonymous == false) {
+            FirebaseAuth.instance.currentUser!.isAnonymous == false &&
+            MainData.isFirstOpen == false) {
           if (MainData.isFavListChanged == true) {
             await FirebaseFirestore.instance
-                .collection("Users")
+                .collection(KeyUtils.usersCollectionKey)
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({'favList': MainData.favList});
             MainData.isFavListChanged = false;
           }
           if (MainData.isLearnedListChanged == true) {
             await FirebaseFirestore.instance
-                .collection("Users")
+                .collection(KeyUtils.usersCollectionKey)
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .update({'learnedList': MainData.learnedList});
             MainData.isLearnedListChanged = false;
@@ -434,6 +437,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
         BlocProvider(
           create: (context) => HomePageSelectedWordCubit(),
+        ),
+
+        BlocProvider(
+          create: (context) => HomepageNotifiAlertCubit(),
         ),
       ],
       child: UpgradeAlert(
