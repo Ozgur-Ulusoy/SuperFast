@@ -1,19 +1,25 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/CheckAnswerButton.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameBackground.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameUpSection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../Ad_Helper.dart';
 import '../../../Business_Layer/cubit/question_cubit.dart';
 import '../../../Business_Layer/cubit/timer_cubit.dart';
 
 import '../../../Data_Layer/data.dart';
+import '../../Widgets/BannerAdWidget.dart';
 import '../../Widgets/ChoiceCard.dart';
+
+// GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 class EngamePage extends StatefulWidget with PopUpMixin {
   const EngamePage({Key? key}) : super(key: key);
@@ -42,15 +48,65 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
   }
 
   startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      BlocProvider.of<TimerCubit>(context).DecreaseTime();
-      if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
-        timer.cancel();
-        print("end");
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        BlocProvider.of<TimerCubit>(context).DecreaseTime();
+        if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
+          timer.cancel();
+          print("end");
+          try {
+            if (BlocProvider.of<QuestionCubit>(context).state.point >
+                MainData.localData!
+                    .get(KeyUtils.engameGameRecordKey, defaultValue: 0)) {
+              MainData.localData!.put(KeyUtils.engameGameRecordKey,
+                  BlocProvider.of<QuestionCubit>(context).state.point);
+              widget.showAfterGameDialog(
+                context,
+                true,
+                () async {
+                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                  BlocProvider.of<QuestionCubit>(context).ResetState();
+                  BlocProvider.of<QuestionCubit>(
+                          context) //! tipi kullanıcının seçtiği türden olacak
+                      .ChangeQuestion(
+                          type: QuestionType.english); //* ilk soruyu sordu
+                  StartTimer();
+                },
+              );
+              if (FirebaseAuth.instance.currentUser != null &&
+                  FirebaseAuth.instance.currentUser!.isAnonymous == false) {
+                FirebaseFirestore.instance
+                    .collection(KeyUtils.usersCollectionKey)
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({
+                  KeyUtils.gameRecordsMapKey +
+                          "." +
+                          KeyUtils.engameGameRecordKey:
+                      BlocProvider.of<QuestionCubit>(context).state.point,
+                });
+              }
+            } else {
+              widget.showAfterGameDialog(
+                context,
+                false,
+                () async {
+                  Navigator.of(context, rootNavigator: true).pop('dialog');
+                  BlocProvider.of<QuestionCubit>(context).ResetState();
+                  BlocProvider.of<QuestionCubit>(
+                          context) //! tipi kullanıcının seçtiği türden olacak
+                      .ChangeQuestion(
+                          type: QuestionType.english); //* ilk soruyu sordu
+                  StartTimer();
+                },
+              );
+            }
+          } catch (e) {}
 
-        //! puan ekranı
-      }
-    });
+          //! puan ekranı
+        }
+      },
+    );
   }
 
   stopTimer() {
@@ -89,27 +145,39 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
   bool isTrueAnswer = false;
   AudioPlayer audioPlayer = AudioPlayer();
 
+  BannerAdWidget bannerAdWidget = BannerAdWidget(
+    adId: AdHelperTest.testPageBannerAdUnitId,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: cBackgroundColor,
+      // key: scaffoldKey,
       body: Stack(
         children: [
           const PlayBackground(),
           SafeArea(
             child: Align(
-              alignment: const Alignment(0.75, -0.94),
+              alignment: const Alignment(0.9, -0.96),
               child: Visibility(
                 child: ScaleTransition(
                   scale: _animation,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: isTrueAnswer
-                        ? const Text("+1",
-                            style: TextStyle(fontSize: 30, color: Colors.green))
-                        : const Text("-1",
-                            style: TextStyle(fontSize: 30, color: Colors.red)),
-                  ),
+                      padding: const EdgeInsets.all(8.0),
+                      child:
+                          //  isTrueAnswer
+                          //     ?
+                          Text(
+                        context.watch<QuestionCubit>().state.point.toString(),
+                        style: TextStyle(
+                          fontSize: ScreenUtil.textScaleFactor * 28,
+                          color: isTrueAnswer ? Colors.green : Colors.red,
+                        ),
+                      )
+                      // : const Text("-1",
+                      //     style: TextStyle(fontSize: 30, color: Colors.red)),
+                      ),
                 ),
                 visible: isAnimationPlaying,
               ),
@@ -180,7 +248,7 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                       ),
                     ],
                   ),
-                  SizedBox(height: ScreenUtil.height * 0.04),
+                  // SizedBox(height: ScreenUtil.height * 0.02),
                   const Spacer(),
                   CheckAnswerButton(
                     callback: () {
@@ -239,13 +307,19 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                         stopTimer();
                       } else {
                         widget.showCustomSnackbar(
-                            context, "Lütfen Bir Cevap Seçiniz");
+                            context, "Lütfen Bir Cevap Seçiniz",
+                            duration: 1);
                       }
                     },
                   ),
                   //!
                   // SizedBox(height: ScreenUtil.height * 0.1),
-                  const Spacer(flex: 2),
+                  const Spacer(),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: bannerAdWidget,
+                  ),
+                  SizedBox(height: ScreenUtil.height * 0.02),
                 ],
               ),
             ),

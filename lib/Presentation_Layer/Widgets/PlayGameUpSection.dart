@@ -11,7 +11,10 @@ import 'PlayAddToWordCard.dart';
 
 class PlayGameUpSelection extends StatefulWidget with PopUpMixin {
   String title;
-  PlayGameUpSelection({Key? key, required this.title}) : super(key: key);
+  bool isLetterPage;
+  PlayGameUpSelection(
+      {Key? key, required this.title, this.isLetterPage = false})
+      : super(key: key);
 
   @override
   State<PlayGameUpSelection> createState() => _PlayGameUpSelectionState();
@@ -43,7 +46,10 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
             ],
           ),
         ),
-        SizedBox(height: ScreenUtil.height * 0.033),
+        SizedBox(
+            height: widget.isLetterPage
+                ? ScreenUtil.height * 0.025
+                : ScreenUtil.height * 0.033),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -115,7 +121,10 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
             );
           },
         ),
-        SizedBox(height: ScreenUtil.height * 0.015),
+        SizedBox(
+            height: widget.isLetterPage
+                ? ScreenUtil.height * 0.00
+                : ScreenUtil.height * 0.015),
         Padding(
           padding: EdgeInsets.only(
               right: ScreenUtil.width * 0.025, top: ScreenUtil.height * 0.015),
@@ -158,7 +167,10 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
             );
           },
         ),
-        SizedBox(height: ScreenUtil.height * 0.04),
+        SizedBox(
+            height: widget.isLetterPage
+                ? ScreenUtil.height * 0.025
+                : ScreenUtil.height * 0.04),
         Row(
           children: [
             const Spacer(),
@@ -207,7 +219,10 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
             const Spacer(),
           ],
         ),
-        SizedBox(height: ScreenUtil.height * 0.04),
+        SizedBox(
+            height: widget.isLetterPage
+                ? ScreenUtil.height * 0.025
+                : ScreenUtil.height * 0.04),
       ],
     );
   }

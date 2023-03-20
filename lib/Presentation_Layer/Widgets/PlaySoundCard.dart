@@ -1,21 +1,22 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
+import 'package:engame2/Data_Layer/data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../Data_Layer/consts.dart';
 
-class PlaySoundCard extends StatelessWidget {
+class PlaySoundCard extends StatelessWidget with PopUpMixin {
   AudioPlayer audioPlayer;
-  String urlSource;
+  // String urlSource;
+  String wordEn;
   Color color;
   String title;
   PlaySoundCard({
     Key? key,
     required this.audioPlayer,
-    required this.urlSource,
+    // required this.urlSource,
+    required this.wordEn,
     required this.color,
     required this.title,
   }) : super(key: key);
@@ -24,7 +25,13 @@ class PlaySoundCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        await audioPlayer.play(UrlSource(urlSource));
+        // await audioPlayer.play(UrlSource(urlSource));
+        String url = await getSoundUrl(wordEn);
+        if (url == "") {
+          showCustomSnackbar(context, "Ses Bulunamadı");
+          return;
+        }
+        await audioPlayer.play(UrlSource(url));
       },
       child: Container(
         width: ScreenUtil.width * 0.35,
@@ -35,21 +42,24 @@ class PlaySoundCard extends StatelessWidget {
         ),
         child: Center(
           child: Row(
-            // mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(),
+              // const Spacer(),
               FittedBox(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const Spacer(),
+              // const Spacer(
+              //   flex: 2,
+              // ),
+              SizedBox(width: ScreenUtil.width * 0.05),
               SvgPicture.asset("assets/images/playSoundIcon.svg"),
-              const Spacer(),
+              // const Spacer(),
             ],
           ),
         ),

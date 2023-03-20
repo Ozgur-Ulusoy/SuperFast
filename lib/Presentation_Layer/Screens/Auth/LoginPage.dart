@@ -22,57 +22,78 @@ class LoginPage extends StatefulWidget with PopUpMixin {
 
 class _LoginPageState extends State<LoginPage> {
   Future GoogleLogin() async {
-    final googleUser = await GoogleSignIn(
-            // signInOption: SignInOption.games,
-            // serverClientId:
-            //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
-            )
-        .signIn();
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final googleUser = await GoogleSignIn(
+              // signInOption: SignInOption.games,
+              // serverClientId:
+              //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
+              )
+          .signIn();
 
-    final googleAuth = await googleUser?.authentication;
+      final googleAuth = await googleUser?.authentication;
 
-    if (googleAuth != null) {
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      if (googleAuth != null) {
+        // Create a new credential
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      // Once signed in, return the UserCredential
-      var result = await FirebaseAuth.instance.signInWithCredential(credential);
-      //     .whenComplete(() async {
-      //   // await saveSkipFirstOpen(context: context);
-      //   // BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
+        // Once signed in, return the UserCredential
+        var result =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+        //     .whenComplete(() async {
+        //   // await saveSkipFirstOpen(context: context);
+        //   // BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
 
-      // });
+        // });
 
-      print("a");
-      if (result.additionalUserInfo!.isNewUser) {
-        print("yeni giris");
-        await FirebaseFirestore.instance
-            .collection(KeyUtils.usersCollectionKey)
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .set({
-          'favList': "",
-          'learnedList': "",
-          'GameRecors': {
-            'engameGameRecord': 0,
-            'soundGameRecord': 0,
-            'wordleGameRecord': 0,
-            'letterGameRecord': 0,
-          }
-        });
+        print("a");
+        if (result.additionalUserInfo!.isNewUser) {
+          print("yeni giris");
+          await FirebaseFirestore.instance
+              .collection(KeyUtils.usersCollectionKey)
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .set({
+            'favList': "",
+            'learnedList': "",
+            'GameRecors': {
+              'engameGameRecord': 0,
+              'soundGameRecord': 0,
+              'wordleGameRecord': 0,
+              'letterGameRecord': 0,
+            }
+          });
+        }
+
+        await fLoadData(context: context);
+        print("debug 1");
+        MainData.isFirstOpen = false;
+        await MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
+        print("debug 2");
+        await MainData.localData!
+            .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
+        MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
+        print("debug 3");
+
+        print("debug 4");
+        BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
+        print("debug 5");
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            '/homePage', (Route<dynamic> route) => false);
+        print("debug 6");
       }
-      MainData.isFirstOpen = false;
-      await MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
-      MainData.localData!
-          .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
-      MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
-      await fLoadData(context: context);
-      BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          '/homePage', (Route<dynamic> route) => false);
+      print("debug 7");
+    } catch (e) {
+      widget.showCustomDialog(context: context, message: e.toString());
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   TextEditingController userNameController = TextEditingController();
@@ -245,7 +266,11 @@ class _LoginPageState extends State<LoginPage> {
                 child: GoArrowButton(
                   toDo: () async {
                     try {
+                      if (FirebaseAuth.instance.currentUser != null) {
+                        await FirebaseAuth.instance.signOut();
+                      }
                       //
+                      // print(FirebaseAuth.instance.currentUser!);
                       String username = userNameController.text.trim();
                       String password = passwordController.text;
 

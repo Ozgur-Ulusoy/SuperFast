@@ -6,6 +6,7 @@ import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart'
 import 'package:engame2/Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
+import 'package:engame2/Presentation_Layer/Widgets/BannerAdWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageDrawer.dart';
 import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
@@ -19,12 +20,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../Ad_Helper.dart';
 import '../../Data_Layer/data.dart';
+
+// GlobalKey<_HomePageState> createKey() => GlobalKey<_HomePageState>();
 
 class HomePage extends StatefulWidget with PopUpMixin {
   HomePage({Key? key}) : super(key: key);
-  static GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  static GlobalKey<_HomePageState> createKey() => GlobalKey<_HomePageState>();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -65,11 +68,14 @@ class _HomePageState extends State<HomePage>
         await MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1);
 
     print("---- " + randomIndex.toString());
-    if (randomIndex != null && MainData.showAlwaysDailyWord) {
+    if (randomIndex != null &&
+        MainData.showAlwaysDailyWord &&
+        MainData.isShowedDailyWord == false) {
       BlocProvider.of<HomePageSelectedWordCubit>(context).changeCurrentData(
         MainData.dailyData!,
       );
       widget.openDailyWordPopUp(context, MainData.dailyData!, _audioPlayer);
+      MainData.isShowedDailyWord = true;
     }
   }
 
@@ -103,12 +109,15 @@ class _HomePageState extends State<HomePage>
     if (!mounted) return;
   }
 
+  BannerAdWidget bannerAdWidget =
+      BannerAdWidget(adId: AdHelperTest.homePageBannerAdUnitId);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: HomePage.scaffoldKey,
+      key: widget.scaffoldKey,
       drawer: HomePageDrawer(
-        callback: () => HomePage.scaffoldKey.currentState!.closeDrawer(),
+        callback: () => widget.scaffoldKey.currentState!.closeDrawer(),
       ),
       backgroundColor: cBackgroundColor,
       resizeToAvoidBottomInset: false,
@@ -141,7 +150,7 @@ class _HomePageState extends State<HomePage>
                         TabButtonWidget(
                           height: ScreenUtil.height * 0.04,
                           callback: () =>
-                              HomePage.scaffoldKey.currentState!.openDrawer(),
+                              widget.scaffoldKey.currentState!.openDrawer(),
                         ),
                         const Spacer(),
                         Visibility(
@@ -238,7 +247,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ],
                     ),
-                    SizedBox(height: ScreenUtil.height * 0.015),
+                    SizedBox(height: ScreenUtil.height * 0.0125),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -295,13 +304,17 @@ class _HomePageState extends State<HomePage>
                           imagePath: "assets/images/thirdplayphoto.svg",
                           text: "Sesli Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
-                          func: () {},
+                          func: () {
+                            Navigator.pushNamed(context, '/playSoundGameMode');
+                          },
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/fourthplayphoto.svg",
-                          text: "Sesli Kelime Oyunu",
+                          text: "Yakında...",
                           iconPath: "assets/images/gamepadicon.svg",
-                          func: () {},
+                          func: () {
+                            widget.showCustomSnackbar(context, "Çok Yakında !");
+                          },
                         ),
                       ],
                     ),
@@ -362,21 +375,39 @@ class _HomePageState extends State<HomePage>
                       ],
                     ),
 
-                    SizedBox(height: ScreenUtil.height * 0.025),
+                    SizedBox(height: ScreenUtil.height * 0.015),
                     // CustomPaint(
                     //   painter: DrawDottedhorizontalline(),
                     // ),
                     MyWordsWidget(
                       scrollController: scrollController,
                       audioPlayer: _audioPlayer,
-                    )
+                      // lastItemHeight: bannerAdWidget.height,
+                    ),
                     //!
                     // const Expanded(flex: 8, child: Placeholder()),
+                    // Align(
+                    //     alignment: const Alignment(0, 0.99),
+                    //     child: bannerAdWidget),
+                    SizedBox(height: ScreenUtil.height * 0.0125),
+                    // const Spacer(),
+
+                    //
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: bannerAdWidget,
+                    ),
+                    // const Spacer(),
+                    SizedBox(height: ScreenUtil.height * 0.01),
                   ],
                 ),
               ),
             ),
           ),
+          // SafeArea(
+          //   child: Align(
+          //       alignment: const Alignment(0, 0.99), child: bannerAdWidget),
+          // ),
         ],
       ),
     );

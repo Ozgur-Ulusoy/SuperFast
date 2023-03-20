@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:engame2/Ad_Helper.dart';
 import 'package:engame2/Business_Layer/cubit/answer_cubit.dart';
+import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameBackground.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlayGameUpSection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,8 +16,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../Business_Layer/cubit/question_cubit.dart';
 import '../../../Business_Layer/cubit/timer_cubit.dart';
 import '../../../Data_Layer/consts.dart';
+import '../../Widgets/BannerAdWidget.dart';
 
-class WordGamePage extends StatefulWidget {
+class WordGamePage extends StatefulWidget with PopUpMixin {
   const WordGamePage({Key? key}) : super(key: key);
 
   @override
@@ -33,6 +38,17 @@ class _WordGamePageState extends State<WordGamePage>
     curve: Curves.fastOutSlowIn,
   );
 
+  late final AnimationController _controller2 = AnimationController(
+    lowerBound: 0.70,
+    // upperBound: 1.0,
+    duration: const Duration(seconds: 1),
+    vsync: this,
+  )..repeat(reverse: true);
+  late final Animation<double> _animation2 = CurvedAnimation(
+    parent: _controller2,
+    curve: Curves.fastOutSlowIn,
+  );
+
   void StartTimer() {
     BlocProvider.of<TimerCubit>(context).ResetTime();
     startTimer();
@@ -44,6 +60,56 @@ class _WordGamePageState extends State<WordGamePage>
       if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
         timer.cancel();
         print("end");
+        // widget.showAfterGameDialog(context);
+        try {
+          if (BlocProvider.of<QuestionCubit>(context).state.point >
+              MainData.localData!
+                  .get(KeyUtils.letterGameRecordKey, defaultValue: 0)) {
+            MainData.localData!.put(KeyUtils.letterGameRecordKey,
+                BlocProvider.of<QuestionCubit>(context).state.point);
+            widget.showAfterGameDialog(
+              context,
+              true,
+              () async {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+                BlocProvider.of<AnswerCubit>(context)
+                    .ResetAnswer(); //* kullanıcnın cevabını resetledi
+                BlocProvider.of<QuestionCubit>(context).ResetState();
+                BlocProvider.of<QuestionCubit>(
+                        context) //! tipi kullanıcının seçtiği türden olacak
+                    .ChangeQuestion(
+                        type: QuestionType.turkish); //* ilk soruyu sordu
+                StartTimer();
+              },
+            );
+            if (FirebaseAuth.instance.currentUser != null &&
+                FirebaseAuth.instance.currentUser!.isAnonymous == false) {
+              FirebaseFirestore.instance
+                  .collection(KeyUtils.usersCollectionKey)
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({
+                KeyUtils.gameRecordsMapKey + "." + KeyUtils.letterGameRecordKey:
+                    BlocProvider.of<QuestionCubit>(context).state.point,
+              });
+            }
+          } else {
+            widget.showAfterGameDialog(
+              context,
+              false,
+              () async {
+                Navigator.of(context, rootNavigator: true).pop('dialog');
+                BlocProvider.of<AnswerCubit>(context)
+                    .ResetAnswer(); //* kullanıcnın cevabını resetledi
+                BlocProvider.of<QuestionCubit>(context).ResetState();
+                BlocProvider.of<QuestionCubit>(
+                        context) //! tipi kullanıcının seçtiği türden olacak
+                    .ChangeQuestion(
+                        type: QuestionType.turkish); //* ilk soruyu sordu
+                StartTimer();
+              },
+            );
+          }
+        } catch (e) {}
 
         //! puan ekranı
       }
@@ -73,6 +139,8 @@ class _WordGamePageState extends State<WordGamePage>
     StartTimer();
 
     _controller.stop();
+    // _controller2.forward();
+    // _controller2.stop();
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -87,6 +155,7 @@ class _WordGamePageState extends State<WordGamePage>
   void dispose() {
     timer?.cancel();
     _controller.dispose();
+    _controller2.dispose();
     audioPlayer.dispose();
     super.dispose();
     _textController.dispose();
@@ -96,6 +165,10 @@ class _WordGamePageState extends State<WordGamePage>
 
   bool isAnimationPlaying = false;
   bool isTrueAnswer = false;
+
+  BannerAdWidget bannerAdWidget = BannerAdWidget(
+    adId: AdHelperTest.letterPageBannerAdUnitId,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -108,17 +181,23 @@ class _WordGamePageState extends State<WordGamePage>
           const PlayBackground(),
           SafeArea(
             child: Align(
-              alignment: const Alignment(0.75, -0.94),
+              alignment: const Alignment(0.9, -0.96),
               child: Visibility(
                 child: ScaleTransition(
                   scale: _animation,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: isTrueAnswer
-                        ? const Text("+1",
-                            style: TextStyle(fontSize: 30, color: Colors.green))
-                        : const Text("-1",
-                            style: TextStyle(fontSize: 30, color: Colors.red)),
+                    child:
+                        //  isTrueAnswer
+                        //     ? const
+                        Text(
+                      context.watch<QuestionCubit>().state.point.toString(),
+                      style: TextStyle(
+                          fontSize: ScreenUtil.textScaleFactor * 28,
+                          color: isTrueAnswer ? Colors.green : Colors.red),
+                    ),
+                    // : const Text("-1",
+                    //     style: TextStyle(fontSize: 30, color: Colors.red)),
                   ),
                 ),
                 visible: isAnimationPlaying,
@@ -129,7 +208,10 @@ class _WordGamePageState extends State<WordGamePage>
             child: Center(
               child: Column(
                 children: [
-                  PlayGameUpSelection(title: "Türkçe - İngilizce"),
+                  PlayGameUpSelection(
+                    title: "Türkçe - İngilizce",
+                    isLetterPage: true,
+                  ),
                   Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -180,9 +262,7 @@ class _WordGamePageState extends State<WordGamePage>
                       ),
                     ),
                   ),
-
-                  SizedBox(height: ScreenUtil.height * 0.04),
-
+                  SizedBox(height: ScreenUtil.height * 0.025),
                   Expanded(
                     flex: 12,
                     child: BlocBuilder<AnswerCubit, AnswerState>(
@@ -217,101 +297,131 @@ class _WordGamePageState extends State<WordGamePage>
                                 ),
                                 itemBuilder: (__, index) {
                                   //* Eğer şık seçilmişse şık butonunu kapar ( yerine boş bir sizedbox gösterir )
-                                  return FittedBox(
-                                    child: MaterialButton(
-                                      minWidth: ScreenUtil.width * 0.12,
-                                      color: const Color(0XFFb9bee7),
-                                      onPressed: () {
-                                        //* şıkka basıldığı zaman kullanıcının cevabına bu şıkkı ekler
+                                  return ScaleTransition(
+                                    scale: _animation2,
+                                    child: GestureDetector(
+                                      // onLongPress: () => setState(() {
+                                      //   _controller2.forward();
+                                      //   print("a");
+                                      // }),
+                                      // onLongPressUp: () => setState(() {
+                                      //   _controller2.reverse();
+                                      //   print("b");
+                                      // }),
+                                      child: SizedBox.expand(
+                                        child: FittedBox(
+                                          child: MaterialButton(
+                                            minWidth: ScreenUtil.width * 0.12,
+                                            color: const Color(0XFFb9bee7),
+                                            onPressed: () {
+                                              //* şıkka basıldığı zaman kullanıcının cevabına bu şıkkı ekler
 
-                                        BlocProvider.of<AnswerCubit>(context)
-                                            .ChangeAnswer(
-                                                state.letters![index], index);
+                                              BlocProvider.of<AnswerCubit>(
+                                                      context)
+                                                  .ChangeAnswer(
+                                                      state.letters![index],
+                                                      index);
 
-                                        //* kullanıcının eklediği şık sayısı ( kullanıcının cevabı ) cevabın harf sayısına eşitse bu duruma bakar
-                                        if (BlocProvider.of<AnswerCubit>(
-                                                    context)
-                                                .state
-                                                .answerList
-                                                .length ==
-                                            state.answer
-                                                .replaceAll(" ", "")
-                                                .length) {
-                                          String res =
-                                              ""; //* kullanıcıının seçtiği şıkları ( harfler ) tek bir stringte birleştirir ( örn : a , d , a , m  şıklarını => adam kelimesine çevirir )
-                                          for (var element
-                                              in BlocProvider.of<AnswerCubit>(
+                                              //* kullanıcının eklediği şık sayısı ( kullanıcının cevabı ) cevabın harf sayısına eşitse bu duruma bakar
+                                              if (BlocProvider.of<AnswerCubit>(
+                                                          context)
+                                                      .state
+                                                      .answerList
+                                                      .length ==
+                                                  state
+                                                      .answer
+                                                      // .replaceAll(" ", "")
+                                                      .length) {
+                                                String res =
+                                                    ""; //* kullanıcıının seçtiği şıkları ( harfler ) tek bir stringte birleştirir ( örn : a , d , a , m  şıklarını => adam kelimesine çevirir )
+                                                for (var element in BlocProvider
+                                                        .of<AnswerCubit>(
+                                                            context)
+                                                    .state
+                                                    .answerList) {
+                                                  res += element.answer!;
+                                                }
+
+                                                //* eğer kullanıcının cevabı sorunun cevabına eşitse doğrudur ve soru-cevap-şık resetlemesi yaptıktan sonra ekrana yeni bir soru getirir
+                                                if (
+                                                    // res.replaceAll(" ", "") ==
+                                                    res == state.answer
+                                                    // .replaceAll(" ", "")
+                                                    ) {
+                                                  print("Dogru");
+                                                  BlocProvider.of<AnswerCubit>(
+                                                          context)
+                                                      .ResetAnswer();
+                                                  BlocProvider.of<
+                                                              QuestionCubit>(
+                                                          context)
+                                                      .TrueAnswerEvent(150);
+                                                  BlocProvider.of<
+                                                              QuestionCubit>(
+                                                          context)
+                                                      .ChangeQuestion(
+                                                          type: QuestionType
+                                                              .turkish);
+                                                  setState(() {
+                                                    isAnimationPlaying = true;
+                                                    isTrueAnswer = true;
+                                                    _controller.forward(
+                                                        from: 0);
+                                                  });
+                                                  if (MainData.isSoundOn) {
+                                                    audioPlayer.stop();
+                                                    audioPlayer.play(
+                                                        AssetSource(
+                                                            "sounds/true.mp3"));
+                                                  }
+                                                }
+                                                //* kullanıcının ve sorunun cevabı eşleşmiyorsa ( yanlışsa ) sadece seçili şıkları ve kullanıcı cevap kısmını resetler - ekran soru ilk geldiği ekran gibi olur
+                                                else {
+                                                  print("Yanlis");
+                                                  BlocProvider.of<AnswerCubit>(
+                                                          context)
+                                                      .ResetAnswer();
+
+                                                  BlocProvider.of<
+                                                              QuestionCubit>(
+                                                          context)
+                                                      .FalseAnswerEvent(125);
+                                                  setState(() {
+                                                    isAnimationPlaying = true;
+                                                    isTrueAnswer = false;
+                                                    _controller.forward(
+                                                        from: 0);
+                                                    if (MainData.isSoundOn) {
+                                                      audioPlayer.stop();
+                                                      audioPlayer.play(AssetSource(
+                                                          "sounds/false.mp3"));
+                                                    }
+                                                  });
+                                                }
+                                              }
+                                            },
+                                            child: Text(
+                                              BlocProvider.of<QuestionCubit>(
                                                       context)
                                                   .state
-                                                  .answerList) {
-                                            res += element.answer!;
-                                          }
-
-                                          //* eğer kullanıcının cevabı sorunun cevabına eşitse doğrudur ve soru-cevap-şık resetlemesi yaptıktan sonra ekrana yeni bir soru getirir
-                                          if (res.replaceAll(" ", "") ==
-                                              state.answer
-                                                  .replaceAll(" ", "")) {
-                                            print("Dogru");
-                                            BlocProvider.of<AnswerCubit>(
-                                                    context)
-                                                .ResetAnswer();
-                                            BlocProvider.of<QuestionCubit>(
-                                                    context)
-                                                .TrueAnswerEvent(150);
-                                            BlocProvider.of<QuestionCubit>(
-                                                    context)
-                                                .ChangeQuestion(
-                                                    type: QuestionType.turkish);
-                                            setState(() {
-                                              isAnimationPlaying = true;
-                                              isTrueAnswer = true;
-                                              _controller.forward(from: 0);
-                                            });
-                                            if (MainData.isSoundOn) {
-                                              audioPlayer.stop();
-                                              audioPlayer.play(AssetSource(
-                                                  "sounds/true.mp3"));
-                                            }
-                                          }
-                                          //* kullanıcının ve sorunun cevabı eşleşmiyorsa ( yanlışsa ) sadece seçili şıkları ve kullanıcı cevap kısmını resetler - ekran soru ilk geldiği ekran gibi olur
-                                          else {
-                                            print("Yanlis");
-                                            BlocProvider.of<AnswerCubit>(
-                                                    context)
-                                                .ResetAnswer();
-
-                                            BlocProvider.of<QuestionCubit>(
-                                                    context)
-                                                .FalseAnswerEvent(125);
-                                            setState(() {
-                                              isAnimationPlaying = true;
-                                              isTrueAnswer = false;
-                                              _controller.forward(from: 0);
-                                              if (MainData.isSoundOn) {
-                                                audioPlayer.stop();
-                                                audioPlayer.play(AssetSource(
-                                                    "sounds/false.mp3"));
-                                              }
-                                            });
-                                          }
-                                        }
-                                      },
-                                      child: Text(
-                                        BlocProvider.of<QuestionCubit>(context)
-                                            .state
-                                            .letters![index],
-                                        style: TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: BlocProvider.of<AnswerCubit>(
-                                                        context)
-                                                    .state
-                                                    .answerList
-                                                    .where((element) =>
-                                                        element.id == index)
-                                                    .isNotEmpty
-                                                ? cBlueBackground
-                                                : cBackgroundColor),
+                                                  .letters![index],
+                                              style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: BlocProvider.of<
+                                                                  AnswerCubit>(
+                                                              context)
+                                                          .state
+                                                          .answerList
+                                                          .where((element) =>
+                                                              element.id ==
+                                                              index)
+                                                          .isNotEmpty
+                                                      ? cBlueBackground
+                                                      : cBackgroundColor),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   );
@@ -334,6 +444,11 @@ class _WordGamePageState extends State<WordGamePage>
                   //!
                   // SizedBox(height: ScreenUtil.height * 0.1),
                   // const Spacer(flex: 2),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: bannerAdWidget,
+                  ),
+                  SizedBox(height: ScreenUtil.height * 0.015),
                 ],
               ),
             ),

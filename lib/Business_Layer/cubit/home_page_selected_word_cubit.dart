@@ -135,7 +135,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
     }
   }
 
-  void updateState(var data, String type, BuildContext context) {
+  void updateState(var data, String type, BuildContext context) async {
     switch (type) {
       case "Learned":
         if (MainData.learnedDatas!.contains(data)) {
@@ -146,12 +146,13 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
           );
           return;
         }
+        // 1 5 8 13 46 85 90
         data.favType = WordFavType.learned;
         MainData.learnedDatas!.add(data);
         MainData.notLearnedDatas!.remove(data);
         MainData.learnedList = MainData.learnedList! + "${data.id} ";
         MainData.isLearnedListChanged = true;
-        MainData.localData!.put(
+        await MainData.localData!.put(
             KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
         break;
       case "NotLearned":
@@ -169,8 +170,9 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         MainData.learnedList =
             MainData.learnedList!.replaceAll("${data.id} ", "");
         MainData.isLearnedListChanged = true;
-        MainData.localData!.put(
+        await MainData.localData!.put(
             KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
+        print(MainData.learnedList);
         break;
       case "Fav":
         if (MainData.favDatas!.contains(data)) {
@@ -185,7 +187,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         MainData.favDatas!.add(data);
         MainData.favList = MainData.favList! + "${data.id} ";
         MainData.isFavListChanged = true;
-        MainData.localData!
+        await MainData.localData!
             .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
         break;
       case "UnFav":
@@ -193,7 +195,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         MainData.favDatas!.remove(data);
         MainData.favList = MainData.favList!.replaceAll("${data.id} ", "");
         MainData.isFavListChanged = true;
-        MainData.localData!
+        await MainData.localData!
             .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
         break;
       default:

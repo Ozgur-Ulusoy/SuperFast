@@ -159,7 +159,7 @@ class QuestionCubit extends Cubit<QuestionState> {
     //   // }
     // }
 
-    resultList.remove(" ");
+    // resultList.remove(" ");
     for (var i = 0; i < resultList.length; i++) {
       resultList[i] = type == QuestionType.english
           ? resultList[i].ToUpperTurkish()

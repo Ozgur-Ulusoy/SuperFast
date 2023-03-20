@@ -114,6 +114,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                               onTap: () {
                                 Navigator.of(context)
                                     .pushNamed('/settingsPage');
+                                widget.callback();
                               },
                               child: Text(
                                 "AYARLAR",
@@ -139,39 +140,44 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                   height: ScreenUtil.height * 0.06,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (FirebaseAuth.instance.currentUser != null &&
-                          FirebaseAuth.instance.currentUser!.isAnonymous ==
-                              false) {
-                        if (MainData.isFavListChanged == true) {
-                          await FirebaseFirestore.instance
-                              .collection(KeyUtils.usersCollectionKey)
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({'favList': MainData.favList});
-                          MainData.isFavListChanged = false;
+                      try {
+                        if (FirebaseAuth.instance.currentUser != null &&
+                            FirebaseAuth.instance.currentUser!.isAnonymous ==
+                                false) {
+                          if (MainData.isFavListChanged == true) {
+                            await FirebaseFirestore.instance
+                                .collection(KeyUtils.usersCollectionKey)
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .update({'favList': MainData.favList});
+                            MainData.isFavListChanged = false;
+                          }
+                          if (MainData.isLearnedListChanged == true) {
+                            await FirebaseFirestore.instance
+                                .collection(KeyUtils.usersCollectionKey)
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .update({'learnedList': MainData.learnedList});
+                            MainData.isLearnedListChanged = false;
+                          }
                         }
-                        if (MainData.isLearnedListChanged == true) {
-                          await FirebaseFirestore.instance
-                              .collection(KeyUtils.usersCollectionKey)
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({'learnedList': MainData.learnedList});
-                          MainData.isLearnedListChanged = false;
-                        }
+                        BlocProvider.of<HomePageSelectedWordCubit>(context)
+                            .StateBuild();
+                        await FirebaseAuth.instance
+                            .signOut()
+                            .whenComplete(() async {
+                          if (FirebaseAuth.instance.currentUser == null) {
+                            await fResetData(context: context);
+                            await Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/loginPage', (Route<dynamic> route) => false);
+                          }
+                          // questionData.forEach((element) {
+                          //   element.isFav = false;
+                          //   element.favType = WordFavType.nlearned;
+                          // });
+                        });
+                      } catch (e) {
+                        await Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/loginPage', (Route<dynamic> route) => false);
                       }
-                      BlocProvider.of<HomePageSelectedWordCubit>(context)
-                          .StateBuild();
-                      await FirebaseAuth.instance
-                          .signOut()
-                          .whenComplete(() async {
-                        if (FirebaseAuth.instance.currentUser == null) {
-                          await fResetData(context: context);
-                          await Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/loginPage', (Route<dynamic> route) => false);
-                        }
-                        // questionData.forEach((element) {
-                        //   element.isFav = false;
-                        //   element.favType = WordFavType.nlearned;
-                        // });
-                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(

@@ -1,5 +1,6 @@
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Presentation_Layer/Widgets/SettingsCard.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,6 +86,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
                 await MainData.localData!
                     .put(KeyUtils.isGetNotificationOnKey, value);
+                try {
+                  if (MainData.getNotification == true) {
+                    await FirebaseMessaging.instance
+                        .subscribeToTopic(KeyUtils.notificationTopicKey);
+                  } else {
+                    await FirebaseMessaging.instance
+                        .unsubscribeFromTopic(KeyUtils.notificationTopicKey);
+                  }
+                } catch (e) {}
               },
             ),
             SizedBox(height: ScreenUtil.height * 0.025),

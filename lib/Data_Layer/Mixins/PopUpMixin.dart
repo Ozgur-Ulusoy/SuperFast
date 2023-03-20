@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlaySoundCard.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
+import '../../Business_Layer/cubit/question_cubit.dart';
 import '../../Presentation_Layer/Screens/WebviewPage.dart';
 import '../../Presentation_Layer/Widgets/PlayAddToWordCard.dart';
 
@@ -132,17 +134,19 @@ mixin PopUpMixin {
                     padding: EdgeInsets.only(right: ScreenUtil.width * 0.04),
                     child: Row(
                       children: [
-                        PlaySoundCard(
-                            audioPlayer: audioPlayer,
-                            urlSource: data.mediaLinkTr,
-                            color: const Color(0XFFFD830D),
-                            title: "Türkçe Telafuz"),
-                        const Spacer(),
-                        PlaySoundCard(
-                            audioPlayer: audioPlayer,
-                            urlSource: data.mediaLink,
-                            color: const Color(0XFF607FF2),
-                            title: "İngilizce Telafuz"),
+                        // PlaySoundCard(
+                        //     audioPlayer: audioPlayer,
+                        //     wordEn: data.english,
+                        //     color: const Color(0XFFFD830D),
+                        //     title: "Türkçe Telafuz"),
+                        // const Spacer(),
+                        Expanded(
+                          child: PlaySoundCard(
+                              audioPlayer: audioPlayer,
+                              wordEn: data.english,
+                              color: const Color(0XFF607FF2),
+                              title: "İngilizce Telafuz"),
+                        ),
                       ],
                     ),
                   ),
@@ -155,7 +159,9 @@ mixin PopUpMixin {
                           context,
                           MaterialPageRoute(
                             builder: (context) => WebViewPage(
-                              url: data.link,
+                              // url: data.link,
+                              url:
+                                  "https://translate.google.com/?hl=tr&sl=en&tl=tr&text=${data.english}&op=translate",
                               title: data.english,
                             ),
                           ),
@@ -324,17 +330,19 @@ mixin PopUpMixin {
                             EdgeInsets.only(right: ScreenUtil.width * 0.04),
                         child: Row(
                           children: [
-                            PlaySoundCard(
-                                audioPlayer: audioPlayer,
-                                urlSource: data.mediaLinkTr,
-                                color: const Color(0XFFFD830D),
-                                title: "Türkçe Telafuz"),
-                            const Spacer(),
-                            PlaySoundCard(
-                                audioPlayer: audioPlayer,
-                                urlSource: data.mediaLink,
-                                color: const Color(0XFF607FF2),
-                                title: "İngilizce Telafuz"),
+                            // PlaySoundCard(
+                            //     audioPlayer: audioPlayer,
+                            //     wordEn: data.english,
+                            //     color: const Color(0XFFFD830D),
+                            //     title: "Türkçe Telafuz"),
+                            // const Spacer(),
+                            Expanded(
+                              child: PlaySoundCard(
+                                  audioPlayer: audioPlayer,
+                                  wordEn: data.english,
+                                  color: const Color(0XFF607FF2),
+                                  title: "İngilizce Telafuz"),
+                            ),
                           ],
                         ),
                       ),
@@ -347,7 +355,9 @@ mixin PopUpMixin {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => WebViewPage(
-                                  url: data.link,
+                                  // url: data.link,
+                                  url:
+                                      "https://translate.google.com/?hl=tr&sl=en&tl=tr&text=${data.english}&op=translate",
                                   title: data.english,
                                 ),
                               ),
@@ -425,11 +435,25 @@ mixin PopUpMixin {
   // }
 
   void showCustomSnackbar(BuildContext context, String message,
-      {int duration = 2, Color color = const Color.fromRGBO(76, 81, 198, 1)}) {
+      {int duration = 1, Color color = const Color.fromRGBO(76, 81, 198, 1)}) {
+    // print(AppBar().preferredSize.height);
+    // print(
+    //   MediaQuery.of(context).padding.top,
+    // );
+    print(WidgetsBinding.instance.window.padding.top);
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+          dismissDirection: DismissDirection.up,
+          behavior: SnackBarBehavior.floating,
+          // width: ScreenUtil.width * 0.95,
+          margin: EdgeInsetsDirectional.only(
+              bottom: ScreenUtil.height +
+                  AppBar().preferredSize.height -
+                  WidgetsBinding.instance.window.padding.top,
+              start: ScreenUtil.width * 0.05,
+              end: ScreenUtil.width * 0.05),
           content: Text(message),
           backgroundColor: color,
           // isOpaque ? cBlueBackground.withOpacity(0.80) : cBlueBackground,
@@ -445,24 +469,108 @@ mixin PopUpMixin {
       );
   }
 
-  void showAfterEngameDialog(BuildContext context) {
+  void showAfterGameDialog(
+      BuildContext context, bool isRecord, AsyncCallback callback) {
+    // showDialog(
+    //   context: context,
+    //   builder: (context) {
+    //     return Center(
+    //       child: Container(
+    //         width: ScreenUtil.width * 0.65,
+    //         height: ScreenUtil.height * 0.65,
+    //         decoration: BoxDecoration(
+    //           color: Colors.white,
+    //           borderRadius: BorderRadius.circular(25),
+    //         ),
+    //         child: Column(
+    //           children: [
+    //             Text(
+    //               "Tebrikler !",
+    //               style: GoogleFonts.poppins(
+    //                   fontSize: 25, fontWeight: FontWeight.bold),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     );
+    //   },
+    // );
     showDialog(
       context: context,
-      builder: (context) {
-        return Center(
-          child: Container(
-            width: ScreenUtil.width * 0.65,
-            height: ScreenUtil.height * 0.65,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Column(
-              children: const [],
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          title: Text(
+            isRecord ? "Rekor Kırıldı !" : "Tebrikler !",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: ScreenUtil.textScaleFactor * 20,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        );
-      },
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Puanınız : ${context.read<QuestionCubit>().state.point}",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                "Rekorunuz : ${MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0)}",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                "Doğru Cevap Sayısı : ${context.read<QuestionCubit>().state.trueAnswer}",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                "Yanlış Cevap Sayısı : ${context.read<QuestionCubit>().state.falseAnswer}",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/homePage', (Route<dynamic> route) => false);
+              },
+              child: Text(
+                "Menüye Dön",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                callback();
+              },
+              child: Text(
+                "Tekrar Oyna",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

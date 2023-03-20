@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import 'package:engame2/Data_Layer/consts.dart';
@@ -8,18 +10,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class Data {
   String english; //? ingilizce hali
   String turkish; //? turkce hali
   WordType type; //? tip'i ( isim zamir fiil vb. )
   WordLevel level; //? ingilizce level seviyesi
-  String mediaLink; //? ses dosyasi linki
-  String mediaLinkTr; //? türkce ses dosyasi linki
+  String?
+      mediaLink; //! Kullanılmıyor - ses dosyasi linki - suan kullanılmıyor aktif olarak
+  // String mediaLinkTr; //! Kullanılmıyor - türkce ses dosyasi linki
   WordFavType favType;
   bool isFav; //? favori mi
   int id; //? listedeki id si
-  String link; //? cambdridge kelime sayfasının linki
+  String link; //! Kullanılmıyor - cambdridge kelime sayfasının linki
   String exampleSentence; //? örnek cümle
 
   Data({
@@ -27,14 +31,41 @@ class Data {
     required this.turkish,
     required this.level,
     required this.type,
-    required this.mediaLink,
+    this.mediaLink,
     required this.id,
-    this.mediaLinkTr = "Tr Link",
+    // this.mediaLinkTr = "Tr Link", //! REQUIRED
     this.favType = WordFavType.nlearned,
     this.isFav = false,
-    this.link = "link",
-    this.exampleSentence = "Example Sentence",
+    this.link = "Çeviri Sayfasına Git", //! REQUIRED
+    this.exampleSentence = "Example Sentence", //! REQUIRED
   });
+}
+
+Future<String> getSoundUrl(String en) async {
+  try {
+    var url = Uri.parse('https://api.dictionaryapi.dev/api/v2/entries/en/$en');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      String result = "";
+      List map = jsonResponse[0]['phonetics'];
+      for (var i = 0; i < map.length; i++) {
+        if (map[i]["audio"] != "") {
+          result = map[i]["audio"];
+          break;
+        }
+      }
+      print(result);
+      return result;
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+      return "";
+    }
+  } on Exception {
+    // TODO
+    return "";
+  }
 }
 
 Future<void> fLoadSvgPictures() async {
@@ -142,38 +173,44 @@ Future<void> fLoadData({BuildContext? context}) async {
   MainData.isLearnedListChanged = MainData.localData!
       .get(KeyUtils.isLearnedListChangedKey, defaultValue: true);
 
-  if (FirebaseAuth.instance.currentUser != null &&
-      !FirebaseAuth.instance.currentUser!.isAnonymous) {
-    if (MainData.isFavListChanged || MainData.isLearnedListChanged) {
-      await FirebaseFirestore.instance
-          .collection(KeyUtils.usersCollectionKey)
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then((value) {
+  try {
+    if (FirebaseAuth.instance.currentUser != null &&
+        !FirebaseAuth.instance.currentUser!.isAnonymous) {
+      if (MainData.isFavListChanged || MainData.isLearnedListChanged) {
+        await FirebaseFirestore.instance
+            .collection(KeyUtils.usersCollectionKey)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get()
+            .then(
+          (value) {
+            if (MainData.isFavListChanged) {
+              MainData.favList = value[KeyUtils.favListValueKey];
+              MainData.localData!.put('favList', MainData.favList);
+              print("Favlist - Firebaseden çekildi");
+            }
+            if (MainData.isLearnedListChanged) {
+              MainData.learnedList = value[KeyUtils.learnedListValueKey];
+              MainData.localData!
+                  .put(KeyUtils.learnedListValueKey, MainData.learnedList);
+              print("LearnedList - Firebaseden çekildi");
+            }
+          },
+        );
+
         if (MainData.isFavListChanged) {
-          MainData.favList = value[KeyUtils.favListValueKey];
-          MainData.localData!.put('favList', MainData.favList);
-        }
-        if (MainData.isLearnedListChanged) {
-          MainData.learnedList = value[KeyUtils.learnedListValueKey];
+          MainData.isFavListChanged = false;
           MainData.localData!
-              .put(KeyUtils.learnedListValueKey, MainData.learnedList);
+              .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
         }
-      });
 
-      if (MainData.isFavListChanged) {
-        MainData.isFavListChanged = false;
-        MainData.localData!
-            .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
-      }
-
-      if (MainData.isLearnedListChanged) {
-        MainData.isLearnedListChanged = false;
-        MainData.localData!.put(
-            KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
+        if (MainData.isLearnedListChanged) {
+          MainData.isLearnedListChanged = false;
+          MainData.localData!.put(
+              KeyUtils.isLearnedListChangedKey, MainData.isLearnedListChanged);
+        }
       }
     }
-  }
+  } catch (e) {}
 
   MainData.learnedList =
       MainData.localData!.get(KeyUtils.learnedListValueKey, defaultValue: "");
@@ -191,18 +228,27 @@ Future<void> fLoadData({BuildContext? context}) async {
       MainData.localData!.get(KeyUtils.favListValueKey, defaultValue: "");
 
   if (MainData.learnedList != "") {
-    print(MainData.learnedList);
-    MainData.learnedList!.trim().split(" ").forEach((e) {
-      questionData.elementAt(int.tryParse(e)! - 1).favType =
-          WordFavType.learned;
-      MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
+    String data = MainData.localData!.get(KeyUtils.learnedListValueKey);
+    data.trim().split(" ").forEach((e) {
+      // questionData.elementAt(int.tryParse(e)! - 1).favType =
+      //     WordFavType.learned;
+      // MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
+      Data data =
+          questionData.where((element) => element.id == int.tryParse(e)).first;
+      data.favType = WordFavType.learned;
+      MainData.learnedDatas!.add(data);
     });
   }
 
   if (MainData.favList != "") {
-    MainData.favList!.trim().split(" ").forEach((e) {
-      questionData.elementAt(int.tryParse(e)! - 1).isFav = true;
-      MainData.favDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
+    String data = MainData.localData!.get(KeyUtils.favListValueKey);
+    data.trim().split(" ").forEach((e) {
+      // questionData.elementAt(int.tryParse(e)! - 1).isFav = true;
+      // MainData.favDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
+      Data data =
+          questionData.where((element) => element.id == int.tryParse(e)).first;
+      data.isFav = true;
+      MainData.favDatas!.add(data);
     });
   }
   MainData.notLearnedDatas = questionData
@@ -215,48 +261,54 @@ Future<void> fLoadData({BuildContext? context}) async {
           MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1))
       .first;
 
-  //! değişecek - app live crycle da olucak bu
-  if (FirebaseAuth.instance.currentUser != null &&
-      !FirebaseAuth.instance.currentUser!.isAnonymous) {
-    if (MainData.isEngameGameRecordChanged ||
-        MainData.isLetterGameRecordChanged ||
-        MainData.isSoundGameRecordChanged ||
-        MainData.isWordleGameRecordChanged) {
-      Map<String, dynamic> map = await FirebaseFirestore.instance
-          .collection(KeyUtils.usersCollectionKey)
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then(
-            (value) => value[KeyUtils.gameRecordsMapKey],
-          );
-      print(map);
+  // CONTINUE HERE
+  // offlineken oynanılan ve kazanılan rekorlar için 4 ayrı değişken olustur true oldugunda kaydedilen local degerler firebase'e aktarılacak
 
-      MainData.engameGameRecord = map[KeyUtils.engameGameRecordKey];
-      MainData.soundGameRecord = map[KeyUtils.soundGameRecordKey];
-      MainData.wordleGameRecord = map[KeyUtils.wordleGameRecordKey];
-      MainData.letterGameRecord = map[KeyUtils.letterGameRecordKey];
-      await MainData.localData!
-          .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
-      await MainData.localData!
-          .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
-      await MainData.localData!
-          .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
-      await MainData.localData!
-          .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
-      MainData.isEngameGameRecordChanged = false;
-      MainData.isSoundGameRecordChanged = false;
-      MainData.isWordleGameRecordChanged = false;
-      MainData.isLetterGameRecordChanged = false;
-      await MainData.localData!
-          .put(KeyUtils.isEngameGameRecordChangedKey, false);
-      await MainData.localData!
-          .put(KeyUtils.isSoundGameRecordChangedKey, false);
-      await MainData.localData!
-          .put(KeyUtils.isWordleGameRecordChangedKey, false);
-      await MainData.localData!
-          .put(KeyUtils.isLetterGameRecordChangedKey, false);
+  //! değişen değerler direkt olarak firebase'ye aktarılacak
+
+  try {
+    if (FirebaseAuth.instance.currentUser != null &&
+        !FirebaseAuth.instance.currentUser!.isAnonymous) {
+      if (MainData.isEngameGameRecordChanged ||
+          MainData.isLetterGameRecordChanged ||
+          MainData.isSoundGameRecordChanged ||
+          MainData.isWordleGameRecordChanged) {
+        Map<String, dynamic> map = await FirebaseFirestore.instance
+            .collection(KeyUtils.usersCollectionKey)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get()
+            .then(
+              (value) => value[KeyUtils.gameRecordsMapKey],
+            );
+        print(map);
+
+        MainData.engameGameRecord = map[KeyUtils.engameGameRecordKey];
+        MainData.soundGameRecord = map[KeyUtils.soundGameRecordKey];
+        MainData.wordleGameRecord = map[KeyUtils.wordleGameRecordKey];
+        MainData.letterGameRecord = map[KeyUtils.letterGameRecordKey];
+        await MainData.localData!
+            .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
+        await MainData.localData!
+            .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
+        await MainData.localData!
+            .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
+        await MainData.localData!
+            .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
+        MainData.isEngameGameRecordChanged = false;
+        MainData.isSoundGameRecordChanged = false;
+        MainData.isWordleGameRecordChanged = false;
+        MainData.isLetterGameRecordChanged = false;
+        await MainData.localData!
+            .put(KeyUtils.isEngameGameRecordChangedKey, false);
+        await MainData.localData!
+            .put(KeyUtils.isSoundGameRecordChangedKey, false);
+        await MainData.localData!
+            .put(KeyUtils.isWordleGameRecordChangedKey, false);
+        await MainData.localData!
+            .put(KeyUtils.isLetterGameRecordChangedKey, false);
+      }
     }
-  }
+  } catch (e) {}
 
   MainData.engameGameRecord =
       MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0);
@@ -277,7 +329,7 @@ Future<void> fLoadData({BuildContext? context}) async {
       MainData.localData!.get(KeyUtils.letterGameRecordKey, defaultValue: 0);
   MainData.isLetterGameRecordChanged = MainData.localData!
       .get(KeyUtils.isLetterGameRecordChangedKey, defaultValue: true);
-
+  print("-----------------------");
   print(MainData.engameGameRecord);
   print(MainData.soundGameRecord);
   print(MainData.wordleGameRecord);
@@ -286,12 +338,7 @@ Future<void> fLoadData({BuildContext? context}) async {
   print(MainData.isSoundGameRecordChanged);
   print(MainData.isWordleGameRecordChanged);
   print(MainData.isLetterGameRecordChanged);
-
-  //
-  // if (isInitial == false) {
-  //   BlocProvider.of<HomePageSelectedWordCubit>(context!).StateBuild();
-  // }
-  //
+  print("-----------------------");
 }
 
 Future<void> fResetData({required BuildContext context}) async {
@@ -444,6 +491,9 @@ class MainData {
   static bool isAutoRestartEnabledForBackground =
       false; //? arkaplanda otomatik yeniden başlatma ayarı yapıdlı mı - yapıldıgı kontrol edilemiyor
   static bool homePageNotifiAlert = true; //? anasayfada bildirim uyarısı
+
+  //! cok önemli degil
+  static bool isShowedDailyWord = false;
 }
 
 enum WordLevel {
@@ -482,8 +532,6 @@ List<Data> questionData = [
     type: WordType.verb,
     mediaLink:
         "https://drive.google.com/uc?export=download&id=1X7KSD2WwdBUIkLxrGzgq_zjYtKr2Ur86",
-    // favType: WordFavType.learned,
-    link: "https://dictionary.cambridge.org/dictionary/english-turkish/abolish",
     id: 1,
   ),
   Data(
@@ -3391,7 +3439,7 @@ List<Data> questionData = [
   ),
   Data(
     english: "Completion",
-    turkish: "Bitme",
+    turkish: "Tamamlanma",
     level: WordLevel.b2,
     type: WordType.noun,
     mediaLink:
@@ -4273,507 +4321,1501 @@ List<Data> questionData = [
     id: 420,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Costly",
+    turkish: "Pahalı",
     level: WordLevel.c1,
-    type: WordType.noun,
-    mediaLink: "https://",
+    type: WordType.adjective,
     id: 421,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Councillor",
+    turkish: "Kurul Üyesi",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 422,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Counsellor",
+    turkish: "Danışman",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 423,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Counter",
+    turkish: "Tezgah",
+    level: WordLevel.b2,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 424,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Counter",
+    turkish: "Karşılık Vermek",
     level: WordLevel.c1,
-    type: WordType.noun,
-    mediaLink: "https://",
+    type: WordType.verb,
     id: 425,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Counterpart",
+    turkish: "Meslektaş",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 426,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Countless",
+    turkish: "Sayısız",
     level: WordLevel.c1,
-    type: WordType.noun,
-    mediaLink: "https://",
+    type: WordType.adjective,
     id: 427,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Coup",
+    turkish: "Darbe",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 428,
   ),
+
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Courtesy",
+    turkish: "Nezaket",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 429,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Coverage",
+    turkish: "Kapsama",
+    level: WordLevel.b2,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 430,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Cowboy",
+    turkish: "Kovboy",
+    level: WordLevel.b2,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 431,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Crack",
+    turkish: "Çatlak",
     level: WordLevel.c1,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 432,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Crack",
+    turkish: "Kaliteli",
     level: WordLevel.c1,
-    type: WordType.noun,
-    mediaLink: "https://",
+    type: WordType.adjective,
     id: 433,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Craft",
+    turkish: "Hüner",
+    level: WordLevel.b2,
     type: WordType.noun,
-    mediaLink: "https://",
     id: 434,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
-    type: WordType.noun,
-    mediaLink: "https://",
+    english: "Crawl",
+    turkish: "Emeklemek",
+    level: WordLevel.b2,
+    type: WordType.verb,
     id: 435,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Creativity",
+    turkish: "Yaratıcılık",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 436,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Creator",
+    turkish: "Yaratıcı",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 437,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Credibility",
+    turkish: "Güvenilirlik",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 438,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Credible",
+    turkish: "Güvenilir",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 439,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Creep",
+    turkish: "Sızmak",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 440,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Critique",
+    turkish: "Eleştiri",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 441,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Crown",
+    turkish: "Taç",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 442,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Crude",
+    turkish: "Ham",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 443,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Cruise",
+    turkish: "Gemi Seyahati",
+    level: WordLevel.b1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 444,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Crush",
+    turkish: "Ezmek",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 445,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Cue",
+    turkish: "İpucu",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 446,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Cult",
+    turkish: "Mezhep",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 447,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Cultivate",
+    turkish: "Tarlayı Sürmek",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 448,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Curiosity",
+    turkish: "Merak",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 449,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
-    type: WordType.noun,
+    english: "Curious",
+    turkish: "Meraklı",
+    level: WordLevel.b2,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 450,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Curriculum",
+    turkish: "Müfredat",
+    level: WordLevel.b1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 451,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Custody",
+    turkish: "Gözaltı",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 452,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
-    type: WordType.noun,
+    english: "Cute",
+    turkish: "Şirin",
+    level: WordLevel.b2,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 453,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Cutting",
+    turkish: "Kırıcı",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 454,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Cynical",
+    turkish: "Kötümser",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 455,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Dairy",
+    turkish: "Süthane",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 456,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Dam",
+    turkish: "Baraj",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 457,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Damage",
+    turkish: "Hasar",
+    level: WordLevel.b1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 458,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Dare",
+    turkish: "Cürret",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 459,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Darkness",
+    turkish: "Karanlık",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 460,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Database",
+    turkish: "Veritabanı",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 461,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Dawn",
+    turkish: "Şafak",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 462,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Deadline",
+    turkish: "Mühlet",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 463,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
-    type: WordType.noun,
+    english: "Deadly",
+    turkish: "Öldürücü",
+    level: WordLevel.b2,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 464,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Dealer",
+    turkish: "Tüccar",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 465,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Debris",
+    turkish: "Enkaz",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 466,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Decisive",
+    turkish: "Belirleyici",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 467,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Deck",
+    turkish: "Güverte",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 468,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Declaration",
+    turkish: "Beyan",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 469,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Dedicated",
+    turkish: "Özel",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 470,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Dedication",
+    turkish: "İthaf",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 471,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Deed",
+    turkish: "Tapu",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 472,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Deem",
+    turkish: "Varsaymak",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 473,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Default",
+    turkish: "Varsayılan",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 474,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Defect",
+    turkish: "Kusur",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 475,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
+    english: "Defender",
+    turkish: "Savunucu",
+    level: WordLevel.b2,
     type: WordType.noun,
     mediaLink: "https://",
     id: 476,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Defensive",
+    turkish: "Savunmaya Yönelik",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.adjective,
     mediaLink: "https://",
     id: 477,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Deficiency",
+    turkish: "Eksiklik",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 478,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Deficit",
+    turkish: "Açık",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 479,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Defy",
+    turkish: "Karşı Koymak",
     level: WordLevel.c1,
-    type: WordType.noun,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 480,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Delegate",
+    turkish: "Delege",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 481,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
+    english: "Delegation",
+    turkish: "Delegasyon",
     level: WordLevel.c1,
     type: WordType.noun,
     mediaLink: "https://",
     id: 482,
   ),
   Data(
-    english: "EN",
-    turkish: "TR",
-    level: WordLevel.c1,
-    type: WordType.noun,
+    english: "Delete",
+    turkish: "Silmek",
+    level: WordLevel.b1,
+    type: WordType.verb,
     mediaLink: "https://",
     id: 483,
   ),
+  Data(
+    english: "Delicate",
+    turkish: "Narin",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 484,
+  ),
+  Data(
+    english: "Delighted",
+    turkish: "Memnun",
+    level: WordLevel.b1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 485,
+  ),
+  Data(
+    english: "Democracy",
+    turkish: "Demokrasi",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 486,
+  ),
+  Data(
+    english: "Democratic",
+    turkish: "Demokratik",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 487,
+  ),
+  Data(
+    english: "Demon",
+    turkish: "Şeytan",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 488,
+  ),
+  Data(
+    english: "Demonstration",
+    turkish: "Gösteri",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 489,
+  ),
+  Data(
+    english: "Denial",
+    turkish: "İnkar",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 490,
+  ),
+  Data(
+    english: "Denounce",
+    turkish: "Suçlamak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 491,
+  ),
+  Data(
+    english: "Dense",
+    turkish: "Yoğun",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 492,
+  ),
+  Data(
+    english: "Density",
+    turkish: "Yoğunluk",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 493,
+  ),
+  Data(
+    english: "Depart",
+    turkish: "Ayrılmak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 494,
+  ),
+  Data(
+    english: "Dependence",
+    turkish: "Bağımlılık",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 495,
+  ),
+  Data(
+    english: "Dependent",
+    turkish: "Bağımlı",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 496,
+  ),
+  Data(
+    english: "Depict",
+    turkish: "Tanımlamak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 497,
+  ),
+  Data(
+    english: "Deploy",
+    turkish: "Konuşlandırmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 498,
+  ),
+  Data(
+    english: "Deployment",
+    turkish: "Yayılma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 499,
+  ),
+  Data(
+    english: "Deposit",
+    turkish: "Koymak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 500,
+  ),
+  Data(
+    english: "Depression",
+    turkish: "Depresyon",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 501,
+  ),
+  Data(
+    english: "Deprive",
+    turkish: "Yoksun Bırakmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 502,
+  ),
+  Data(
+    english: "Deputy",
+    turkish: "Vekil",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 503,
+  ),
+  Data(
+    english: "Derive",
+    turkish: "Türemek",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 504,
+  ),
+  Data(
+    english: "Descend",
+    turkish: "Alçalmak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 505,
+  ),
+  Data(
+    english: "Descent",
+    turkish: "Alçalma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 506,
+  ),
+  Data(
+    english: "Designate",
+    turkish: "Atamak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 507,
+  ),
+  Data(
+    english: "Desirable",
+    turkish: "Hoş",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 508,
+  ),
+  Data(
+    english: "Desktop",
+    turkish: "Masaüstü",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 509,
+  ),
+  Data(
+    english: "Desperately",
+    turkish: "Umutsuzca",
+    level: WordLevel.b2,
+    type: WordType.adverb,
+    mediaLink: "https://",
+    id: 510,
+  ),
+  Data(
+    english: "Destruction",
+    turkish: "Yıkım",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 511,
+  ),
+  Data(
+    english: "Destructive",
+    turkish: "Yıkıcı",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 512,
+  ),
+  Data(
+    english: "Detain",
+    turkish: "Alıkoymak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 513,
+  ),
+  Data(
+    english: "Detection",
+    turkish: "Bulma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 514,
+  ),
+  Data(
+    english: "Detention",
+    turkish: "Tutuklanma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 515,
+  ),
+  Data(
+    english: "Deteriorate",
+    turkish: "Kötüleşmek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 516,
+  ),
+  Data(
+    english: "Determination",
+    turkish: "Kararlılık",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 517,
+  ),
+  Data(
+    english: "Devastate",
+    turkish: "Yıkmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 518,
+  ),
+  Data(
+    english: "Devil",
+    turkish: "Şeytan",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 519,
+  ),
+  Data(
+    english: "Devise",
+    turkish: "Tasarlamak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 520,
+  ),
+  Data(
+    english: "Devote",
+    turkish: "Adamak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 521,
+  ),
+  Data(
+    english: "Diagnose",
+    turkish: "Teşhis Etmek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 522,
+  ),
+  Data(
+    english: "Diagnosis",
+    turkish: "Teşhis",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 523,
+  ),
+  Data(
+    english: "Dictate",
+    turkish: "Yazdırmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 524,
+  ),
+  Data(
+    english: "Dictator",
+    turkish: "Diktatör",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 525,
+  ),
+  Data(
+    english: "Differ",
+    turkish: "Farklı Olmak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 526,
+  ),
+  Data(
+    english: "Differentiate",
+    turkish: "Ayırmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 527,
+  ),
+  Data(
+    english: "Dignity",
+    turkish: "Haysiyet",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 528,
+  ),
+  Data(
+    english: "Dilemma",
+    turkish: "İkilem",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 529,
+  ),
+  Data(
+    english: "Dimension",
+    turkish: "Boyut",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 530,
+  ),
+  Data(
+    english: "Diminish",
+    turkish: "Azaltmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 531,
+  ),
+  Data(
+    english: "Dip",
+    turkish: "Daldırmak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 532,
+  ),
+  Data(
+    english: "Directory",
+    turkish: "Rehber",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 533,
+  ),
+  Data(
+    english: "Disability",
+    turkish: "Sakatlık",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 534,
+  ),
+  Data(
+    english: "Disabled",
+    turkish: "Sakat",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 535,
+  ),
+  Data(
+    english: "Disagreement",
+    turkish: "Anlaşmazlık",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 536,
+  ),
+  Data(
+    english: "Disappointment",
+    turkish: "Hayal Kırıklığı",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 537,
+  ),
+  Data(
+    english: "Disastrous",
+    turkish: "Feci",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 538,
+  ),
+  Data(
+    english: "Discard",
+    turkish: "Atmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 539,
+  ),
+  Data(
+    english: "Discharge",
+    turkish: "Tahliye",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 540,
+  ),
+  Data(
+    english: "Disclose",
+    turkish: "İfşa Etmek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 541,
+  ),
+  Data(
+    english: "Disclosure",
+    turkish: "İfşa",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 542,
+  ),
+  Data(
+    english: "Discourage",
+    turkish: "Vazgeçirmek",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 543,
+  ),
+  Data(
+    english: "Discourse",
+    turkish: "Söylem",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 544,
+  ),
+  Data(
+    english: "Discretion",
+    turkish: "Sağduyu",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 545,
+  ),
+  Data(
+    english: "Discrimination",
+    turkish: "Ayrımcılık",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 546,
+  ),
+  Data(
+    english: "Dismissal",
+    turkish: "İşten Atılma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 547,
+  ),
+  Data(
+    english: "Disorder",
+    turkish: "Düzensizlik",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 548,
+  ),
+  Data(
+    english: "Displace",
+    turkish: "Yer Değiştirmek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 549,
+  ),
+  Data(
+    english: "Disposal",
+    turkish: "Atma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 550,
+  ),
+  Data(
+    english: "Dispute",
+    turkish: "Anlaşmazlık",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 551,
+  ),
+  Data(
+    english: "Disrupt",
+    turkish: "Engellemek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 552,
+  ),
+  Data(
+    english: "Disruption",
+    turkish: "Bozulma",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 553,
+  ),
+  Data(
+    english: "Dissolve",
+    turkish: "Eritmek",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 554,
+  ),
+  Data(
+    english: "Distant",
+    turkish: "Uzak",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 555,
+  ),
+  Data(
+    english: "Distinct",
+    turkish: "Farklı",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 556,
+  ),
+  Data(
+    english: "Distinction",
+    turkish: "Ayrım",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 557,
+  ),
+  Data(
+    english: "Distinctive",
+    turkish: "Karakteristik",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 558,
+  ),
+  Data(
+    english: "Distinguish",
+    turkish: "Ayırt Etmek",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 559,
+  ),
+  Data(
+    english: "Distort",
+    turkish: "Çarpıtmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 560,
+  ),
+  Data(
+    english: "Distress",
+    turkish: "Sıkıntı",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 561,
+  ),
+  Data(
+    english: "Disturb",
+    turkish: "Rahatsız Etmek",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 562,
+  ),
+  Data(
+    english: "Disturbing",
+    turkish: "Rahatsız Edici",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 563,
+  ),
+  Data(
+    english: "Dive",
+    turkish: "Dalmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 564,
+  ),
+  Data(
+    english: "Diverse",
+    turkish: "Çeşitli",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 565,
+  ),
+  Data(
+    english: "Diversity",
+    turkish: "Çeşitlilik",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 566,
+  ),
+  Data(
+    english: "Divert",
+    turkish: "Saptırmak",
+    level: WordLevel.c1,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 567,
+  ),
+  Data(
+    english: "Divine",
+    turkish: "İlahi",
+    level: WordLevel.c1,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 568,
+  ),
+  Data(
+    english: "Divorce",
+    turkish: "Boşanmak",
+    level: WordLevel.b2,
+    type: WordType.verb,
+    mediaLink: "https://",
+    id: 569,
+  ),
+  Data(
+    english: "Doctrine",
+    turkish: "Doktrin",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 570,
+  ),
+  Data(
+    english: "Domain",
+    turkish: "İhtisas",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 571,
+  ),
+  Data(
+    english: "Dominance",
+    turkish: "Hakimiyet",
+    level: WordLevel.c1,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 572,
+  ),
+  Data(
+    english: "Dominant",
+    turkish: "Baskın",
+    level: WordLevel.b2,
+    type: WordType.adjective,
+    mediaLink: "https://",
+    id: 573,
+  ),
+  Data(
+    english: "Donation",
+    turkish: "Bağış",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 574,
+  ),
+  Data(
+    english: "Dose",
+    turkish: "Doz",
+    level: WordLevel.b2,
+    type: WordType.noun,
+    mediaLink: "https://",
+    id: 575,
+  ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
+  // Data(
+  //   english: "",
+  //   turkish: "",
+  //   level: WordLevel.c1,
+  //   type: WordType.noun,
+  //   mediaLink: "https://",
+  //   id: 483,
+  // ),
 ];

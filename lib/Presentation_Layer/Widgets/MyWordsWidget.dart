@@ -6,12 +6,17 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Data_Layer/consts.dart';
+import '../../Data_Layer/data.dart';
 
 class MyWordsWidget extends StatefulWidget with PopUpMixin {
   ScrollController scrollController;
   AudioPlayer audioPlayer;
+  double lastItemHeight;
   MyWordsWidget(
-      {Key? key, required this.scrollController, required this.audioPlayer})
+      {Key? key,
+      required this.scrollController,
+      required this.audioPlayer,
+      this.lastItemHeight = 0})
       : super(key: key);
 
   @override
@@ -46,128 +51,151 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                   // physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     //
-                    return GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        BlocProvider.of<HomePageSelectedWordCubit>(context)
-                            .changeCurrentData(
-                          BlocProvider.of<HomePageSelectedWordCubit>(context)
-                              .returnDataList()[index],
-                        );
-                        widget.openWordPopUp(
-                            context,
+                    return index <
                             BlocProvider.of<HomePageSelectedWordCubit>(context)
-                                .returnDataList()[index],
-                            widget.audioPlayer);
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        width: ScreenUtil.width,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Spacer(),
-                            // Flexible(
-                            //   child: GestureDetector(
-                            //     behavior: HitTestBehavior.translucent,
-                            //     onTap: () => widget.OpenWordPopUp(context),
-                            //     child: Container(
-                            //       width: 500,
-                            //     ),
-                            //   ),
-                            // ),
-                            SizedBox(
-                              width: ScreenUtil.width * 0.18,
+                                .returnDataList()
+                                .length
+                        ? GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              BlocProvider.of<HomePageSelectedWordCubit>(
+                                      context)
+                                  .changeCurrentData(
+                                BlocProvider.of<HomePageSelectedWordCubit>(
+                                        context)
+                                    .returnDataList()[index],
+                              );
+                              widget.openWordPopUp(
+                                  context,
+                                  BlocProvider.of<HomePageSelectedWordCubit>(
+                                          context)
+                                      .returnDataList()[index],
+                                  widget.audioPlayer);
+                            },
+                            child: SizedBox(
+                              height: 50,
+                              width: ScreenUtil.width,
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Flexible(
+                                  const Spacer(),
+                                  // Flexible(
+                                  //   child: GestureDetector(
+                                  //     behavior: HitTestBehavior.translucent,
+                                  //     onTap: () => widget.OpenWordPopUp(context),
+                                  //     child: Container(
+                                  //       width: 500,
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  SizedBox(
+                                    width: ScreenUtil.width * 0.18,
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: FittedBox(
+                                            child: Text(
+                                              BlocProvider.of<
+                                                          HomePageSelectedWordCubit>(
+                                                      context)
+                                                  .returnDataList()[index]
+                                                  .english,
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  SizedBox(
+                                    width: ScreenUtil.width * 0.05,
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            BlocProvider.of<
+                                                        HomePageSelectedWordCubit>(
+                                                    context)
+                                                .returnDataList()[index]
+                                                .level
+                                                .name
+                                                .toUpperCase(),
+                                            // "dsaşdsaşdsdadsasd",
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      //
+                                      String url = await getSoundUrl(BlocProvider
+                                              .of<HomePageSelectedWordCubit>(
+                                                  context)
+                                          .returnDataList()[index]
+                                          .english);
+                                      if (url == "") {
+                                        widget.showCustomSnackbar(
+                                            context, "Ses Bulunamadı");
+                                        return;
+                                      }
+                                      await widget.audioPlayer
+                                          .play(UrlSource(url));
+                                    },
+                                    child: SvgPicture.asset(
+                                      "assets/images/playSoundVector.svg",
+                                      // fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  SizedBox(
+                                    width: ScreenUtil.width * 0.15,
                                     child: FittedBox(
+                                      fit: BoxFit.scaleDown,
                                       child: Text(
                                         BlocProvider.of<
                                                     HomePageSelectedWordCubit>(
                                                 context)
                                             .returnDataList()[index]
-                                            .english,
+                                            .turkish,
                                         style: const TextStyle(
                                           color: Colors.black,
                                         ),
+                                        maxLines: 2,
                                       ),
                                     ),
                                   ),
+                                  const Spacer(),
                                 ],
                               ),
                             ),
-                            const Spacer(),
-                            SizedBox(
-                              width: ScreenUtil.width * 0.05,
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      BlocProvider.of<
-                                                  HomePageSelectedWordCubit>(
-                                              context)
-                                          .returnDataList()[index]
-                                          .level
-                                          .name
-                                          .toUpperCase(),
-                                      // "dsaşdsaşdsdadsasd",
-                                      maxLines: 1,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            GestureDetector(
-                              onTap: () async {
-                                //
-                                await widget.audioPlayer.play(UrlSource(
-                                    BlocProvider.of<HomePageSelectedWordCubit>(
-                                            context)
-                                        .returnDataList()[index]
-                                        .mediaLink));
-                              },
-                              child: SvgPicture.asset(
-                                "assets/images/playSoundVector.svg",
-                                // fit: BoxFit.contain,
-                              ),
-                            ),
-                            const Spacer(),
-                            SizedBox(
-                              width: ScreenUtil.width * 0.15,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  BlocProvider.of<HomePageSelectedWordCubit>(
-                                          context)
-                                      .returnDataList()[index]
-                                      .turkish,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                  maxLines: 2,
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                          ],
-                        ),
-                      ),
-                    );
+                          )
+                        : SizedBox(
+                            height: widget.lastItemHeight,
+                          );
                   },
                   separatorBuilder: (context, index) {
-                    return CustomPaint(
-                      painter: DrawDottedhorizontalline(),
-                    );
+                    return index <
+                            BlocProvider.of<HomePageSelectedWordCubit>(context)
+                                    .returnDataList()
+                                    .length -
+                                1
+                        ? CustomPaint(painter: DrawDottedhorizontalline())
+                        : const SizedBox();
                   },
                   // itemCount: state.learnedWordsList.length,
                   itemCount: BlocProvider.of<HomePageSelectedWordCubit>(context)
-                      .returnDataList()
-                      .length,
+                          .returnDataList()
+                          .length +
+                      1,
                 );
               },
             ),

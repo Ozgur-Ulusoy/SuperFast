@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:workmanager/workmanager.dart';
@@ -32,10 +33,12 @@ import 'Business_Layer/cubit/timer_cubit.dart';
 import 'Presentation_Layer/Screens/FirstPage.dart';
 import 'Presentation_Layer/Screens/HomePage.dart';
 import 'Presentation_Layer/Screens/Auth/LoginPage.dart';
+import 'Presentation_Layer/Screens/Play/SoundGamePage.dart';
 import 'Presentation_Layer/Screens/SettingsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp();
   await refleshUser();
   //! WorkManager
@@ -46,7 +49,7 @@ void main() async {
 
     // If enabled it will post a notification whenever
     // the task is running. Handy for debugging tasks
-    isInDebugMode: true,
+    isInDebugMode: false,
   );
 
   await Workmanager().registerPeriodicTask(
@@ -55,14 +58,14 @@ void main() async {
       //This is the value that will be
       // returned in the callbackDispatcher
       "dailyRandomWordTask",
-      // initialDelay: const Duration(minutes: 15), //! 1 gün olucak
+      initialDelay: const Duration(hours: 1), //! 1 gün olucak
       // When no frequency is provided
       // the default 15 minutes is set.
       // Minimum frequency is 15 min.
       // Android will automatically change
       // your frequency to 15 min
       // if you have configured a lower frequency.
-      frequency: const Duration(minutes: 15), //! 1 gün olucak
+      frequency: const Duration(days: 1), //! 1 gün olucak
       existingWorkPolicy: ExistingWorkPolicy.append);
 
   await fLoadData();
@@ -127,7 +130,7 @@ Future<void> setRandomDailyWord() async {
   await Hive.initFlutter();
   Box box = await Hive.openBox("SuperFastBox");
   Random rnd = Random();
-  int random = rnd.nextInt(questionData.length);
+  int random = rnd.nextInt(questionData.length - 1) + 1;
   await box.put("dailyWordId", random);
 
   print(box.get("dailyWordId", defaultValue: 1).toString() + "a");
@@ -137,10 +140,12 @@ Future<void> setRandomDailyWord() async {
   List<Data> notLearnedDatas = [];
 
   if (learnedList != "") {
-    learnedList.trim().split(" ").forEach((e) {
-      questionData.elementAt(int.tryParse(e)! - 1).favType =
-          WordFavType.learned;
-      learnedDatas.add(questionData.elementAt(int.tryParse(e)! - 1));
+    String data = learnedList;
+    data.trim().split(" ").forEach((e) {
+      Data data =
+          questionData.where((element) => element.id == int.tryParse(e)).first;
+      data.favType = WordFavType.learned;
+      learnedDatas.add(data);
     });
   }
 
@@ -361,19 +366,30 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         if (FirebaseAuth.instance.currentUser != null &&
             FirebaseAuth.instance.currentUser!.isAnonymous == false &&
             MainData.isFirstOpen == false) {
-          if (MainData.isFavListChanged == true) {
-            await FirebaseFirestore.instance
-                .collection(KeyUtils.usersCollectionKey)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({'favList': MainData.favList});
-            MainData.isFavListChanged = false;
-          }
-          if (MainData.isLearnedListChanged == true) {
-            await FirebaseFirestore.instance
-                .collection(KeyUtils.usersCollectionKey)
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .update({'learnedList': MainData.learnedList});
-            MainData.isLearnedListChanged = false;
+          try {
+            if (MainData.isFavListChanged == true) {
+              await FirebaseFirestore.instance
+                  .collection(KeyUtils.usersCollectionKey)
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({'favList': MainData.favList});
+              MainData.isFavListChanged = false;
+              print("favList changed");
+            }
+            if (MainData.isLearnedListChanged == true) {
+              await FirebaseFirestore.instance
+                  .collection(KeyUtils.usersCollectionKey)
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({'learnedList': MainData.learnedList});
+              MainData.isLearnedListChanged = false;
+              print("learnedList changed");
+            }
+          } on Exception {
+            // TODO
+            MainData.isFavListChanged = true;
+            MainData.isLearnedListChanged = true;
+            await MainData.localData!.put(KeyUtils.isFavListChangedKey, true);
+            await MainData.localData!
+                .put(KeyUtils.isLearnedListChangedKey, true);
           }
         }
 
@@ -472,6 +488,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             // '/playClassicMode': (context) => const PlayPage(), //! sonradan düzeltilicek
             '/playEngameMode': (context) => const EngamePage(),
             '/playWordGameMode': (context) => const WordGamePage(),
+            '/playSoundGameMode': (context) => const SoundGamePage(),
             '/myWordsPage': (context) => const MyWordsPage(),
             '/settingsPage': (context) => const SettingsPage(),
           },
