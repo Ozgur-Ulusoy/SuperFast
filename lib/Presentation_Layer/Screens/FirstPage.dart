@@ -193,7 +193,7 @@ class _FirstOpenPageState extends State<FirstOpenPage> {
                 toDo: () {
                   Navigator.pushNamed(
                     context,
-                    '/loginPage',
+                    KeyUtils.loginPageKey,
                   );
                 },
               ),

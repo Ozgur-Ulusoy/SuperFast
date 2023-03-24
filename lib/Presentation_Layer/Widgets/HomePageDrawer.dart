@@ -7,7 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Data_Layer/consts.dart';
@@ -70,7 +72,11 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             ),
                             Flexible(
                               child: GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .pushNamed(KeyUtils.profilePageKey);
+                                  widget.callback();
+                                },
                                 child: Text(
                                   "HESABIM",
                                   style: GoogleFonts.bebasNeue(
@@ -83,13 +89,24 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             ),
                             const Spacer(),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () async {
+                                // ! Play Store Linkine Gitme
+                                // if (await canLaunchUrlString(
+                                //     "https://play.google.com/store/apps/details?id=com.ozgurulusoy.superfastenglish")) {
+                                //   await launchUrlString(
+                                //       "https://play.google.com/store/apps/details?id=com.ozgurulusoy.superfastenglish",
+                                //       mode: LaunchMode.externalApplication);
+                                // }
+                                if (await InAppReview.instance.isAvailable()) {
+                                  InAppReview.instance.requestReview();
+                                }
+                              },
                               child: Text(
-                                "KELİMELER",
+                                "UYGULAMAYA OY VER",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 35,
-                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                  fontSize: ScreenUtil.textScaleFactor * 34,
+                                  letterSpacing: ScreenUtil.letterSpacing * 3,
                                 ),
                               ),
                             ),
@@ -113,7 +130,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context)
-                                    .pushNamed('/settingsPage');
+                                    .pushNamed(KeyUtils.settingsPageKey);
                                 widget.callback();
                               },
                               child: Text(
@@ -167,7 +184,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                           if (FirebaseAuth.instance.currentUser == null) {
                             await fResetData(context: context);
                             await Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/loginPage', (Route<dynamic> route) => false);
+                                KeyUtils.loginPageKey,
+                                (Route<dynamic> route) => false);
                           }
                           // questionData.forEach((element) {
                           //   element.isFav = false;
@@ -176,7 +194,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                         });
                       } catch (e) {
                         await Navigator.of(context).pushNamedAndRemoveUntil(
-                            '/loginPage', (Route<dynamic> route) => false);
+                            KeyUtils.loginPageKey,
+                            (Route<dynamic> route) => false);
                       }
                     },
                     style: ButtonStyle(

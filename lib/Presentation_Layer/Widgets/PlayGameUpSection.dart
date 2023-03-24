@@ -12,8 +12,12 @@ import 'PlayAddToWordCard.dart';
 class PlayGameUpSelection extends StatefulWidget with PopUpMixin {
   String title;
   bool isLetterPage;
+  VoidCallback goBackCaller;
   PlayGameUpSelection(
-      {Key? key, required this.title, this.isLetterPage = false})
+      {Key? key,
+      required this.title,
+      this.isLetterPage = false,
+      required this.goBackCaller})
       : super(key: key);
 
   @override
@@ -35,7 +39,7 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pop();
+                  widget.goBackCaller();
                 },
                 child: Icon(
                   Icons.arrow_back,
@@ -104,7 +108,7 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
                         //     (ScreenUtil.width / 20).floorToDouble());
                         return Container(
                           width: (ScreenUtil.width / count) - spacerWidth,
-                          color: state.getRemainTime * count / 90 <= index
+                          color: state.getRemainTime * count / 75 <= index
                               ? Colors.red
                               : Colors.blue,
                         );
@@ -187,9 +191,9 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
                             getAddToCardTypeFuncType(state.data.favType),
                             context);
                     BlocProvider.of<QuestionCubit>(context).UpdateState();
-                    widget.showCustomSnackbar(context,
-                        getAddToCardTypeTitle(state.data.favType) + "ndi",
-                        duration: 1);
+                    // widget.showCustomSnackbar(context,
+                    //     getAddToCardTypeSnackbarTitle(state.data.favType),
+                    //     duration: 150);
                   },
                 );
               },
@@ -206,12 +210,13 @@ class _PlayGameUpSelectionState extends State<PlayGameUpSelection> {
                         .updateState(state.data,
                             getAddToCardFavFuncType(state.data.isFav), context);
                     BlocProvider.of<QuestionCubit>(context).UpdateState();
-                    widget.showCustomSnackbar(
-                        context,
-                        state.data.isFav
-                            ? "Favorilere Eklendi"
-                            : "Favorilerden Çıkarıldı",
-                        duration: 1);
+
+                    // widget.showCustomSnackbar(
+                    //     context,
+                    //     state.data.isFav
+                    //         ? "Favorilere Eklendi"
+                    //         : "Favorilerden Çıkarıldı",
+                    //     duration: 150);
                   },
                 );
               },

@@ -27,11 +27,10 @@ class _LoginPageState extends State<LoginPage> {
     });
     try {
       final googleUser = await GoogleSignIn(
-              // signInOption: SignInOption.games,
-              // serverClientId:
-              //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
-              )
-          .signIn();
+        signInOption: SignInOption.games,
+        // serverClientId:
+        //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
+      ).signIn();
 
       final googleAuth = await googleUser?.authentication;
 
@@ -83,12 +82,12 @@ class _LoginPageState extends State<LoginPage> {
         BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
         print("debug 5");
         Navigator.of(context).pushNamedAndRemoveUntil(
-            '/homePage', (Route<dynamic> route) => false);
+            KeyUtils.homePageKey, (Route<dynamic> route) => false);
         print("debug 6");
       }
       print("debug 7");
     } catch (e) {
-      widget.showCustomDialog(context: context, message: e.toString());
+      widget.showCustomSnackbar(context, e.toString());
     }
 
     setState(() {
@@ -185,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                     GestureDetector(
                       onTap: () {
                         //
-                        Navigator.pushNamed(context, '/registerPage');
+                        Navigator.pushNamed(context, KeyUtils.registerPageKey);
                       },
                       child: Container(
                         width: ScreenUtil.width * 0.3075,
@@ -240,7 +239,8 @@ class _LoginPageState extends State<LoginPage> {
                             if (FirebaseAuth.instance.currentUser != null) {
                               await saveSkipFirstOpen(context: context);
                               Navigator.of(context).pushNamedAndRemoveUntil(
-                                  '/homePage', (Route<dynamic> route) => false);
+                                  KeyUtils.homePageKey,
+                                  (Route<dynamic> route) => false);
                             }
                           });
                         });
@@ -335,7 +335,8 @@ class _LoginPageState extends State<LoginPage> {
                               // state build
 
                               Navigator.of(context).pushNamedAndRemoveUntil(
-                                  '/homePage', (Route<dynamic> route) => false);
+                                  KeyUtils.homePageKey,
+                                  (Route<dynamic> route) => false);
 
                               print("giris yapildi");
                               print(MainData.learnedList);
@@ -345,6 +346,23 @@ class _LoginPageState extends State<LoginPage> {
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: username, password: password);
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            await saveSkipFirstOpen(
+                              haveUsername: true,
+                              username: userNameController.text.split("@")[0],
+                              context: context,
+                            );
+                            BlocProvider.of<HomePageSelectedWordCubit>(context)
+                                .StateBuild();
+                            // state build
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                KeyUtils.homePageKey,
+                                (Route<dynamic> route) => false);
+
+                            print("giris yapildi");
+                            print(MainData.learnedList);
+                          }
                         }
                       }
                     } on FirebaseAuthException catch (e) {
@@ -490,112 +508,163 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     // const SizedBox(),
                     const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            //!
-                            BlocProvider.of<LoginPageCubit>(context)
-                                .ChangeSignInMethod();
-                          },
-                          child: BlocBuilder<LoginPageCubit, LoginPageState>(
-                            builder: (context, state) {
-                              return Container(
-                                width: ScreenUtil.width * 0.4,
-                                height: ScreenUtil.height * 0.05,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
+                    Padding(
+                      padding: EdgeInsets.only(right: ScreenUtil.width * 0.055),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     //!
+                          //     BlocProvider.of<LoginPageCubit>(context)
+                          //         .ChangeSignInMethod();
+                          //   },
+                          //   child: BlocBuilder<LoginPageCubit, LoginPageState>(
+                          //     builder: (context, state) {
+                          //       return Container(
+                          //         width: ScreenUtil.width * 0.4,
+                          //         height: ScreenUtil.height * 0.05,
+                          //         decoration: BoxDecoration(
+                          //           borderRadius: const BorderRadius.all(
+                          //               Radius.circular(10)),
+                          //           border: Border.all(
+                          //             color: Colors.white,
+                          //             width: 2,
+                          //           ),
+                          //         ),
+                          //         child: Padding(
+                          //           padding: const EdgeInsets.all(5),
+                          //           child: Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.spaceEvenly,
+                          //             children: [
+                          //               const Expanded(
+                          //                 child: Image(
+                          //                     image: AssetImage(
+                          //                         "assets/images/d89d897deab62ea991727abe5e8f963e.png")),
+                          //               ),
+                          //               const SizedBox(width: 5),
+                          //               Expanded(
+                          //                 flex: 4,
+                          //                 child: FittedBox(
+                          //                   child: Text(
+                          //                     state.isSignInUsername
+                          //                         ? "Mail ile giriş"
+                          //                         : "Kullanıcı adı ile giriş",
+                          //                     style: GoogleFonts.poppins(
+                          //                       color: Colors.white,
+                          //                       fontWeight: FontWeight.bold,
+                          //                     ),
+                          //                     maxLines: 1,
+                          //                   ),
+                          //                 ),
+                          //               ),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+
+                          //?
+                          GestureDetector(
+                            onTap: () async {
+                              //!
+                              try {
+                                await GoogleLogin();
+                                // await GamesServices.signIn();
+                                // Player.getPlayerID()
+                              } catch (e) {
+                                print(e.toString());
+                              }
+                            },
+                            child: Container(
+                              width: ScreenUtil.width * 0.4,
+                              height: ScreenUtil.height * 0.05,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      const Expanded(
-                                        child: Image(
-                                            image: AssetImage(
-                                                "assets/images/d89d897deab62ea991727abe5e8f963e.png")),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Expanded(
-                                        flex: 4,
-                                        child: FittedBox(
-                                          child: Text(
-                                            state.isSignInUsername
-                                                ? "Mail ile giriş"
-                                                : "Kullanıcı adı ile giriş",
-                                            style: GoogleFonts.poppins(
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Expanded(
+                                      child: Image(
+                                          image: AssetImage(
+                                              "assets/images/a425df6d0df9ed03d7521b884e7f8366.png")),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Expanded(
+                                      flex: 4,
+                                      child: FittedBox(
+                                        child: Text(
+                                          "Google ile giriş",
+                                          style: GoogleFonts.poppins(
                                               color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            maxLines: 1,
-                                          ),
+                                              fontWeight: FontWeight.bold),
+                                          maxLines: 1,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            //!
-                            try {
-                              await GoogleLogin();
-                            } catch (e) {
-                              print(e.toString());
-                            }
-                          },
-                          child: Container(
-                            width: ScreenUtil.width * 0.4,
-                            height: ScreenUtil.height * 0.05,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 2,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Expanded(
-                                    child: Image(
-                                        image: AssetImage(
-                                            "assets/images/a425df6d0df9ed03d7521b884e7f8366.png")),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    flex: 4,
-                                    child: FittedBox(
-                                      child: Text(
-                                        "Google ile giriş",
-                                        style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                        maxLines: 1,
-                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: ScreenUtil.height * 0.02),
+                    Padding(
+                      padding: EdgeInsets.only(right: ScreenUtil.width * 0.085),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              if (BlocProvider.of<LoginPageCubit>(context)
+                                          .state
+                                          .isSignInUsername ==
+                                      true ||
+                                  userNameController.text.isEmpty) {
+                                widget.showCustomSnackbar(
+                                    context, "Lütfen Mail Adresinizi Giriniz",
+                                    color: Colors.red);
+                                return;
+                              }
+                              // if(userNameController.text.)
+                              try {
+                                await FirebaseAuth.instance
+                                    .sendPasswordResetEmail(
+                                        email: userNameController.text);
+                                widget.showCustomSnackbar(
+                                    context, "Şifre Sıfırlama Maili Gönderildi",
+                                    color: Colors.green);
+                              } catch (e) {
+                                print(e.toString());
+                                widget.showCustomSnackbar(context,
+                                    "Lütfen Mail Adresinizi Kontrol Ediniz",
+                                    color: Colors.red);
+                              }
+                            },
+                            child: Text(
+                              "Şifremi Unuttum",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
                     const Spacer(
                       flex: 10,

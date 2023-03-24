@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "185354327561-v70d9temmuduk3h51mc08g9rlml2niik.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ozgurulusoy.superfastenglish",
+            "certificate_hash": "345243557047bcb79a09c5ee5e7be96ac9713416"
+          }
+        },
+        {
           "client_id": "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
           "client_type": 3
         }

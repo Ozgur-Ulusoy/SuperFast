@@ -20,6 +20,8 @@ class BannerAdWidget extends StatefulWidget {
 
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
+  int maxtry = 3;
+  int tryCount = 0;
 
   void _loadBannerAd() {
     BannerAd(
@@ -31,6 +33,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
           setState(() {
             _bannerAd = ad as BannerAd;
             widget.height = _bannerAd!.size.height.toDouble();
+            tryCount = 0;
+
             // if (widget.scaffoldKey != null) {
             //   widget.scaffoldKey!.currentState!.setState(() {});
             // }
@@ -39,10 +43,15 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
         },
         onAdFailedToLoad: (ad, err) {
           print('Failed to load a banner ad: ${err.message}');
+          tryCount++;
+          if (tryCount < maxtry) {
+            ad.dispose();
+            _loadBannerAd();
+          }
           // setState(() {
           //   widget.isLoading = false;
           // });
-          ad.dispose();
+          // ad.dispose();
         },
       ),
     ).load();
@@ -73,6 +82,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     }
     return const SizedBox(
       height: 50,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

@@ -26,6 +26,7 @@ class ScreenUtil {
   static double textScaleFactor = 1.5;
   static double wordSpacing = 1.5;
   static double letterSpacing = 1;
+  static double topPadding = 0;
 
   static void init(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
@@ -36,6 +37,7 @@ class ScreenUtil {
     // _statusBarHeight = mediaQuery.padding.top;
     // bottomBarHeight = mediaQueryData.padding.bottom;
     textScaleFactor = mediaQuery.textScaleFactor;
+    topPadding = AppBar().preferredSize.height + mediaQuery.padding.top;
 
     // print(height);
     // print(width);
@@ -72,6 +74,13 @@ class KeyUtils {
       "isWordleGameRecordChanged";
   static const String isLetterGameRecordChangedKey =
       "isLetterGameRecordChanged";
+
+  //? Ads
+  // static const String canWatchVideoAdKey = "canWatchVideoAd";
+  static const String lastWatchedAdTime = "lastWatchedAdTime";
+  static int adWatchVideoDelayMinute = 4;
+  static String videoAdDelayWMKey = "watchVideoAdDelay";
+
   //? Firebase
   static const String isFavListChangedKey = "isFavListChanged";
   static const String isLearnedListChangedKey = "isLearnedListChanged";
@@ -88,4 +97,17 @@ class KeyUtils {
 
   //! Firebase Notification
   static String notificationTopicKey = "notificationTopic";
+
+  //? ROUTES
+  static const String initialPageKey = '/';
+  static const String firstOpenPageKey = '/firstOpenPage';
+  static const String loginPageKey = '/loginPage';
+  static const String homePageKey = '/homePage';
+  static const String registerPageKey = '/registerPage';
+  static const String testGamePageKey = '/testGamePage';
+  static const String letterGamePageKey = '/letterGamePage';
+  static const String soundGamePageKey = '/soundGamePage';
+  static const String wordsPageKey = '/wordsPage';
+  static const String settingsPageKey = '/settingsPage';
+  static const String profilePageKey = '/profilePage';
 }

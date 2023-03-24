@@ -4,8 +4,7 @@ part '../state/login_page_state.dart';
 
 class LoginPageCubit extends Cubit<LoginPageState> {
   LoginPageCubit()
-      : super(
-            LoginPageState(isSignInUsername: true, signInKey: "Kullanıcı adı"));
+      : super(LoginPageState(isSignInUsername: false, signInKey: "Email"));
 
   void ChangeSignInMethod() {
     emit(LoginPageState(

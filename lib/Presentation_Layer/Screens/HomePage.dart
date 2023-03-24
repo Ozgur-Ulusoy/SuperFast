@@ -13,6 +13,7 @@ import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,6 +62,19 @@ class _HomePageState extends State<HomePage>
     BlocProvider.of<HomePageSelectedWordCubit>(context)
         .ChangeState(WordSelectedStateEnums.learnedWordState);
     getRandomDailyWord();
+    setFirebaseNotifications();
+  }
+
+  Future<void> setFirebaseNotifications() async {
+    try {
+      if (MainData.getNotification) {
+        await FirebaseMessaging.instance
+            .subscribeToTopic(KeyUtils.notificationTopicKey);
+      } else {
+        await FirebaseMessaging.instance
+            .unsubscribeFromTopic(KeyUtils.notificationTopicKey);
+      }
+    } catch (e) {}
   }
 
   Future<void> getRandomDailyWord() async {
@@ -110,7 +124,7 @@ class _HomePageState extends State<HomePage>
   }
 
   BannerAdWidget bannerAdWidget =
-      BannerAdWidget(adId: AdHelperTest.homePageBannerAdUnitId);
+      BannerAdWidget(adId: AdHelper.homePageBannerAdUnitId);
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +303,8 @@ class _HomePageState extends State<HomePage>
                           text: "Test Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
-                            Navigator.pushNamed(context, '/playEngameMode');
+                            Navigator.pushNamed(
+                                context, KeyUtils.testGamePageKey);
                           },
                         ),
                         PlayGameCard(
@@ -297,7 +312,8 @@ class _HomePageState extends State<HomePage>
                           text: "Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
-                            Navigator.pushNamed(context, '/playWordGameMode');
+                            Navigator.pushNamed(
+                                context, KeyUtils.letterGamePageKey);
                           },
                         ),
                         PlayGameCard(
@@ -305,7 +321,8 @@ class _HomePageState extends State<HomePage>
                           text: "Sesli Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
-                            Navigator.pushNamed(context, '/playSoundGameMode');
+                            Navigator.pushNamed(
+                                context, KeyUtils.soundGamePageKey);
                           },
                         ),
                         PlayGameCard(
@@ -333,7 +350,8 @@ class _HomePageState extends State<HomePage>
                         GestureDetector(
                           onTap: () {
                             // TODO
-                            Navigator.of(context).pushNamed('/myWordsPage');
+                            Navigator.of(context)
+                                .pushNamed(KeyUtils.wordsPageKey);
                           },
                           child: Text(
                             "Tümünü Gör",
@@ -389,7 +407,7 @@ class _HomePageState extends State<HomePage>
                     // Align(
                     //     alignment: const Alignment(0, 0.99),
                     //     child: bannerAdWidget),
-                    SizedBox(height: ScreenUtil.height * 0.0125),
+                    SizedBox(height: ScreenUtil.height * 0.025),
                     // const Spacer(),
 
                     //
@@ -398,7 +416,7 @@ class _HomePageState extends State<HomePage>
                       child: bannerAdWidget,
                     ),
                     // const Spacer(),
-                    SizedBox(height: ScreenUtil.height * 0.01),
+                    SizedBox(height: ScreenUtil.height * 0.02),
                   ],
                 ),
               ),

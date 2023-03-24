@@ -12,5 +12,5 @@ class TimerState {
     }
   }
 
-  TimerState({this.remainTime = 90});
+  TimerState({this.remainTime = 75});
 }

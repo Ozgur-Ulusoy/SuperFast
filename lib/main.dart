@@ -7,7 +7,6 @@ import 'package:engame2/Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
 import 'package:engame2/Business_Layer/cubit/login_page_cubit.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
-import 'package:engame2/Data_Layer/test.dart';
 import 'package:engame2/Presentation_Layer/Screens/MainPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/MyWordsPage.dart';
 import 'package:engame2/Presentation_Layer/Screens/Play/EngamePage.dart';
@@ -34,15 +33,30 @@ import 'Presentation_Layer/Screens/FirstPage.dart';
 import 'Presentation_Layer/Screens/HomePage.dart';
 import 'Presentation_Layer/Screens/Auth/LoginPage.dart';
 import 'Presentation_Layer/Screens/Play/SoundGamePage.dart';
+import 'Presentation_Layer/Screens/ProfilePage.dart';
 import 'Presentation_Layer/Screens/SettingsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
+  // MobileAds.instance.initialize();
+  //! Debug
+  RequestConfiguration configuration =
+      RequestConfiguration(testDeviceIds: ["71E560CE43A9A87F70D994CE11BEAA10"]);
+  MobileAds.instance.updateRequestConfiguration(configuration);
+  //!
   await Firebase.initializeApp();
   await refleshUser();
-  //! WorkManager
+  //! Test for duplicate id - Debug
+  // List<int> a = [];
+  // for (var i = 1; i < questionData.length; i++) {
+  //   if (a.contains(questionData[i].id) == false) {
+  //     a.add(questionData[i].id);
+  //   } else {
+  //     print("duplicate id: ${questionData[i].id}");
+  //   }
+  // }
 
+  //! WorkManager
   await Workmanager().initialize(
     // The top level function, aka callbackDispatcher
     callbackDispatcher,
@@ -52,27 +66,26 @@ void main() async {
     isInDebugMode: false,
   );
 
-  await Workmanager().registerPeriodicTask(
-      "2",
+  //  await Workmanager().registerPeriodicTask(
+  //       "dailyRandomWordTaskID",
 
-      //This is the value that will be
-      // returned in the callbackDispatcher
-      "dailyRandomWordTask",
-      initialDelay: const Duration(hours: 1), //! 1 gün olucak
-      // When no frequency is provided
-      // the default 15 minutes is set.
-      // Minimum frequency is 15 min.
-      // Android will automatically change
-      // your frequency to 15 min
-      // if you have configured a lower frequency.
-      frequency: const Duration(days: 1), //! 1 gün olucak
-      existingWorkPolicy: ExistingWorkPolicy.append);
+  //       //This is the value that will be
+  //       // returned in the callbackDispatcher
+  //       "dailyRandomWordTask",
+  //       initialDelay: const Duration(minutes: 1), //! 1 saat olucak
+  //       // When no frequency is provided
+  //       // the default 15 minutes is set.
+  //       // Minimum frequency is 15 min.
+  //       // Android will automatically change
+  //       // your frequency to 15 min
+  //       // if you have configured a lower frequency.
+  //       frequency: const Duration(days: 1), //! 1 gün olucak
+  //       existingWorkPolicy: ExistingWorkPolicy.append);
 
   await fLoadData();
-
   await setMainDataDailyWord(); //? set daily word
   await fLoadSvgPictures();
-  Test(); //? Test
+  // Test(); //? Test
   LicenseRegistry.addLicense(() async* {
     //? google fonts license
     final license = await rootBundle.loadString('google_fonts/OFL.txt');
@@ -98,13 +111,13 @@ void main() async {
     sound: true,
   );
 
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
-  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print('User granted provisional permission');
-  } else {
-    print('User declined or has not accepted permission');
-  }
+  // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+  //   print('User granted permission');
+  // } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+  //   print('User granted provisional permission');
+  // } else {
+  //   print('User declined or has not accepted permission');
+  // }
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -176,7 +189,8 @@ Future<void> setRandomDailyWord() async {
           importance: Importance.high,
           // TODO add a proper drawable resource to android, for now using
           //      one that already exists in example app.
-          // icon: '@mipmap/ic_launcher',
+          icon: '@mipmap/notification_icon',
+          color: const Color.fromRGBO(76, 81, 198, 1),
         ),
       ),
       // payload: jsonEncode({
@@ -194,7 +208,7 @@ Future<void> setRandomDailyWord() async {
 
 Future<void> setNotificationSettings() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/notification_icon');
 
   // const IOSInitializationSettings initializationSettingsIOS =
   //     IOSInitializationSettings(
@@ -230,13 +244,19 @@ Future<void> setNotificationSettings() async {
 //   }
 // }
 
+//! Bu fonksiyon calisiyordu - fload dataya tasıyacagım
 Future<void> setMainDataDailyWord() async {
   await Hive.initFlutter();
   Box box = await Hive.openBox(KeyUtils.boxName);
   int randomIndex = box.get(KeyUtils.dailyWordIdKey, defaultValue: 1);
+  print(randomIndex);
   List<Data> allList = MainData.learnedDatas! + MainData.notLearnedDatas!;
-  MainData.dailyData =
-      allList.where((element) => element.id == randomIndex).first;
+  try {
+    MainData.dailyData =
+        allList.where((element) => element.id == randomIndex).first;
+  } catch (e) {
+    MainData.dailyData = allList.first;
+  }
 }
 
 //! Notification
@@ -297,14 +317,12 @@ void showFlutterNotification(RemoteMessage message) {
       notification.title,
       notification.body,
       NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channelDescription: channel.description,
-          // TODO add a proper drawable resource to android, for now using
-          //      one that already exists in example app.
-          // icon: 'launch_background',
-        ),
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description,
+            // TODO add a proper drawable resource to android, for now using
+            //      one that already exists in example app.
+            icon: '@mipmap/notification_icon',
+            color: const Color.fromRGBO(76, 81, 198, 1)),
       ),
     );
   }
@@ -335,8 +353,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     getNotifiInApp();
-    // initAutoStart();
-    // _runWhileAppIsTerminated();
+    // refleshUser();
+
+    initSetRandomlyWord();
+    MobileAds.instance.initialize();
   }
 
   @override
@@ -421,6 +441,24 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   //   }
   // }
 
+  Future<void> initSetRandomlyWord() async {
+    await Workmanager().registerPeriodicTask(
+        "dailyRandomWordTaskID",
+
+        //This is the value that will be
+        // returned in the callbackDispatcher
+        "dailyRandomWordTask",
+        initialDelay: const Duration(hours: 1), //! 1 saat olucak
+        // When no frequency is provided
+        // the default 15 minutes is set.
+        // Minimum frequency is 15 min.
+        // Android will automatically change
+        // your frequency to 15 min
+        // if you have configured a lower frequency.
+        frequency: const Duration(days: 1), //! 1 gün olucak
+        existingWorkPolicy: ExistingWorkPolicy.append);
+  }
+
   Future<void> getNotifiInApp() async {
     await setupFlutterNotifications();
     FirebaseMessaging.onMessage.listen((event) {
@@ -477,20 +515,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           //   primarySwatch: Colors.blue,
           // ),
           // home: const MainPage(),
-          initialRoute: '/',
+          initialRoute: KeyUtils.initialPageKey,
           routes: {
             // When navigating to the "/" route, build the FirstScreen widget.
-            '/': (context) => const MainPage(),
-            '/firstOpenPage': (context) => const FirstOpenPage(),
-            '/loginPage': (context) => const LoginPage(),
-            '/homePage': (context) => HomePage(),
-            '/registerPage': (context) => const RegisterPage(),
-            // '/playClassicMode': (context) => const PlayPage(), //! sonradan düzeltilicek
-            '/playEngameMode': (context) => const EngamePage(),
-            '/playWordGameMode': (context) => const WordGamePage(),
-            '/playSoundGameMode': (context) => const SoundGamePage(),
-            '/myWordsPage': (context) => const MyWordsPage(),
-            '/settingsPage': (context) => const SettingsPage(),
+            KeyUtils.initialPageKey: (context) => const MainPage(),
+            KeyUtils.firstOpenPageKey: (context) => const FirstOpenPage(),
+            KeyUtils.loginPageKey: (context) => const LoginPage(),
+            KeyUtils.homePageKey: (context) => HomePage(),
+            KeyUtils.registerPageKey: (context) => const RegisterPage(),
+            KeyUtils.testGamePageKey: (context) => const EngamePage(),
+            KeyUtils.letterGamePageKey: (context) => const WordGamePage(),
+            KeyUtils.soundGamePageKey: (context) => const SoundGamePage(),
+            KeyUtils.wordsPageKey: (context) => const MyWordsPage(),
+            KeyUtils.settingsPageKey: (context) => const SettingsPage(),
+            KeyUtils.profilePageKey: (context) => const ProfilePage(),
           },
         ),
       ),

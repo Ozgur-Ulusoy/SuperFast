@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:engame2/Ad_Helper.dart';
 import 'package:engame2/Data_Layer/consts.dart';
+import 'package:engame2/Presentation_Layer/Widgets/BannerAdWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +35,10 @@ class _MyWordsPageState extends State<MyWordsPage> {
     super.dispose();
     _audioPlayer.dispose();
   }
+
+  BannerAdWidget bannerAdWidget = BannerAdWidget(
+    adId: AdHelper.wordsPageBannerAdUnitId,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +243,13 @@ class _MyWordsPageState extends State<MyWordsPage> {
                         MyWordsWidget(
                           scrollController: scrollController,
                           audioPlayer: _audioPlayer,
-                        )
+                        ),
+                        SizedBox(height: ScreenUtil.height * 0.03),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: bannerAdWidget,
+                        ),
+                        SizedBox(height: ScreenUtil.height * 0.025),
                       ],
                     ),
                   ),

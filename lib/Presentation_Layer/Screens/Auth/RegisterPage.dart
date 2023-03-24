@@ -17,7 +17,7 @@ class RegisterPage extends StatefulWidget with PopUpMixin {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  TextEditingController usernameController = TextEditingController();
+  // TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
@@ -30,8 +30,6 @@ class _RegisterPageState extends State<RegisterPage> {
             .collection(KeyUtils.usersCollectionKey)
             .doc(value.user!.uid)
             .set({
-          'username': usernameController.text.trim(),
-          'email': value.user!.email,
           'favList': "",
           'learnedList': "",
           'GameRecors': {
@@ -48,11 +46,12 @@ class _RegisterPageState extends State<RegisterPage> {
           if (FirebaseAuth.instance.currentUser != null) {
             await saveSkipFirstOpen(
                 haveUsername: true,
-                username: usernameController.text.trim(),
+                username: emailController.text.split("@")[0],
+                // username: usernameController.text.trim(),
                 context: context);
             // await fLoadData();
             Navigator.of(context).pushNamedAndRemoveUntil(
-                '/homePage', (Route<dynamic> route) => false);
+                KeyUtils.homePageKey, (Route<dynamic> route) => false);
           }
         },
       );
@@ -99,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    usernameController.dispose();
+    // usernameController.dispose();
     passwordController.dispose();
     emailController.dispose();
   }
@@ -261,22 +260,24 @@ class _RegisterPageState extends State<RegisterPage> {
                     alignment: const Alignment(-0.4, -0.40),
                     child: GoArrowButton(
                       toDo: () async {
-                        String username = usernameController.text.trim();
+                        // String username = usernameController.text.trim();
                         String email = emailController.text.trim();
                         String password = passwordController.text;
-                        var userRef = await FirebaseFirestore.instance
-                            .collection('Users')
-                            .where('username', isEqualTo: username)
-                            .get();
+                        // var userRef = await FirebaseFirestore.instance
+                        //     .collection('Users')
+                        //     .where('username', isEqualTo: username)
+                        //     .get();
 
-                        if (usernameController.text.isEmpty) {
-                          widget.showCustomSnackbar(
-                            context,
-                            "Kullanıcı Adı Boş Olamaz",
-                            color: Colors.red,
-                          );
-                          return;
-                        } else if (emailController.text.isEmpty) {
+                        //  if (usernameController.text.isEmpty) {
+                        //   widget.showCustomSnackbar(
+                        //     context,
+                        //     "Kullanıcı Adı Boş Olamaz",
+                        //     color: Colors.red,
+                        //   );
+                        //   return;
+                        // }
+                        // else
+                        if (emailController.text.isEmpty) {
                           widget.showCustomSnackbar(
                             context,
                             "Email Boş Olamaz",
@@ -290,14 +291,16 @@ class _RegisterPageState extends State<RegisterPage> {
                             color: Colors.red,
                           );
                           return;
-                        } else if (userRef.size != 0) {
-                          widget.showCustomSnackbar(
-                            context,
-                            "Kullanıcı Adı Zaten Kullanılıyor",
-                            color: Colors.red,
-                          );
-                          return;
-                        } else {
+                        }
+                        //  else if (userRef.size != 0) {
+                        //   widget.showCustomSnackbar(
+                        //     context,
+                        //     "Kullanıcı Adı Zaten Kullanılıyor",
+                        //     color: Colors.red,
+                        //   );
+                        //   return;
+                        // }
+                        else {
                           setState(() {
                             isLoading = true;
                           });
@@ -334,54 +337,55 @@ class _RegisterPageState extends State<RegisterPage> {
 
                         Expanded(flex: 2, child: Container()),
 
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                "Kullanıcı Adı",
-                                style: GoogleFonts.poppins(
-                                  fontSize: ScreenUtil.textScaleFactor * 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Expanded(child: SizedBox()),
-                        Padding(
-                          padding:
-                              EdgeInsets.only(right: ScreenUtil.width * 0.1),
-                          child: Container(
-                            height: ScreenUtil.height * 0.085,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              border: Border.all(
-                                  width: 2,
-                                  color: const Color.fromRGBO(96, 127, 242, 1)),
-                            ),
-                            child: Center(
-                              child: TextField(
-                                keyboardType: TextInputType.name,
-                                controller: usernameController,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(
-                                      left: 15, bottom: 11, top: 11, right: 15),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        // const SizedBox(),
-                        // const Spacer(),
-                        const Expanded(flex: 3, child: SizedBox()),
+                        // Row(
+                        //   children: [
+                        //     Flexible(
+                        //       child: Text(
+                        //         "Kullanıcı Adı",
+                        //         style: GoogleFonts.poppins(
+                        //           fontSize: ScreenUtil.textScaleFactor * 18,
+                        //           color: Colors.white,
+                        //           fontWeight: FontWeight.bold,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const Expanded(child: SizedBox()),
+                        // Padding(
+                        //   padding:
+                        //       EdgeInsets.only(right: ScreenUtil.width * 0.1),
+                        //   child: Container(
+                        //     height: ScreenUtil.height * 0.085,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.white,
+                        //       borderRadius:
+                        //           const BorderRadius.all(Radius.circular(10)),
+                        //       border: Border.all(
+                        //           width: 2,
+                        //           color: const Color.fromRGBO(96, 127, 242, 1)),
+                        //     ),
+                        //     child: Center(
+                        //       child: TextField(
+                        //         keyboardType: TextInputType.name,
+                        //         controller: usernameController,
+                        //         decoration: const InputDecoration(
+                        //           border: InputBorder.none,
+                        //           focusedBorder: InputBorder.none,
+                        //           enabledBorder: InputBorder.none,
+                        //           errorBorder: InputBorder.none,
+                        //           disabledBorder: InputBorder.none,
+                        //           contentPadding: EdgeInsets.only(
+                        //               left: 15, bottom: 11, top: 11, right: 15),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // // const SizedBox(),
+                        // // const Spacer(),
+                        // const Expanded(flex: 3, child: SizedBox()),
+
                         Padding(
                           padding:
                               EdgeInsets.only(right: ScreenUtil.width * 0.1),
@@ -459,7 +463,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         ),
-                        const Expanded(flex: 5, child: SizedBox()),
+                        const Expanded(flex: 7, child: SizedBox()),
                       ],
                     ),
                   ),

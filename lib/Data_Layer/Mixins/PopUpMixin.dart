@@ -22,7 +22,7 @@ mixin PopUpMixin {
       builder: (context) {
         return Center(
           child: Container(
-            height: ScreenUtil.height * 0.5,
+            height: ScreenUtil.height * 0.46,
             width: ScreenUtil.width * 0.8,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -75,12 +75,11 @@ mixin PopUpMixin {
                                         getAddToCardTypeFuncType(
                                             state.currentData!.favType),
                                         context);
-
                                 showCustomSnackbar(
                                     context,
                                     getAddToCardTypeSnackbarTitle(
                                         state.currentData!.favType),
-                                    duration: 1);
+                                    duration: 400);
                               },
                             );
                           },
@@ -109,7 +108,7 @@ mixin PopUpMixin {
                                     state.currentData!.isFav
                                         ? "Favorilere Eklendi"
                                         : "Favorilerden Çıkarıldı",
-                                    duration: 1);
+                                    duration: 400);
                               },
                             );
                           },
@@ -123,8 +122,8 @@ mixin PopUpMixin {
                   SizedBox(height: ScreenUtil.height * 0.015),
                   popUpTextWidget("Anlamı", data.turkish),
                   SizedBox(height: ScreenUtil.height * 0.015),
-                  popUpTextWidget("Örnek Cümle", data.exampleSentence),
-                  SizedBox(height: ScreenUtil.height * 0.015),
+                  // popUpTextWidget("Örnek Cümle", data.exampleSentence),
+                  // SizedBox(height: ScreenUtil.height * 0.015),
                   popUpTextWidget("Türü", returnTypeText(data.type.name)),
                   SizedBox(height: ScreenUtil.height * 0.015),
                   popUpTextWidget(
@@ -206,7 +205,7 @@ mixin PopUpMixin {
             backgroundColor: Colors.transparent,
             body: Center(
               child: Container(
-                height: ScreenUtil.height * 0.6,
+                height: ScreenUtil.height * 0.55,
                 width: ScreenUtil.width * 0.8,
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -234,7 +233,7 @@ mixin PopUpMixin {
                         ],
                       ),
                       SizedBox(height: ScreenUtil.height * 0.025),
-                      Flexible(
+                      FittedBox(
                         child: Text(
                           "Günün Kelimesi",
                           style: GoogleFonts.poppins(
@@ -275,7 +274,7 @@ mixin PopUpMixin {
                                         context,
                                         getAddToCardTypeSnackbarTitle(
                                             state.currentData!.favType),
-                                        duration: 1);
+                                        duration: 400);
                                   },
                                 );
                               },
@@ -304,7 +303,7 @@ mixin PopUpMixin {
                                         state.currentData!.isFav
                                             ? "Favorilere Eklendi"
                                             : "Favorilerden Çıkarıldı",
-                                        duration: 1);
+                                        duration: 400);
                                   },
                                 );
                               },
@@ -318,13 +317,17 @@ mixin PopUpMixin {
                       SizedBox(height: ScreenUtil.height * 0.015),
                       popUpTextWidget("Anlamı", data.turkish),
                       SizedBox(height: ScreenUtil.height * 0.015),
-                      popUpTextWidget("Örnek Cümle", data.exampleSentence),
-                      SizedBox(height: ScreenUtil.height * 0.015),
+                      // popUpTextWidget("Örnek Cümle", data.exampleSentence),
+                      // SizedBox(height: ScreenUtil.height * 0.015),
                       popUpTextWidget("Türü", returnTypeText(data.type.name)),
                       SizedBox(height: ScreenUtil.height * 0.015),
                       popUpTextWidget(
                           "Seviyesi", data.level.name.toString().toUpperCase()),
                       SizedBox(height: ScreenUtil.height * 0.025),
+                      // const Spacer(
+                      //   flex: 2,
+                      // ),
+                      const Spacer(),
                       Padding(
                         padding:
                             EdgeInsets.only(right: ScreenUtil.width * 0.04),
@@ -347,7 +350,7 @@ mixin PopUpMixin {
                         ),
                       ),
                       SizedBox(height: ScreenUtil.height * 0.025),
-                      Flexible(
+                      FittedBox(
                         child: GestureDetector(
                           onTap: () {
                             //* Webview
@@ -378,6 +381,9 @@ mixin PopUpMixin {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                      ),
+                      const Spacer(
+                        flex: 2,
                       ),
                     ],
                   ),
@@ -435,12 +441,14 @@ mixin PopUpMixin {
   // }
 
   void showCustomSnackbar(BuildContext context, String message,
-      {int duration = 1, Color color = const Color.fromRGBO(76, 81, 198, 1)}) {
+      {int duration = 400,
+      Color color = const Color.fromRGBO(76, 81, 198, 1)}) {
     // print(AppBar().preferredSize.height);
     // print(
     //   MediaQuery.of(context).padding.top,
     // );
     print(WidgetsBinding.instance.window.padding.top);
+
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
       ..showSnackBar(
@@ -449,12 +457,13 @@ mixin PopUpMixin {
           behavior: SnackBarBehavior.floating,
           // width: ScreenUtil.width * 0.95,
           margin: EdgeInsetsDirectional.only(
-              bottom: ScreenUtil.height +
-                  AppBar().preferredSize.height -
-                  WidgetsBinding.instance.window.padding.top,
+              bottom: ScreenUtil.height - ScreenUtil.topPadding,
               start: ScreenUtil.width * 0.05,
               end: ScreenUtil.width * 0.05),
-          content: Text(message),
+          content: AbsorbPointer(
+            absorbing: true,
+            child: Text(message),
+          ),
           backgroundColor: color,
           // isOpaque ? cBlueBackground.withOpacity(0.80) : cBlueBackground,
           action: SnackBarAction(
@@ -464,13 +473,13 @@ mixin PopUpMixin {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
             },
           ),
-          duration: Duration(seconds: duration),
+          duration: Duration(milliseconds: duration),
         ),
       );
   }
 
-  void showAfterGameDialog(
-      BuildContext context, bool isRecord, AsyncCallback callback) {
+  void showAfterGameDialog(BuildContext context, bool isRecord,
+      AsyncCallback callback, AsyncCallback goBackCallback) {
     // showDialog(
     //   context: context,
     //   builder: (context) {
@@ -544,9 +553,10 @@ mixin PopUpMixin {
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                goBackCallback();
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/homePage', (Route<dynamic> route) => false);
+                    KeyUtils.homePageKey, (Route<dynamic> route) => false);
               },
               child: Text(
                 "Menüye Dön",
