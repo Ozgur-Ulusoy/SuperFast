@@ -59,13 +59,15 @@ class _SoundGamePageState extends State<SoundGamePage>
           // _showInterstitialAd();
           try {
             if (BlocProvider.of<QuestionCubit>(context).state.point >
-                MainData.localData!
-                    .get(KeyUtils.soundGameRecordKey, defaultValue: 0)) {
+                MainData.soundGameRecord!) {
               MainData.localData!.put(KeyUtils.soundGameRecordKey,
                   BlocProvider.of<QuestionCubit>(context).state.point);
+              MainData.soundGameRecord =
+                  BlocProvider.of<QuestionCubit>(context).state.point;
               widget.showAfterGameDialog(
                 context,
                 true,
+                KeyUtils.soundGameRecordKey,
                 () async {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   BlocProvider.of<QuestionCubit>(context).ResetState();
@@ -101,6 +103,7 @@ class _SoundGamePageState extends State<SoundGamePage>
               widget.showAfterGameDialog(
                 context,
                 false,
+                KeyUtils.soundGameRecordKey,
                 () async {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   BlocProvider.of<QuestionCubit>(context).ResetState();
@@ -192,9 +195,11 @@ class _SoundGamePageState extends State<SoundGamePage>
         startTimer();
       }
     } catch (e) {
-      widget.showCustomSnackbar(
-          context, "Hata ! Lütfen İnternetinizi Kontrol Edin",
-          color: Colors.red);
+      if (mounted) {
+        widget.showCustomSnackbar(
+            context, "Hata ! Lütfen İnternetinizi Kontrol Edin",
+            color: Colors.red);
+      }
     }
   }
 
@@ -272,7 +277,9 @@ class _SoundGamePageState extends State<SoundGamePage>
     return WillPopScope(
       onWillPop: () async {
         print("kapatiliyor");
-        _showInterstitialAd();
+        if (BlocProvider.of<TimerCubit>(context).state.getRemainTime < 45) {
+          _showInterstitialAd();
+        }
         Navigator.of(context).pop();
         return false;
       },
@@ -341,7 +348,12 @@ class _SoundGamePageState extends State<SoundGamePage>
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      _showInterstitialAd();
+                                      if (BlocProvider.of<TimerCubit>(context)
+                                              .state
+                                              .getRemainTime <
+                                          45) {
+                                        _showInterstitialAd();
+                                      }
                                       Navigator.of(context).pop();
                                     },
                                     child: Icon(

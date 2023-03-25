@@ -245,4 +245,38 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
             element.english.toLowerCase().startsWith(input.toLowerCase()))
         .toList();
   }
+
+  List<Data> returnFilteredDataList(
+      bool isA1,
+      bool isA2,
+      bool isB1,
+      bool isB2,
+      bool isC1,
+      bool isC2,
+      bool isNoun,
+      bool isVerb,
+      bool isAdjective,
+      bool isAdverb,
+      bool isPreposition) {
+    return returnDataList()
+        .where(
+          (element) =>
+              element.level == WordLevel.a1 && isA1 ||
+              element.level == WordLevel.a2 && isA2 ||
+              element.level == WordLevel.b1 && isB1 ||
+              element.level == WordLevel.b2 && isB2 ||
+              element.level == WordLevel.c1 && isC1 ||
+              element.level == WordLevel.c2 && isC2,
+        )
+        .toList()
+        .where(
+          (element) =>
+              element.type == WordType.noun && isNoun ||
+              element.type == WordType.verb && isVerb ||
+              element.type == WordType.adjective && isAdjective ||
+              element.type == WordType.adverb && isAdverb ||
+              element.type == WordType.preposition && isPreposition,
+        )
+        .toList();
+  }
 }

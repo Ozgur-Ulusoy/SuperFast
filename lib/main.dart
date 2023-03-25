@@ -26,6 +26,7 @@ import 'package:upgrader/upgrader.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'Business_Layer/cubit/answer_cubit.dart';
+import 'Business_Layer/cubit/cubit/word_filter_cubit.dart';
 import 'Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import 'Business_Layer/cubit/question_cubit.dart';
 import 'Business_Layer/cubit/timer_cubit.dart';
@@ -54,6 +55,13 @@ void main() async {
   //   } else {
   //     print("duplicate id: ${questionData[i].id}");
   //   }
+
+  //   if (questionData[i].english == "EN" || questionData[i].english == "E") {
+  //     print("EN: ${questionData[i].id}");
+  //   }
+  //   if (questionData[i].turkish == "TR" || questionData[i].turkish == "T") {
+  //     print("TR: ${questionData[i].id}");
+  //   }
   // }
 
   //! WorkManager
@@ -66,21 +74,21 @@ void main() async {
     isInDebugMode: false,
   );
 
-  //  await Workmanager().registerPeriodicTask(
-  //       "dailyRandomWordTaskID",
+  await Workmanager().registerPeriodicTask(
+      "dailyRandomWordTaskID",
 
-  //       //This is the value that will be
-  //       // returned in the callbackDispatcher
-  //       "dailyRandomWordTask",
-  //       initialDelay: const Duration(minutes: 1), //! 1 saat olucak
-  //       // When no frequency is provided
-  //       // the default 15 minutes is set.
-  //       // Minimum frequency is 15 min.
-  //       // Android will automatically change
-  //       // your frequency to 15 min
-  //       // if you have configured a lower frequency.
-  //       frequency: const Duration(days: 1), //! 1 gün olucak
-  //       existingWorkPolicy: ExistingWorkPolicy.append);
+      //This is the value that will be
+      // returned in the callbackDispatcher
+      "dailyRandomWordTask",
+      initialDelay: const Duration(hours: 1), //! 1 saat olucak
+      // When no frequency is provided
+      // the default 15 minutes is set.
+      // Minimum frequency is 15 min.
+      // Android will automatically change
+      // your frequency to 15 min
+      // if you have configured a lower frequency.
+      frequency: const Duration(days: 1), //! 1 gün olucak
+      existingWorkPolicy: ExistingWorkPolicy.append);
 
   await fLoadData();
   await setMainDataDailyWord(); //? set daily word
@@ -144,9 +152,9 @@ Future<void> setRandomDailyWord() async {
   Box box = await Hive.openBox("SuperFastBox");
   Random rnd = Random();
   int random = rnd.nextInt(questionData.length - 1) + 1;
-  await box.put("dailyWordId", random);
+  await box.put(KeyUtils.dailyWordIdKey, random);
 
-  print(box.get("dailyWordId", defaultValue: 1).toString() + "a");
+  print(box.get(KeyUtils.dailyWordIdKey, defaultValue: 1).toString() + "a");
   print(random.toString() + "b");
   String learnedList = box.get(KeyUtils.learnedListValueKey, defaultValue: "");
   List<Data> learnedDatas = [];
@@ -167,7 +175,12 @@ Future<void> setRandomDailyWord() async {
       .toList();
 
   List<Data> datas = learnedDatas + notLearnedDatas;
-  Data dailyData = datas.where((element) => element.id == random).first;
+  Data dailyData;
+  try {
+    dailyData = datas.where((element) => element.id == random).first;
+  } catch (e) {
+    dailyData = datas.first;
+  }
   bool isNotificationsOn =
       await box.get(KeyUtils.isGetNotificationOnKey, defaultValue: true);
   if (isNotificationsOn) {
@@ -249,7 +262,7 @@ Future<void> setMainDataDailyWord() async {
   await Hive.initFlutter();
   Box box = await Hive.openBox(KeyUtils.boxName);
   int randomIndex = box.get(KeyUtils.dailyWordIdKey, defaultValue: 1);
-  print(randomIndex);
+  print(randomIndex.toString() + " " + "setMainDataDailyWord");
   List<Data> allList = MainData.learnedDatas! + MainData.notLearnedDatas!;
   try {
     MainData.dailyData =
@@ -353,9 +366,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     getNotifiInApp();
+    // ScreenUtil.init(context);
     // refleshUser();
-
-    initSetRandomlyWord();
+    // initSetRandomlyWord();
     MobileAds.instance.initialize();
   }
 
@@ -441,23 +454,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   //   }
   // }
 
-  Future<void> initSetRandomlyWord() async {
-    await Workmanager().registerPeriodicTask(
-        "dailyRandomWordTaskID",
+  // Future<void> initSetRandomlyWord() async {
+  //   await Workmanager().registerPeriodicTask(
+  //       "dailyRandomWordTaskID",
 
-        //This is the value that will be
-        // returned in the callbackDispatcher
-        "dailyRandomWordTask",
-        initialDelay: const Duration(hours: 1), //! 1 saat olucak
-        // When no frequency is provided
-        // the default 15 minutes is set.
-        // Minimum frequency is 15 min.
-        // Android will automatically change
-        // your frequency to 15 min
-        // if you have configured a lower frequency.
-        frequency: const Duration(days: 1), //! 1 gün olucak
-        existingWorkPolicy: ExistingWorkPolicy.append);
-  }
+  //       //This is the value that will be
+  //       // returned in the callbackDispatcher
+  //       "dailyRandomWordTask",
+  //       initialDelay: const Duration(seconds: 15), //! 1 saat olucak
+  //       // When no frequency is provided
+  //       // the default 15 minutes is set.
+  //       // Minimum frequency is 15 min.
+  //       // Android will automatically change
+  //       // your frequency to 15 min
+  //       // if you have configured a lower frequency.
+  //       frequency: const Duration(minutes: 15), //! 1 gün olucak
+  //       existingWorkPolicy: ExistingWorkPolicy.append);
+  // }
 
   Future<void> getNotifiInApp() async {
     await setupFlutterNotifications();
@@ -495,6 +508,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
         BlocProvider(
           create: (context) => HomepageNotifiAlertCubit(),
+        ),
+
+        BlocProvider(
+          create: (context) => WordFilterCubit(),
         ),
       ],
       child: UpgradeAlert(

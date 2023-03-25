@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:engame2/Business_Layer/cubit/cubit/word_filter_cubit.dart';
 import 'package:engame2/Data_Layer/consts.dart';
 import 'package:engame2/Data_Layer/data.dart';
 import 'package:engame2/Presentation_Layer/Widgets/PlaySoundCard.dart';
@@ -22,7 +23,7 @@ mixin PopUpMixin {
       builder: (context) {
         return Center(
           child: Container(
-            height: ScreenUtil.height * 0.46,
+            height: ScreenUtil.height * 0.5,
             width: ScreenUtil.width * 0.8,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -129,6 +130,7 @@ mixin PopUpMixin {
                   popUpTextWidget(
                       "Seviyesi", data.level.name.toString().toUpperCase()),
                   SizedBox(height: ScreenUtil.height * 0.025),
+                  const Spacer(),
                   Padding(
                     padding: EdgeInsets.only(right: ScreenUtil.width * 0.04),
                     child: Row(
@@ -150,7 +152,7 @@ mixin PopUpMixin {
                     ),
                   ),
                   SizedBox(height: ScreenUtil.height * 0.025),
-                  Flexible(
+                  FittedBox(
                     child: GestureDetector(
                       onTap: () {
                         //* Webview
@@ -182,6 +184,7 @@ mixin PopUpMixin {
                       ),
                     ),
                   ),
+                  const Spacer(flex: 2),
                 ],
               ),
             ),
@@ -205,7 +208,7 @@ mixin PopUpMixin {
             backgroundColor: Colors.transparent,
             body: Center(
               child: Container(
-                height: ScreenUtil.height * 0.55,
+                height: ScreenUtil.height * 0.58,
                 width: ScreenUtil.width * 0.8,
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -479,7 +482,7 @@ mixin PopUpMixin {
   }
 
   void showAfterGameDialog(BuildContext context, bool isRecord,
-      AsyncCallback callback, AsyncCallback goBackCallback) {
+      String recordKey, AsyncCallback callback, AsyncCallback goBackCallback) {
     // showDialog(
     //   context: context,
     //   builder: (context) {
@@ -529,7 +532,7 @@ mixin PopUpMixin {
                 ),
               ),
               Text(
-                "Rekorunuz : ${MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0)}",
+                "Rekorunuz : ${MainData.localData!.get(recordKey, defaultValue: 0)}",
                 style: GoogleFonts.poppins(
                   fontSize: ScreenUtil.textScaleFactor * 18,
                   fontWeight: FontWeight.w600,
@@ -678,7 +681,7 @@ mixin PopUpMixin {
                           Navigator.pop(context);
                         },
                         child: Text(
-                          "Bu uyarıyı gösterme",
+                          "Bu Uyarıyı Gösterme",
                           style: GoogleFonts.poppins(
                             color: Colors.red,
                             fontWeight: FontWeight.bold,
@@ -696,18 +699,154 @@ mixin PopUpMixin {
       },
     );
   }
+
+  void showFilterPopUp(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(
+              child: Container(
+                width: ScreenUtil.width * 0.85,
+                height: ScreenUtil.height * 0.7,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    filterPopUpTextWidget(
+                        "A1 Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isA1,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsA1(value!)),
+                    filterPopUpTextWidget(
+                        "A2 Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isA2,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsA2(value!)),
+                    filterPopUpTextWidget(
+                        "B1 Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isB1,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsB1(value!)),
+                    filterPopUpTextWidget(
+                      "B2 Kelimeler",
+                      BlocProvider.of<WordFilterCubit>(context, listen: true)
+                          .state
+                          .isB2,
+                      (value) => BlocProvider.of<WordFilterCubit>(context)
+                          .ChangeIsB2(value!),
+                    ),
+                    filterPopUpTextWidget(
+                        "C1 Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isC1,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsC1(value!)),
+                    filterPopUpTextWidget(
+                      "C2 Kelimeler",
+                      BlocProvider.of<WordFilterCubit>(context, listen: true)
+                          .state
+                          .isC2,
+                      (value) => BlocProvider.of<WordFilterCubit>(context)
+                          .ChangeIsC2(value!),
+                    ),
+                    //
+                    filterPopUpTextWidget(
+                        "Türü İsim Olan Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isNoun,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsNoun(value!)),
+                    filterPopUpTextWidget(
+                        "Türü Fiil Olan Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isVerb,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsVerb(value!)),
+
+                    filterPopUpTextWidget(
+                        "Türü Sıfat Olan Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isAdjective,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsAdjective(value!)),
+
+                    filterPopUpTextWidget(
+                        "Türü Zarf Olan Kelimeler",
+                        BlocProvider.of<WordFilterCubit>(context, listen: true)
+                            .state
+                            .isAdverb,
+                        (value) => BlocProvider.of<WordFilterCubit>(context)
+                            .ChangeIsAdverb(value!)),
+
+                    filterPopUpTextWidget(
+                      "Türü Edat Olan Kelimeler",
+                      BlocProvider.of<WordFilterCubit>(context, listen: true)
+                          .state
+                          .isPreposition,
+                      (value) => BlocProvider.of<WordFilterCubit>(context)
+                          .ChangeIsPreposition(value!),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 Widget popUpTextWidget(String key, String value) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.start,
     children: [
-      Flexible(
-        child: Text(
-          "$key : $value",
-          style: TextStyle(
-            fontSize: ScreenUtil.textScaleFactor * 18,
-            fontWeight: FontWeight.bold,
+      FittedBox(
+        child: RichText(
+          text: TextSpan(
+            text: key,
+            style: GoogleFonts.poppins(
+              fontSize: ScreenUtil.textScaleFactor * 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            // text: Text(
+            //   "$key : $value",
+            //   style: GoogleFonts.poppins(
+            //     fontSize: ScreenUtil.textScaleFactor * 18,
+            //     fontWeight: FontWeight.w600,
+            //   ),
+            // ),
+            children: [
+              TextSpan(
+                text: " : $value",
+                style: GoogleFonts.poppins(
+                  fontSize: ScreenUtil.textScaleFactor * 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -736,4 +875,27 @@ String returnTypeText(String name) {
     default:
       return "";
   }
+}
+
+Widget filterPopUpTextWidget(
+    String title, bool value, Function(bool?)? valueChanged) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      FittedBox(
+        child: Text(
+          title,
+          style: GoogleFonts.roboto(
+            fontSize: ScreenUtil.textScaleFactor * 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        fit: BoxFit.scaleDown,
+      ),
+      Checkbox(
+        value: value,
+        onChanged: valueChanged,
+      ),
+    ],
+  );
 }

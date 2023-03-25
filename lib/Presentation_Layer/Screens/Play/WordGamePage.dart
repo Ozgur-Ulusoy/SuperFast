@@ -68,11 +68,13 @@ class _WordGamePageState extends State<WordGamePage>
         // widget.showAfterGameDialog(context);
         try {
           if (BlocProvider.of<QuestionCubit>(context).state.point >
-              MainData.localData!
-                  .get(KeyUtils.letterGameRecordKey, defaultValue: 0)) {
+              MainData.letterGameRecord!) {
             MainData.localData!.put(KeyUtils.letterGameRecordKey,
                 BlocProvider.of<QuestionCubit>(context).state.point);
-            widget.showAfterGameDialog(context, true, () async {
+            MainData.letterGameRecord =
+                BlocProvider.of<QuestionCubit>(context).state.point;
+            widget.showAfterGameDialog(
+                context, true, KeyUtils.letterGameRecordKey, () async {
               Navigator.of(context, rootNavigator: true).pop('dialog');
               BlocProvider.of<QuestionCubit>(context).ResetState();
               BlocProvider.of<QuestionCubit>(
@@ -106,6 +108,7 @@ class _WordGamePageState extends State<WordGamePage>
             widget.showAfterGameDialog(
               context,
               false,
+              KeyUtils.letterGameRecordKey,
               () async {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
                 BlocProvider.of<QuestionCubit>(context).ResetState();
@@ -265,7 +268,9 @@ class _WordGamePageState extends State<WordGamePage>
     return WillPopScope(
       onWillPop: () async {
         print("Kapatiliyor");
-        _showInterstitialAd();
+        if (BlocProvider.of<TimerCubit>(context).state.getRemainTime < 45) {
+          _showInterstitialAd();
+        }
         Navigator.of(context).pop();
         return false;
       },
@@ -307,7 +312,12 @@ class _WordGamePageState extends State<WordGamePage>
                       title: "Türkçe - İngilizce",
                       isLetterPage: true,
                       goBackCaller: () {
-                        _showInterstitialAd();
+                        if (BlocProvider.of<TimerCubit>(context)
+                                .state
+                                .getRemainTime <
+                            45) {
+                          _showInterstitialAd();
+                        }
                         Navigator.of(context).pop();
                       },
                     ),

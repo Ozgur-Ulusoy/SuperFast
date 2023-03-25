@@ -61,11 +61,13 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
           print("end");
           try {
             if (BlocProvider.of<QuestionCubit>(context).state.point >
-                MainData.localData!
-                    .get(KeyUtils.engameGameRecordKey, defaultValue: 0)) {
+                MainData.engameGameRecord!) {
               MainData.localData!.put(KeyUtils.engameGameRecordKey,
                   BlocProvider.of<QuestionCubit>(context).state.point);
-              widget.showAfterGameDialog(context, true, () async {
+              MainData.engameGameRecord =
+                  BlocProvider.of<QuestionCubit>(context).state.point;
+              widget.showAfterGameDialog(
+                  context, true, KeyUtils.engameGameRecordKey, () async {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
                 BlocProvider.of<QuestionCubit>(context).ResetState();
                 BlocProvider.of<QuestionCubit>(
@@ -101,6 +103,7 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
               widget.showAfterGameDialog(
                 context,
                 false,
+                KeyUtils.engameGameRecordKey,
                 () async {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   BlocProvider.of<QuestionCubit>(context).ResetState();
@@ -247,7 +250,9 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async {
         print("Kapatiliyor");
-        _showInterstitialAd();
+        if (BlocProvider.of<TimerCubit>(context).state.getRemainTime < 45) {
+          _showInterstitialAd();
+        }
         Navigator.of(context).pop();
         return false;
       },
@@ -290,7 +295,12 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                     PlayGameUpSelection(
                       title: "İngilizce - Türkçe",
                       goBackCaller: () {
-                        _showInterstitialAd();
+                        if (BlocProvider.of<TimerCubit>(context)
+                                .state
+                                .getRemainTime <
+                            45) {
+                          _showInterstitialAd();
+                        }
                         Navigator.of(context).pop();
                       },
                     ),
@@ -412,11 +422,12 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                             return;
                           }
                           stopTimer();
-                        } else {
-                          widget.showCustomSnackbar(
-                              context, "Lütfen Bir Cevap Seçiniz",
-                              duration: 100);
                         }
+                        // else {
+                        //   widget.showCustomSnackbar(
+                        //       context, "Lütfen Bir Cevap Seçiniz",
+                        //       duration: 100);
+                        // }
                       },
                     ),
                     //!

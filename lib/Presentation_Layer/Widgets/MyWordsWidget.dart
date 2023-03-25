@@ -12,12 +12,14 @@ class MyWordsWidget extends StatefulWidget with PopUpMixin {
   ScrollController scrollController;
   AudioPlayer audioPlayer;
   double lastItemHeight;
-  MyWordsWidget(
-      {Key? key,
-      required this.scrollController,
-      required this.audioPlayer,
-      this.lastItemHeight = 0})
-      : super(key: key);
+  List<Data> dataList;
+  MyWordsWidget({
+    Key? key,
+    required this.scrollController,
+    required this.audioPlayer,
+    this.lastItemHeight = 0,
+    required this.dataList,
+  }) : super(key: key);
 
   @override
   State<MyWordsWidget> createState() => _MyWordsWidgetState();
@@ -51,26 +53,17 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                   // physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     //
-                    return index <
-                            BlocProvider.of<HomePageSelectedWordCubit>(context)
-                                .returnDataList()
-                                .length
+                    return index < widget.dataList.length
                         ? GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
                               BlocProvider.of<HomePageSelectedWordCubit>(
                                       context)
                                   .changeCurrentData(
-                                BlocProvider.of<HomePageSelectedWordCubit>(
-                                        context)
-                                    .returnDataList()[index],
+                                widget.dataList[index],
                               );
-                              widget.openWordPopUp(
-                                  context,
-                                  BlocProvider.of<HomePageSelectedWordCubit>(
-                                          context)
-                                      .returnDataList()[index],
-                                  widget.audioPlayer);
+                              widget.openWordPopUp(context,
+                                  widget.dataList[index], widget.audioPlayer);
                             },
                             child: SizedBox(
                               height: 50,
@@ -95,11 +88,7 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                                         Flexible(
                                           child: FittedBox(
                                             child: Text(
-                                              BlocProvider.of<
-                                                          HomePageSelectedWordCubit>(
-                                                      context)
-                                                  .returnDataList()[index]
-                                                  .english,
+                                              widget.dataList[index].english,
                                               style: const TextStyle(
                                                 color: Colors.black,
                                               ),
@@ -116,12 +105,7 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                                       children: [
                                         Flexible(
                                           child: Text(
-                                            BlocProvider.of<
-                                                        HomePageSelectedWordCubit>(
-                                                    context)
-                                                .returnDataList()[index]
-                                                .level
-                                                .name
+                                            widget.dataList[index].level.name
                                                 .toUpperCase(),
                                             // "dsaşdsaşdsdadsasd",
                                             maxLines: 1,
@@ -137,11 +121,8 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                                   GestureDetector(
                                     onTap: () async {
                                       //
-                                      String url = await getSoundUrl(BlocProvider
-                                              .of<HomePageSelectedWordCubit>(
-                                                  context)
-                                          .returnDataList()[index]
-                                          .english);
+                                      String url = await getSoundUrl(
+                                          widget.dataList[index].english);
                                       if (url == "") {
                                         widget.showCustomSnackbar(
                                             context, "Ses Bulunamadı");
@@ -161,11 +142,7 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                                     child: FittedBox(
                                       fit: BoxFit.scaleDown,
                                       child: Text(
-                                        BlocProvider.of<
-                                                    HomePageSelectedWordCubit>(
-                                                context)
-                                            .returnDataList()[index]
-                                            .turkish,
+                                        widget.dataList[index].turkish,
                                         style: const TextStyle(
                                           color: Colors.black,
                                         ),
@@ -183,19 +160,12 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
                           );
                   },
                   separatorBuilder: (context, index) {
-                    return index <
-                            BlocProvider.of<HomePageSelectedWordCubit>(context)
-                                    .returnDataList()
-                                    .length -
-                                1
+                    return index < widget.dataList.length - 1
                         ? CustomPaint(painter: DrawDottedhorizontalline())
                         : const SizedBox();
                   },
                   // itemCount: state.learnedWordsList.length,
-                  itemCount: BlocProvider.of<HomePageSelectedWordCubit>(context)
-                          .returnDataList()
-                          .length +
-                      1,
+                  itemCount: widget.dataList.length + 1,
                 );
               },
             ),

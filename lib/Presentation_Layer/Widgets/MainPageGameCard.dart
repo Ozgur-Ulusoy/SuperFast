@@ -6,6 +6,8 @@ import '../../Data_Layer/consts.dart';
 
 class PlayGameCard extends StatefulWidget {
   String imagePath;
+  Color firstColor;
+  Color secondColor;
   String text;
   String iconPath;
   VoidCallback func;
@@ -13,6 +15,8 @@ class PlayGameCard extends StatefulWidget {
   PlayGameCard({
     Key? key,
     required this.imagePath,
+    required this.firstColor,
+    required this.secondColor,
     required this.text,
     required this.iconPath,
     required this.func,
@@ -32,12 +36,21 @@ class _PlayGameCardState extends State<PlayGameCard> {
       child: Stack(
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            child: SvgPicture.asset(
-              widget.imagePath,
-              fit: BoxFit.fitWidth,
-            ),
-          ),
+              borderRadius: const BorderRadius.all(Radius.circular(15)),
+              child:
+                  // SvgPicture.asset(
+                  //   widget.imagePath,
+                  //   fit: BoxFit.fitWidth,
+                  // ),
+                  Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                  colors: [
+                    widget.firstColor,
+                    widget.secondColor,
+                  ],
+                )),
+              )),
           Center(
             child: Text(
               widget.text,

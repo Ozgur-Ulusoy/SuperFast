@@ -238,25 +238,27 @@ class _HomePageState extends State<HomePage>
                         Flexible(
                           child: RichText(
                             text: TextSpan(
-                                text: "Hello ,\n",
-                                style: GoogleFonts.fredoka(
-                                  color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 35,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: FirebaseAuth.instance.currentUser!
-                                            .displayName ??
-                                        MainData.username,
-                                    style: GoogleFonts.fredoka(
-                                      color: cBlueBackground,
-                                      fontSize: ScreenUtil.textScaleFactor * 35,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  )
-                                ]),
+                              text: "Hello ,\n",
+                              style: GoogleFonts.fredoka(
+                                color: cBlueBackground,
+                                fontSize: ScreenUtil.textScaleFactor * 35,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: FirebaseAuth
+                                          .instance.currentUser!.displayName ??
+                                      MainData.username,
+                                  style: GoogleFonts.fredoka(
+                                    color: cBlueBackground,
+                                    fontSize: ScreenUtil.textScaleFactor * 35,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                )
+                              ],
+                            ),
                             maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -273,20 +275,21 @@ class _HomePageState extends State<HomePage>
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            // TODO
-                          },
-                          child: Text(
-                            "Tümünü Gör",
-                            style: GoogleFonts.roboto(
-                              color: cBlueBackground,
-                              fontSize: ScreenUtil.textScaleFactor * 18,
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        )
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     // TODO
+                        //   },
+                        //   child: Text(
+                        //     "Tümünü Gör",
+                        //     style: GoogleFonts.roboto(
+                        //       color: cBlueBackground,
+                        //       fontSize: ScreenUtil.textScaleFactor * 18,
+                        //       decoration: TextDecoration.underline,
+                        //       fontWeight: FontWeight.w400,
+                        //     ),
+                        //   ),
+                        // )
+                        const SizedBox(), //! şimdilik
                       ],
                     ),
                     GridView.count(
@@ -300,6 +303,8 @@ class _HomePageState extends State<HomePage>
                       children: [
                         PlayGameCard(
                           imagePath: "assets/images/firstplayphoto.svg",
+                          firstColor: Colors.pink,
+                          secondColor: Colors.pink[300]!,
                           text: "Test Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
@@ -309,6 +314,8 @@ class _HomePageState extends State<HomePage>
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/secondplayphoto.svg",
+                          firstColor: Colors.blue,
+                          secondColor: Colors.blueAccent,
                           text: "Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
@@ -318,6 +325,8 @@ class _HomePageState extends State<HomePage>
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/thirdplayphoto.svg",
+                          firstColor: Colors.purple[300]!,
+                          secondColor: Colors.purpleAccent,
                           text: "Sesli Kelime Oyunu",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
@@ -327,6 +336,8 @@ class _HomePageState extends State<HomePage>
                         ),
                         PlayGameCard(
                           imagePath: "assets/images/fourthplayphoto.svg",
+                          firstColor: Colors.purple,
+                          secondColor: Colors.deepPurpleAccent,
                           text: "Yakında...",
                           iconPath: "assets/images/gamepadicon.svg",
                           func: () {
@@ -400,6 +411,10 @@ class _HomePageState extends State<HomePage>
                     MyWordsWidget(
                       scrollController: scrollController,
                       audioPlayer: _audioPlayer,
+                      dataList: BlocProvider.of<HomePageSelectedWordCubit>(
+                              context,
+                              listen: true)
+                          .returnDataList(),
                       // lastItemHeight: bannerAdWidget.height,
                     ),
                     //!
