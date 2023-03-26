@@ -12,7 +12,6 @@ import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart
 import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -246,8 +245,10 @@ class _HomePageState extends State<HomePage>
                               ),
                               children: [
                                 TextSpan(
-                                  text: FirebaseAuth
-                                          .instance.currentUser!.displayName ??
+                                  text:
+                                      // await GamesServices.isSignedIn ? GamesServices.getPlayerName()  :
+                                      // FirebaseAuth
+                                      //         .instance.currentUser?.displayName ??
                                       MainData.username,
                                   style: GoogleFonts.fredoka(
                                     color: cBlueBackground,

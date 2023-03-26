@@ -46,7 +46,9 @@ class _RegisterPageState extends State<RegisterPage> {
           if (FirebaseAuth.instance.currentUser != null) {
             await saveSkipFirstOpen(
                 haveUsername: true,
-                username: emailController.text.split("@")[0],
+                username: emailController.text.split("@").isEmpty
+                    ? ""
+                    : emailController.text.split("@")[0],
                 // username: usernameController.text.trim(),
                 context: context);
             // await fLoadData();

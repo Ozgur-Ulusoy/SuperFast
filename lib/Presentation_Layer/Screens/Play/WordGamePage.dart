@@ -11,6 +11,7 @@ import 'package:engame2/Presentation_Layer/Widgets/PlayGameUpSection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -59,7 +60,7 @@ class _WordGamePageState extends State<WordGamePage>
   }
 
   startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       BlocProvider.of<TimerCubit>(context).DecreaseTime();
       if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
         timer.cancel();
@@ -69,8 +70,6 @@ class _WordGamePageState extends State<WordGamePage>
         try {
           if (BlocProvider.of<QuestionCubit>(context).state.point >
               MainData.letterGameRecord!) {
-            MainData.localData!.put(KeyUtils.letterGameRecordKey,
-                BlocProvider.of<QuestionCubit>(context).state.point);
             MainData.letterGameRecord =
                 BlocProvider.of<QuestionCubit>(context).state.point;
             widget.showAfterGameDialog(
@@ -102,7 +101,18 @@ class _WordGamePageState extends State<WordGamePage>
                   .update({
                 KeyUtils.gameRecordsMapKey + "." + KeyUtils.letterGameRecordKey:
                     BlocProvider.of<QuestionCubit>(context).state.point,
+              }).then((value) {
+                MainData.localData!.put(KeyUtils.letterGameRecordKey,
+                    BlocProvider.of<QuestionCubit>(context).state.point);
               });
+            }
+            if (await GamesServices.isSignedIn) {
+              GamesServices.submitScore(
+                score: Score(
+                  androidLeaderboardID: "CgkIiazqv7IFEAIQAQ",
+                  value: BlocProvider.of<QuestionCubit>(context).state.point,
+                ),
+              );
             }
           } else {
             widget.showAfterGameDialog(

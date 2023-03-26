@@ -4,6 +4,7 @@ import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -26,68 +27,85 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
     try {
-      final googleUser = await GoogleSignIn(
-        signInOption: SignInOption.games,
-        // serverClientId:
-        //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
-      ).signIn();
-
-      final googleAuth = await googleUser?.authentication;
-
-      if (googleAuth != null) {
-        // Create a new credential
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        // Once signed in, return the UserCredential
-        var result =
-            await FirebaseAuth.instance.signInWithCredential(credential);
-        //     .whenComplete(() async {
-        //   // await saveSkipFirstOpen(context: context);
-        //   // BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
-
-        // });
-
-        print("a");
-        if (result.additionalUserInfo!.isNewUser) {
-          print("yeni giris");
-          await FirebaseFirestore.instance
-              .collection(KeyUtils.usersCollectionKey)
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .set({
-            'favList': "",
-            'learnedList': "",
-            'GameRecors': {
-              'engameGameRecord': 0,
-              'soundGameRecord': 0,
-              'wordleGameRecord': 0,
-              'letterGameRecord': 0,
-            }
+      if (await GamesServices.isSignedIn) {
+        if (FirebaseAuth.instance.currentUser != null) {
+          await FirebaseAuth.instance.signOut();
+        }
+        try {
+          await GoogleSignIn.games().disconnect();
+          await GamesServices.signOut();
+        } catch (e) {
+          setState(() {
+            isLoading = false;
           });
         }
-
-        await fLoadData(context: context);
-        print("debug 1");
-        MainData.isFirstOpen = false;
-        await MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
-        print("debug 2");
-        await MainData.localData!
-            .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
-        MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
-        print("debug 3");
-
-        print("debug 4");
-        BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
-        print("debug 5");
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            KeyUtils.homePageKey, (Route<dynamic> route) => false);
-        print("debug 6");
+        // print("anaınsikm");
       }
-      print("debug 7");
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        signInOption: SignInOption.games,
+        scopes: ['email'],
+      );
+
+      final GoogleSignInAccount? googleUser =
+          await googleSignIn.signIn().catchError((error) {
+        print('Failed to sign in with Google Play Games: $error');
+        setState(() {
+          isLoading = false;
+        });
+      });
+
+      if (googleUser == null) {
+        print('Failed to sign in with Google Play Games.');
+        setState(() {
+          isLoading = false;
+        });
+        return Future.value(null);
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      var result = await FirebaseAuth.instance.signInWithCredential(credential);
+      if (result.additionalUserInfo!.isNewUser) {
+        print("yeni kullanıcı");
+        await FirebaseFirestore.instance
+            .collection(KeyUtils.usersCollectionKey)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'favList': "",
+          'learnedList': "",
+          'GameRecors': {
+            'engameGameRecord': 0,
+            'soundGameRecord': 0,
+            'wordleGameRecord': 0,
+            'letterGameRecord': 0,
+          }
+        });
+      }
+      GamesServices.signIn();
+      await fLoadData(context: context);
+      await saveSkipFirstOpen(context: context, haveUsername: true);
+      await MainData.localData!
+          .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
+      MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
+      BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          KeyUtils.homePageKey, (Route<dynamic> route) => false);
     } catch (e) {
-      widget.showCustomSnackbar(context, e.toString());
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        print(e.toString());
+        widget.showCustomSnackbar(context, "Hata !", color: Colors.red);
+      }
     }
 
     setState(() {
@@ -299,49 +317,49 @@ class _LoginPageState extends State<LoginPage> {
                         if (BlocProvider.of<LoginPageCubit>(context)
                             .state
                             .isSignInUsername) {
-                          var userRef = await FirebaseFirestore.instance
-                              .collection('Users')
-                              .where('username', isEqualTo: username)
-                              .get();
+                          // var userRef = await FirebaseFirestore.instance
+                          //     .collection('Users')
+                          //     .where('username', isEqualTo: username)
+                          //     .get();
 
-                          if (userRef.size == 0) {
-                            print("Kullanıcı Bulunamadı");
-                            widget.showCustomSnackbar(
-                              context,
-                              "Kullanıcı Bulunamadı",
-                            );
-                            setState(() {
-                              isLoading = false;
-                            });
-                            return;
-                          }
+                          // if (userRef.size == 0) {
+                          //   print("Kullanıcı Bulunamadı");
+                          //   widget.showCustomSnackbar(
+                          //     context,
+                          //     "Kullanıcı Bulunamadı",
+                          //   );
+                          //   setState(() {
+                          //     isLoading = false;
+                          //   });
+                          //   return;
+                          // }
 
-                          await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                  email: userRef.docs[0]['email'],
-                                  password: password)
-                              .whenComplete(() async {
-                            if (FirebaseAuth.instance.currentUser != null) {
-                              // ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                              await saveSkipFirstOpen(
-                                haveUsername: true,
-                                username: userNameController.text.trim(),
-                                context: context,
-                              );
-                              BlocProvider.of<HomePageSelectedWordCubit>(
-                                      context)
-                                  .StateBuild();
+                          // await FirebaseAuth.instance
+                          //     .signInWithEmailAndPassword(
+                          //         email: userRef.docs[0]['email'],
+                          //         password: password)
+                          //     .whenComplete(() async {
+                          //   if (FirebaseAuth.instance.currentUser != null) {
+                          //     // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          //     await saveSkipFirstOpen(
+                          //       haveUsername: true,
+                          //       username: userNameController.text.trim(),
+                          //       context: context,
+                          //     );
+                          //     BlocProvider.of<HomePageSelectedWordCubit>(
+                          //             context)
+                          //         .StateBuild();
 
-                              // state build
+                          //     // state build
 
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  KeyUtils.homePageKey,
-                                  (Route<dynamic> route) => false);
+                          //     Navigator.of(context).pushNamedAndRemoveUntil(
+                          //         KeyUtils.homePageKey,
+                          //         (Route<dynamic> route) => false);
 
-                              print("giris yapildi");
-                              print(MainData.learnedList);
-                            }
-                          });
+                          //     print("giris yapildi");
+                          //     print(MainData.learnedList);
+                          //   }
+                          // });
                         } else {
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
@@ -350,13 +368,16 @@ class _LoginPageState extends State<LoginPage> {
                             // ScaffoldMessenger.of(context).hideCurrentSnackBar();
                             await saveSkipFirstOpen(
                               haveUsername: true,
-                              username: userNameController.text.split("@")[0],
+                              username:
+                                  userNameController.text.split("@").isEmpty
+                                      ? ""
+                                      : userNameController.text.split("@")[0],
                               context: context,
                             );
-                            BlocProvider.of<HomePageSelectedWordCubit>(context)
-                                .StateBuild();
+                            // BlocProvider.of<HomePageSelectedWordCubit>(context)
+                            //     .StateBuild();
                             // state build
-                            Navigator.of(context).pushNamedAndRemoveUntil(
+                            await Navigator.of(context).pushNamedAndRemoveUntil(
                                 KeyUtils.homePageKey,
                                 (Route<dynamic> route) => false);
 
@@ -573,8 +594,6 @@ class _LoginPageState extends State<LoginPage> {
                               //!
                               try {
                                 await GoogleLogin();
-                                // await GamesServices.signIn();
-                                // Player.getPlayerID()
                               } catch (e) {
                                 print(e.toString());
                               }

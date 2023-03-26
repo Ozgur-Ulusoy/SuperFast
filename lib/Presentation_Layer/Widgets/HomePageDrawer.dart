@@ -6,7 +6,9 @@ import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -90,6 +92,30 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             const Spacer(),
                             GestureDetector(
                               onTap: () async {
+                                // Navigator.of(context)
+                                //     .pushNamed(KeyUtils.settingsPageKey);
+                                // widget.callback();
+                                if (await GamesServices.isSignedIn) {
+                                  GamesServices.showLeaderboards();
+                                } else {
+                                  widget.callback();
+                                  widget.showCustomSnackbar(context,
+                                      "Google Hesabınız İle Giriş yapın",
+                                      duration: 1000);
+                                }
+                              },
+                              child: Text(
+                                "LİDERLİK TABLOSU",
+                                style: GoogleFonts.bebasNeue(
+                                  color: cBlueBackground,
+                                  fontSize: ScreenUtil.textScaleFactor * 35,
+                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () async {
                                 // ! Play Store Linkine Gitme
                                 // if (await canLaunchUrlString(
                                 //     "https://play.google.com/store/apps/details?id=com.ozgurulusoy.superfastenglish")) {
@@ -98,7 +124,16 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 //       mode: LaunchMode.externalApplication);
                                 // }
                                 if (await InAppReview.instance.isAvailable()) {
-                                  InAppReview.instance.requestReview();
+                                  print("yes");
+                                  widget.callback();
+                                  InAppReview.instance.openStoreListing();
+                                  Future.delayed(const Duration(seconds: 1),
+                                      () {
+                                    InAppReview.instance.requestReview();
+                                  });
+                                  // InAppReview.instance.openStoreListing();
+                                } else {
+                                  InAppReview.instance.openStoreListing();
                                 }
                               },
                               child: Text(
@@ -143,7 +178,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                               ),
                             ),
                             const Spacer(
-                              flex: 2,
+                              flex: 1,
                             ),
                           ],
                         ),
@@ -176,6 +211,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             MainData.isLearnedListChanged = false;
                           }
                         }
+
                         BlocProvider.of<HomePageSelectedWordCubit>(context)
                             .StateBuild();
                         await FirebaseAuth.instance
@@ -183,9 +219,19 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             .whenComplete(() async {
                           if (FirebaseAuth.instance.currentUser == null) {
                             await fResetData(context: context);
-                            await Navigator.of(context).pushNamedAndRemoveUntil(
-                                KeyUtils.loginPageKey,
-                                (Route<dynamic> route) => false);
+                            if (await GamesServices.isSignedIn) {
+                              try {
+                                await GamesServices.signOut();
+                              } catch (e) {
+                                // await Navigator.of(context)
+                                //     .pushNamedAndRemoveUntil(
+                                //         KeyUtils.loginPageKey,
+                                //         (Route<dynamic> route) => false);
+                              }
+                            }
+                            // await Navigator.of(context).pushNamedAndRemoveUntil(
+                            //     KeyUtils.loginPageKey,
+                            //     (Route<dynamic> route) => false);
                           }
                           // questionData.forEach((element) {
                           //   element.isFav = false;
@@ -193,6 +239,10 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                           // });
                         });
                       } catch (e) {
+                        // await Navigator.of(context).pushNamedAndRemoveUntil(
+                        //     KeyUtils.loginPageKey,
+                        //     (Route<dynamic> route) => false);
+                      } finally {
                         await Navigator.of(context).pushNamedAndRemoveUntil(
                             KeyUtils.loginPageKey,
                             (Route<dynamic> route) => false);
@@ -241,8 +291,12 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                   padding: EdgeInsets.all(ScreenUtil.width * 0.015),
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
-                    backgroundImage:
-                        FirebaseAuth.instance.currentUser!.photoURL != null
+                    backgroundImage: FirebaseAuth.instance.currentUser == null
+                        ? Image.asset(
+                            "assets/images/profilepic.png",
+                            color: Colors.white,
+                          ).image
+                        : FirebaseAuth.instance.currentUser!.photoURL != null
                             ? Image.network(
                                 // FirebaseAuth.instance.currentUser!.photoURL ??
                                 //     "http://cdn.onlinewebfonts.com/svg/img_181369.png",

@@ -39,15 +39,15 @@ import 'Presentation_Layer/Screens/SettingsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // MobileAds.instance.initialize();
-  //! Debug
-  RequestConfiguration configuration =
-      RequestConfiguration(testDeviceIds: ["71E560CE43A9A87F70D994CE11BEAA10"]);
-  MobileAds.instance.updateRequestConfiguration(configuration);
+  //! DEBUG
+  // RequestConfiguration configuration =
+  //     RequestConfiguration(testDeviceIds: ["71E560CE43A9A87F70D994CE11BEAA10"]);
+  // MobileAds.instance.updateRequestConfiguration(configuration);
   //!
   await Firebase.initializeApp();
   await refleshUser();
-  //! Test for duplicate id - Debug
+
+  //! Test for duplicate id - DebuG
   // List<int> a = [];
   // for (var i = 1; i < questionData.length; i++) {
   //   if (a.contains(questionData[i].id) == false) {
@@ -55,7 +55,6 @@ void main() async {
   //   } else {
   //     print("duplicate id: ${questionData[i].id}");
   //   }
-
   //   if (questionData[i].english == "EN" || questionData[i].english == "E") {
   //     print("EN: ${questionData[i].id}");
   //   }
@@ -94,11 +93,12 @@ void main() async {
   await setMainDataDailyWord(); //? set daily word
   await fLoadSvgPictures();
   // Test(); //? Test
-  LicenseRegistry.addLicense(() async* {
-    //? google fonts license
-    final license = await rootBundle.loadString('google_fonts/OFL.txt');
-    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
-  });
+  //
+  // LicenseRegistry.addLicense(() async* {
+  //   //? google fonts license
+  //   final license = await rootBundle.loadString('google_fonts/OFL.txt');
+  //   yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  // });
 
   //! FirebaseMessaging
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -119,17 +119,7 @@ void main() async {
     sound: true,
   );
 
-  // if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-  //   print('User granted permission');
-  // } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-  //   print('User granted provisional permission');
-  // } else {
-  //   print('User declined or has not accepted permission');
-  // }
-
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  //!
 
   runApp(const MyApp());
 }
@@ -163,10 +153,12 @@ Future<void> setRandomDailyWord() async {
   if (learnedList != "") {
     String data = learnedList;
     data.trim().split(" ").forEach((e) {
-      Data data =
-          questionData.where((element) => element.id == int.tryParse(e)).first;
-      data.favType = WordFavType.learned;
-      learnedDatas.add(data);
+      if (int.tryParse(e) != null) {
+        Data data =
+            questionData.firstWhere((element) => element.id == int.tryParse(e));
+        data.favType = WordFavType.learned;
+        learnedDatas.add(data);
+      }
     });
   }
 
@@ -366,10 +358,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     getNotifiInApp();
-    // ScreenUtil.init(context);
-    // refleshUser();
-    // initSetRandomlyWord();
     MobileAds.instance.initialize();
+    // DebuG
+    LicenseRegistry.addLicense(() async* {
+      //? google fonts license
+      final license = await rootBundle.loadString('google_fonts/OFL.txt');
+      yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+    });
   }
 
   @override

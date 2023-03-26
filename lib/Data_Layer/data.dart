@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:games_services/games_services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
@@ -205,6 +206,9 @@ Future<void> fLoadData({BuildContext? context}) async {
   MainData.learnedList =
       MainData.localData!.get(KeyUtils.learnedListValueKey, defaultValue: "");
 
+  MainData.favList =
+      MainData.localData!.get(KeyUtils.favListValueKey, defaultValue: "");
+
   MainData.userUID =
       MainData.localData!.get(KeyUtils.userUIDKey, defaultValue: "");
 
@@ -212,33 +216,36 @@ Future<void> fLoadData({BuildContext? context}) async {
       MainData.localData!.get(KeyUtils.isFirstOpenKey, defaultValue: true);
 
   MainData.username =
-      MainData.localData!.get(KeyUtils.usernameKey, defaultValue: null);
-
-  MainData.favList =
-      MainData.localData!.get(KeyUtils.favListValueKey, defaultValue: "");
+      MainData.localData!.get(KeyUtils.usernameKey, defaultValue: "");
 
   if (MainData.learnedList != "") {
     String data = MainData.localData!.get(KeyUtils.learnedListValueKey);
     data.trim().split(" ").forEach((e) {
+      if (int.tryParse(e) != null) {
+        Data? data = questionData
+            .where((element) => element.id == int.tryParse(e))
+            .first;
+        data.favType = WordFavType.learned;
+        MainData.learnedDatas!.add(data);
+      }
       // questionData.elementAt(int.tryParse(e)! - 1).favType =
       //     WordFavType.learned;
       // MainData.learnedDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
-      Data data =
-          questionData.where((element) => element.id == int.tryParse(e)).first;
-      data.favType = WordFavType.learned;
-      MainData.learnedDatas!.add(data);
     });
   }
 
   if (MainData.favList != "") {
     String data = MainData.localData!.get(KeyUtils.favListValueKey);
     data.trim().split(" ").forEach((e) {
+      if (int.tryParse(e) != null) {
+        Data? data = questionData
+            .where((element) => element.id == int.tryParse(e))
+            .first;
+        data.isFav = true;
+        MainData.favDatas!.add(data);
+      }
       // questionData.elementAt(int.tryParse(e)! - 1).isFav = true;
       // MainData.favDatas!.add(questionData.elementAt(int.tryParse(e)! - 1));
-      Data data =
-          questionData.where((element) => element.id == int.tryParse(e)).first;
-      data.isFav = true;
-      MainData.favDatas!.add(data);
     });
   }
   MainData.notLearnedDatas = questionData
@@ -310,25 +317,25 @@ Future<void> fLoadData({BuildContext? context}) async {
             .put(KeyUtils.isLetterGameRecordChangedKey, false);
       }
     }
+    MainData.engameGameRecord =
+        MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0);
+    // MainData.isEngameGameRecordChanged = MainData.localData!
+    //     .get(KeyUtils.isEngameGameRecordChangedKey, defaultValue: true);
+
+    MainData.soundGameRecord =
+        MainData.localData!.get(KeyUtils.soundGameRecordKey, defaultValue: 0);
+    // MainData.isSoundGameRecordChanged = MainData.localData!
+    //     .get(KeyUtils.isSoundGameRecordChangedKey, defaultValue: true);
+
+    MainData.wordleGameRecord =
+        MainData.localData!.get(KeyUtils.wordleGameRecordKey, defaultValue: 0);
+    // MainData.isWordleGameRecordChanged = MainData.localData!
+    //     .get(KeyUtils.isWordleGameRecordChangedKey, defaultValue: true);
+
+    MainData.letterGameRecord =
+        MainData.localData!.get(KeyUtils.letterGameRecordKey, defaultValue: 0);
   } catch (e) {}
 
-  MainData.engameGameRecord =
-      MainData.localData!.get(KeyUtils.engameGameRecordKey, defaultValue: 0);
-  // MainData.isEngameGameRecordChanged = MainData.localData!
-  //     .get(KeyUtils.isEngameGameRecordChangedKey, defaultValue: true);
-
-  MainData.soundGameRecord =
-      MainData.localData!.get(KeyUtils.soundGameRecordKey, defaultValue: 0);
-  // MainData.isSoundGameRecordChanged = MainData.localData!
-  //     .get(KeyUtils.isSoundGameRecordChangedKey, defaultValue: true);
-
-  MainData.wordleGameRecord =
-      MainData.localData!.get(KeyUtils.wordleGameRecordKey, defaultValue: 0);
-  // MainData.isWordleGameRecordChanged = MainData.localData!
-  //     .get(KeyUtils.isWordleGameRecordChangedKey, defaultValue: true);
-
-  MainData.letterGameRecord =
-      MainData.localData!.get(KeyUtils.letterGameRecordKey, defaultValue: 0);
   // MainData.isLetterGameRecordChanged = MainData.localData!
   //     .get(KeyUtils.isLetterGameRecordChangedKey, defaultValue: true);
   // print("-----------------------");
@@ -452,6 +459,10 @@ Future<void> saveSkipFirstOpen(
 
   if (haveUsername) {
     MainData.username = username;
+    if (await GamesServices.isSignedIn) {
+      MainData.username = await GamesServices.getPlayerName();
+      print(await GamesServices.getPlayerName());
+    }
     MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
   }
 

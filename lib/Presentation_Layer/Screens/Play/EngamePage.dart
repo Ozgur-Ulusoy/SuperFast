@@ -10,6 +10,7 @@ import 'package:engame2/Presentation_Layer/Widgets/PlayGameUpSection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../Ad_Helper.dart';
@@ -54,7 +55,7 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
   startTimer() {
     timer = Timer.periodic(
       const Duration(seconds: 1),
-      (timer) {
+      (timer) async {
         BlocProvider.of<TimerCubit>(context).DecreaseTime();
         if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
           timer.cancel();
@@ -62,8 +63,6 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
           try {
             if (BlocProvider.of<QuestionCubit>(context).state.point >
                 MainData.engameGameRecord!) {
-              MainData.localData!.put(KeyUtils.engameGameRecordKey,
-                  BlocProvider.of<QuestionCubit>(context).state.point);
               MainData.engameGameRecord =
                   BlocProvider.of<QuestionCubit>(context).state.point;
               widget.showAfterGameDialog(
@@ -87,6 +86,7 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
               }, () async {
                 _showInterstitialAd();
               });
+
               if (FirebaseAuth.instance.currentUser != null &&
                   FirebaseAuth.instance.currentUser!.isAnonymous == false) {
                 FirebaseFirestore.instance
@@ -97,7 +97,18 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                           "." +
                           KeyUtils.engameGameRecordKey:
                       BlocProvider.of<QuestionCubit>(context).state.point,
+                }).then((value) {
+                  MainData.localData!.put(KeyUtils.engameGameRecordKey,
+                      BlocProvider.of<QuestionCubit>(context).state.point);
                 });
+              }
+              if (await GamesServices.isSignedIn) {
+                GamesServices.submitScore(
+                  score: Score(
+                    androidLeaderboardID: "CgkIiazqv7IFEAIQBw",
+                    value: BlocProvider.of<QuestionCubit>(context).state.point,
+                  ),
+                );
               }
             } else {
               widget.showAfterGameDialog(

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 class AdHelper {
-  static bool isTest = false;
+  static bool isTest = false; // DebuG = true, Release = false
   //! Banner
   static String get homePageBannerAdUnitId {
     if (Platform.isAndroid) {

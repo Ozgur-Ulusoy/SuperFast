@@ -7,6 +7,7 @@ import 'package:engame2/Data_Layer/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -51,7 +52,7 @@ class _SoundGamePageState extends State<SoundGamePage>
   startTimer() {
     timer = Timer.periodic(
       const Duration(seconds: 1),
-      (timer) {
+      (timer) async {
         BlocProvider.of<TimerCubit>(context).DecreaseTime();
         if (BlocProvider.of<TimerCubit>(context).state.getRemainTime <= 0) {
           timer.cancel();
@@ -60,8 +61,6 @@ class _SoundGamePageState extends State<SoundGamePage>
           try {
             if (BlocProvider.of<QuestionCubit>(context).state.point >
                 MainData.soundGameRecord!) {
-              MainData.localData!.put(KeyUtils.soundGameRecordKey,
-                  BlocProvider.of<QuestionCubit>(context).state.point);
               MainData.soundGameRecord =
                   BlocProvider.of<QuestionCubit>(context).state.point;
               widget.showAfterGameDialog(
@@ -71,14 +70,15 @@ class _SoundGamePageState extends State<SoundGamePage>
                 () async {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   BlocProvider.of<QuestionCubit>(context).ResetState();
-                  await chechIsSoundableQuestion();
                   if (DateTime.now()
                           .difference(MainData.localData!.get(
                               KeyUtils.lastWatchedAdTime,
                               defaultValue: DateTime(1900)))
                           .inMinutes <
                       KeyUtils.adWatchVideoDelayMinute) {
-                    StartTimer();
+                    // StartTimer();
+                    BlocProvider.of<TimerCubit>(context).ResetTime();
+                    await chechIsSoundableQuestion();
                   } else {
                     _showInterstitialAd();
                   }
@@ -97,7 +97,19 @@ class _SoundGamePageState extends State<SoundGamePage>
                           "." +
                           KeyUtils.soundGameRecordKey:
                       BlocProvider.of<QuestionCubit>(context).state.point,
+                }).then((value) {
+                  MainData.localData!.put(KeyUtils.soundGameRecordKey,
+                      BlocProvider.of<QuestionCubit>(context).state.point);
                 });
+              }
+
+              if (await GamesServices.isSignedIn) {
+                GamesServices.submitScore(
+                  score: Score(
+                    androidLeaderboardID: "CgkIiazqv7IFEAIQCA",
+                    value: BlocProvider.of<QuestionCubit>(context).state.point,
+                  ),
+                );
               }
             } else {
               widget.showAfterGameDialog(
@@ -107,14 +119,16 @@ class _SoundGamePageState extends State<SoundGamePage>
                 () async {
                   Navigator.of(context, rootNavigator: true).pop('dialog');
                   BlocProvider.of<QuestionCubit>(context).ResetState();
-                  await chechIsSoundableQuestion();
+                  // await chechIsSoundableQuestion();
                   if (DateTime.now()
                           .difference(MainData.localData!.get(
                               KeyUtils.lastWatchedAdTime,
                               defaultValue: DateTime(1900)))
                           .inMinutes <
                       KeyUtils.adWatchVideoDelayMinute) {
-                    StartTimer();
+                    // StartTimer();
+                    BlocProvider.of<TimerCubit>(context).ResetTime();
+                    await chechIsSoundableQuestion();
                   } else {
                     _showInterstitialAd();
                   }
@@ -173,10 +187,9 @@ class _SoundGamePageState extends State<SoundGamePage>
       BlocProvider.of<QuestionCubit>(
               context) //! tipi kullanıcının seçtiği türden olacak
           .ChangeQuestion(type: QuestionType.english); //* ilk soruyu sordu
-
+      stopTimer();
       String url = await getSoundUrl(
           BlocProvider.of<QuestionCubit>(context).state.data.english);
-      stopTimer();
       if (url == "") {
         setState(() {
           isLoading = true;
@@ -253,8 +266,8 @@ class _SoundGamePageState extends State<SoundGamePage>
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
         print('$ad onAdDismissedFullScreenContent.');
         ad.dispose();
-        _createInterstitialAd();
         StartTimer();
+        _createInterstitialAd();
       },
       onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
         print('$ad onAdFailedToShowFullScreenContent: $error');
