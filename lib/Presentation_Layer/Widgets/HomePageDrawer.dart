@@ -236,50 +236,18 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                               //   //         (Route<dynamic> route) => false);
                               // }
                             }
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                KeyUtils.loginPageKey,
-                                (Route<dynamic> route) => false);
-                            // if (await GoogleSignIn.games().isSignedIn()) {
-                            //   try {
-                            //     await GoogleSignIn.games().disconnect();
-                            //     await GoogleSignIn.games().signOut();
-                            //   } catch (e) {
-                            //     // await Navigator.of(context)
-                            //     //     .pushNamedAndRemoveUntil(
-                            //     //         KeyUtils.loginPageKey,
-                            //     //         (Route<dynamic> route) => false);
-                            //   }
-                            // }
-                            // await Navigator.of(context).pushNamedAndRemoveUntil(
-                            //     KeyUtils.loginPageKey,
-                            //     (Route<dynamic> route) => false);
                           }
-
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              KeyUtils.loginPageKey,
-                              (Route<dynamic> route) => false);
-                          // questionData.forEach((element) {
-                          //   element.isFav = false;
-                          //   element.favType = WordFavType.nlearned;
-                          // });
                         });
                       } catch (e) {
                         // await Navigator.of(context).pushNamedAndRemoveUntil(
                         //     KeyUtils.loginPageKey,
                         //     (Route<dynamic> route) => false);
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            KeyUtils.loginPageKey,
-                            (Route<dynamic> route) => false);
                       } finally {
                         await Navigator.of(context).pushNamedAndRemoveUntil(
                             KeyUtils.loginPageKey,
                             (Route<dynamic> route) => false);
+                        setState(() {});
                       }
-                      setState(() {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            KeyUtils.loginPageKey,
-                            (Route<dynamic> route) => false);
-                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
