@@ -23,32 +23,42 @@ class LoginPage extends StatefulWidget with PopUpMixin {
 
 class _LoginPageState extends State<LoginPage> {
   Future GoogleLogin() async {
+    if (isLoading == true) {
+      return;
+    }
     setState(() {
       isLoading = true;
     });
     try {
-      if (await GamesServices.isSignedIn) {
+      try {
+        print(FirebaseAuth.instance.currentUser);
         if (FirebaseAuth.instance.currentUser != null) {
           await FirebaseAuth.instance.signOut();
         }
-        try {
+      } catch (e) {}
+
+      try {
+        if (await GamesServices.isSignedIn) {
           await GoogleSignIn.games().disconnect();
           await GamesServices.signOut();
-        } catch (e) {
-          setState(() {
-            isLoading = false;
-          });
         }
-        // print("anaınsikm");
-      }
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        signInOption: SignInOption.games,
-        scopes: ['email'],
-      );
+      } catch (e) {}
 
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        signInOption: SignInOption.standard,
+        // serverClientId:
+        //     "185354327561-2d876edbfppficjjt2h04b2el0hf8n8l.apps.googleusercontent.com",
+        // scopes: ['email'],
+      );
+      // if (await googleSignIn.isSignedIn()) {
+      await googleSignIn.signOut();
+      // }
       final GoogleSignInAccount? googleUser =
-          await googleSignIn.signIn().catchError((error) {
-        print('Failed to sign in with Google Play Games: $error');
+          await googleSignIn.signIn().catchError((error) async {
+        print('Failed to sign in with Google Play Account: $error');
+        if (FirebaseAuth.instance.currentUser != null) {
+          await FirebaseAuth.instance.signOut();
+        }
         setState(() {
           isLoading = false;
         });
@@ -56,6 +66,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (googleUser == null) {
         print('Failed to sign in with Google Play Games.');
+        if (FirebaseAuth.instance.currentUser != null) {
+          await FirebaseAuth.instance.signOut();
+        }
         setState(() {
           isLoading = false;
         });
@@ -68,7 +81,6 @@ class _LoginPageState extends State<LoginPage> {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
       var result = await FirebaseAuth.instance.signInWithCredential(credential);
       if (result.additionalUserInfo!.isNewUser) {
         print("yeni kullanıcı");
@@ -86,19 +98,51 @@ class _LoginPageState extends State<LoginPage> {
           }
         });
       }
-      GamesServices.signIn();
-      await fLoadData(context: context);
-      await saveSkipFirstOpen(context: context, haveUsername: true);
+      // await GoogleSignIn.games().disconnect();
+      // await GamesServices.signOut();
+      // GamesServices.signIn();
+      // await fLoadData(context: context);
       await MainData.localData!
           .put(KeyUtils.userUIDKey, FirebaseAuth.instance.currentUser!.uid);
       MainData.userUID = FirebaseAuth.instance.currentUser!.uid;
-      BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
       setState(() {
         isLoading = false;
       });
-      Navigator.of(context).pushNamedAndRemoveUntil(
-          KeyUtils.homePageKey, (Route<dynamic> route) => false);
+      // await GamesServices.signIn().then((value) async {
+      //   await GamesServices.signOut();
+      // });
+      // await GoogleSignIn.games().signInSilently();
+      await GamesServices.signIn().then((value) async {
+        // print(await GamesServices.getPlayerID());
+        MainData.isGoogleGamesSigned = true;
+        await MainData.localData!.put(KeyUtils.isGoogleGamesSignedInKey, true);
+        await saveSkipFirstOpen(
+            context: context, haveUsername: false, isGoogleGamesSigned: true);
+        await Navigator.of(context).pushNamedAndRemoveUntil(
+            KeyUtils.homePageKey, (Route<dynamic> route) => false);
+      }).onError((error, stackTrace) {
+        print("games servislerine giriş yapılamadı");
+        if (FirebaseAuth.instance.currentUser != null) {
+          FirebaseAuth.instance.signOut();
+        }
+      });
+
+      // await GamesServices.signIn().then((value) async {
+      //   print("games servislerine giriş yapıldı");
+      //   await saveSkipFirstOpen(context: context, haveUsername: true);
+      //   await Navigator.of(context).pushNamedAndRemoveUntil(
+      //       KeyUtils.homePageKey, (Route<dynamic> route) => false);
+      // }).catchError((e) async {
+      //   print("games servislerine giriş yapılamadı");
+      //   if (FirebaseAuth.instance.currentUser != null) {
+      //     await FirebaseAuth.instance.signOut();
+      //   }
+      // });
+      BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
     } catch (e) {
+      if (FirebaseAuth.instance.currentUser != null) {
+        await FirebaseAuth.instance.signOut();
+      }
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -592,11 +636,24 @@ class _LoginPageState extends State<LoginPage> {
                           GestureDetector(
                             onTap: () async {
                               //!
-                              try {
-                                await GoogleLogin();
-                              } catch (e) {
-                                print(e.toString());
-                              }
+                              // print("object");
+                              // if (await GamesServices.isSignedIn) {
+                              //   if (FirebaseAuth.instance.currentUser != null) {
+                              //     await FirebaseAuth.instance.signOut();
+                              //   }
+                              //   try {
+                              //     await GoogleSignIn.games().disconnect();
+                              //     await GamesServices.signOut();
+                              //   } catch (e) {
+                              //     setState(() {
+                              //       isLoading = false;
+                              //     });
+                              //   }
+                              //   // print("anaınsikm");
+                              // }
+                              await GoogleLogin();
+                              // GamesServices.signIn();
+                              // pri
                             },
                             child: Container(
                               width: ScreenUtil.width * 0.4,

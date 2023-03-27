@@ -12,11 +12,13 @@ import 'package:engame2/Presentation_Layer/Widgets/HomePageWordSelectButton.dart
 import 'package:engame2/Presentation_Layer/Widgets/MainPageGameCard.dart';
 import 'package:engame2/Presentation_Layer/Widgets/MyWordsWidget.dart';
 import 'package:engame2/Presentation_Layer/Widgets/TabButtonWidget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:games_services/games_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -62,6 +64,40 @@ class _HomePageState extends State<HomePage>
         .ChangeState(WordSelectedStateEnums.learnedWordState);
     getRandomDailyWord();
     setFirebaseNotifications();
+    checkGooglePlayAccount();
+  }
+
+  Future<void> checkGooglePlayAccount() async {
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        for (var element in FirebaseAuth.instance.currentUser!.providerData) {
+          if (element.providerId == "google.com") {
+            print("its google play account");
+            if (await GamesServices.isSignedIn == true &&
+                MainData.isGoogleGamesSigned == false) {
+              print("reflesh user 1");
+              await GamesServices.signIn().then((value) async {
+                MainData.isGoogleGamesSigned = true;
+                await MainData.localData!
+                    .put(KeyUtils.isGoogleGamesSignedInKey, true);
+              });
+              // await GoogleSignIn.games().disconnect();
+              // await GamesServices.signOut();
+              // await FirebaseAuth.instance.signOut();
+              // await Navigator.of(context).pushNamedAndRemoveUntil(
+              //     KeyUtils.loginPageKey, (Route<dynamic> route) => false);
+              // await fResetData(context: context);
+
+              // await GamesServices.signIn();
+              print("refleshhhhhh userrrrrrrrrrrrrrrr");
+            }
+          } else {
+            print("its not google play account");
+          }
+        }
+        // await FirebaseAuth.instance.signInAnonymously();
+      }
+    } catch (e) {}
   }
 
   Future<void> setFirebaseNotifications() async {
@@ -228,7 +264,8 @@ class _HomePageState extends State<HomePage>
                               ),
                             ),
                           ),
-                        )
+                        ),
+                        SizedBox(width: ScreenUtil.width * 0.01),
                       ],
                     ),
                     SizedBox(height: ScreenUtil.height * 0.015),
@@ -359,19 +396,23 @@ class _HomePageState extends State<HomePage>
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            // TODO
-                            Navigator.of(context)
-                                .pushNamed(KeyUtils.wordsPageKey);
-                          },
-                          child: Text(
-                            "Tümünü Gör",
-                            style: GoogleFonts.roboto(
-                              color: cBlueBackground,
-                              fontSize: ScreenUtil.textScaleFactor * 18,
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.w400,
+                        Padding(
+                          padding:
+                              EdgeInsets.only(right: ScreenUtil.width * 0.025),
+                          child: GestureDetector(
+                            onTap: () {
+                              // TODO
+                              Navigator.of(context)
+                                  .pushNamed(KeyUtils.wordsPageKey);
+                            },
+                            child: Text(
+                              "Tümünü Gör",
+                              style: GoogleFonts.roboto(
+                                color: cBlueBackground,
+                                fontSize: ScreenUtil.textScaleFactor * 16,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         )

@@ -43,7 +43,7 @@ class HomePageSelectedWordCubit extends Cubit<HomePageSelectedWordState> {
         favWordsList: MainData.favDatas!,
         isSearching: false,
         searchValue: "",
-        currentData: null,
+        currentData: MainData.dailyData,
       ),
     );
   }

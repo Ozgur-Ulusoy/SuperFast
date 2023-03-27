@@ -33,13 +33,15 @@ class _MyWordsWidgetState extends State<MyWordsWidget> {
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(45),
-            topRight: Radius.circular(45),
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+            bottomLeft: Radius.circular(25),
+            bottomRight: Radius.circular(25),
           ),
         ),
         child: Padding(
           padding: EdgeInsets.only(
-            top: ScreenUtil.height * 0.045,
+            top: ScreenUtil.height * 0.02,
             left: ScreenUtil.width * 0.02,
             right: ScreenUtil.width * 0.02,
           ),

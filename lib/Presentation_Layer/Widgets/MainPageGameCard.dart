@@ -52,13 +52,19 @@ class _PlayGameCardState extends State<PlayGameCard> {
                 )),
               )),
           Center(
-            child: Text(
-              widget.text,
-              style: GoogleFonts.fredoka(
-                color: cBackgroundColor,
-                fontWeight: FontWeight.w500,
-                fontSize: ScreenUtil.textScaleFactor * 19,
+            child: FittedBox(
+              child: Container(
+                child: Text(
+                  widget.text,
+                  style: GoogleFonts.fredoka(
+                    color: cBackgroundColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: ScreenUtil.textScaleFactor * 18,
+                  ),
+                  maxLines: 1,
+                ),
               ),
+              fit: BoxFit.scaleDown,
             ),
           ),
           Padding(

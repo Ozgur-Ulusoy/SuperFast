@@ -83,8 +83,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                   "HESABIM",
                                   style: GoogleFonts.bebasNeue(
                                     color: cBlueBackground,
-                                    fontSize: ScreenUtil.textScaleFactor * 35,
-                                    letterSpacing: ScreenUtil.letterSpacing * 5,
+                                    fontSize: ScreenUtil.textScaleFactor * 32,
+                                    letterSpacing: ScreenUtil.letterSpacing * 3,
                                   ),
                                 ),
                               ),
@@ -95,8 +95,9 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 // Navigator.of(context)
                                 //     .pushNamed(KeyUtils.settingsPageKey);
                                 // widget.callback();
-                                if (await GamesServices.isSignedIn) {
-                                  GamesServices.showLeaderboards();
+                                if (await GamesServices.isSignedIn &&
+                                    MainData.isGoogleGamesSigned) {
+                                  await GamesServices.showLeaderboards();
                                 } else {
                                   widget.callback();
                                   widget.showCustomSnackbar(context,
@@ -108,8 +109,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 "LİDERLİK TABLOSU",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 35,
-                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                  fontSize: ScreenUtil.textScaleFactor * 32,
+                                  letterSpacing: ScreenUtil.letterSpacing * 3,
                                 ),
                               ),
                             ),
@@ -140,7 +141,7 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 "UYGULAMAYA OY VER",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 34,
+                                  fontSize: ScreenUtil.textScaleFactor * 32,
                                   letterSpacing: ScreenUtil.letterSpacing * 3,
                                 ),
                               ),
@@ -149,15 +150,20 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                             GestureDetector(
                               onTap: () {
                                 widget.callback();
-                                widget.openDailyWordPopUp(context,
-                                    MainData.dailyData!, AudioPlayer());
+                                if (MainData.dailyData != null) {
+                                  BlocProvider.of<HomePageSelectedWordCubit>(
+                                          context)
+                                      .changeCurrentData(MainData.dailyData!);
+                                  widget.openDailyWordPopUp(context,
+                                      MainData.dailyData!, AudioPlayer());
+                                }
                               },
                               child: Text(
                                 "GÜNÜN KELİMESİ",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 35,
-                                  letterSpacing: ScreenUtil.letterSpacing * 2.8,
+                                  fontSize: ScreenUtil.textScaleFactor * 32,
+                                  letterSpacing: ScreenUtil.letterSpacing * 3,
                                 ),
                               ),
                             ),
@@ -172,8 +178,8 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                                 "AYARLAR",
                                 style: GoogleFonts.bebasNeue(
                                   color: cBlueBackground,
-                                  fontSize: ScreenUtil.textScaleFactor * 35,
-                                  letterSpacing: ScreenUtil.letterSpacing * 5,
+                                  fontSize: ScreenUtil.textScaleFactor * 32,
+                                  letterSpacing: ScreenUtil.letterSpacing * 3,
                                 ),
                               ),
                             ),
@@ -220,19 +226,38 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                           if (FirebaseAuth.instance.currentUser == null) {
                             await fResetData(context: context);
                             if (await GamesServices.isSignedIn) {
-                              try {
-                                await GamesServices.signOut();
-                              } catch (e) {
-                                // await Navigator.of(context)
-                                //     .pushNamedAndRemoveUntil(
-                                //         KeyUtils.loginPageKey,
-                                //         (Route<dynamic> route) => false);
-                              }
+                              // try {
+                              await GoogleSignIn.games().disconnect();
+                              await GamesServices.signOut();
+                              // } catch (e) {
+                              //   // await Navigator.of(context)
+                              //   //     .pushNamedAndRemoveUntil(
+                              //   //         KeyUtils.loginPageKey,
+                              //   //         (Route<dynamic> route) => false);
+                              // }
                             }
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                KeyUtils.loginPageKey,
+                                (Route<dynamic> route) => false);
+                            // if (await GoogleSignIn.games().isSignedIn()) {
+                            //   try {
+                            //     await GoogleSignIn.games().disconnect();
+                            //     await GoogleSignIn.games().signOut();
+                            //   } catch (e) {
+                            //     // await Navigator.of(context)
+                            //     //     .pushNamedAndRemoveUntil(
+                            //     //         KeyUtils.loginPageKey,
+                            //     //         (Route<dynamic> route) => false);
+                            //   }
+                            // }
                             // await Navigator.of(context).pushNamedAndRemoveUntil(
                             //     KeyUtils.loginPageKey,
                             //     (Route<dynamic> route) => false);
                           }
+
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              KeyUtils.loginPageKey,
+                              (Route<dynamic> route) => false);
                           // questionData.forEach((element) {
                           //   element.isFav = false;
                           //   element.favType = WordFavType.nlearned;
@@ -242,11 +267,19 @@ class _HomePageDrawerState extends State<HomePageDrawer> {
                         // await Navigator.of(context).pushNamedAndRemoveUntil(
                         //     KeyUtils.loginPageKey,
                         //     (Route<dynamic> route) => false);
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            KeyUtils.loginPageKey,
+                            (Route<dynamic> route) => false);
                       } finally {
                         await Navigator.of(context).pushNamedAndRemoveUntil(
                             KeyUtils.loginPageKey,
                             (Route<dynamic> route) => false);
                       }
+                      setState(() {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            KeyUtils.loginPageKey,
+                            (Route<dynamic> route) => false);
+                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(

@@ -129,6 +129,9 @@ Future<void> fLoadData({BuildContext? context}) async {
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox(KeyUtils.boxName);
 
+  MainData.isGoogleGamesSigned = MainData.localData!
+      .get(KeyUtils.isGoogleGamesSignedInKey, defaultValue: false);
+
   //! Settings
   MainData.isSoundOn =
       MainData.localData!.get(KeyUtils.isSoundOnKey, defaultValue: true);
@@ -252,11 +255,14 @@ Future<void> fLoadData({BuildContext? context}) async {
       .where((element) => element.favType == WordFavType.nlearned)
       .toList();
 
+  print(MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1));
   MainData.dailyData = (MainData.learnedDatas! + MainData.notLearnedDatas!)
-      .where((element) =>
-          element.id ==
-          MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1))
-      .first;
+      .firstWhere(
+          (element) =>
+              element.id ==
+              MainData.localData!.get(KeyUtils.dailyWordIdKey, defaultValue: 1),
+          orElse: () =>
+              (MainData.learnedDatas! + MainData.notLearnedDatas!).first);
 
   // CONTINUE HERE
   // offlineken oynanılan ve kazanılan rekorlar için 4 ayrı değişken olustur true oldugunda kaydedilen local degerler firebase'e aktarılacak
@@ -360,6 +366,9 @@ Future<void> fResetData({required BuildContext context}) async {
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox(KeyUtils.boxName);
 
+  MainData.isGoogleGamesSigned = false;
+  MainData.localData!.put(KeyUtils.isGoogleGamesSignedInKey, false);
+
   MainData.isFavListChanged = true;
   MainData.localData!
       .put(KeyUtils.isFavListChangedKey, MainData.isFavListChanged);
@@ -450,6 +459,7 @@ Future<void> fResetData({required BuildContext context}) async {
 Future<void> saveSkipFirstOpen(
     {bool haveUsername = false,
     String username = "",
+    bool isGoogleGamesSigned = false,
     required BuildContext context}) async {
   MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
   MainData.localData!
@@ -459,12 +469,19 @@ Future<void> saveSkipFirstOpen(
 
   if (haveUsername) {
     MainData.username = username;
-    if (await GamesServices.isSignedIn) {
-      MainData.username = await GamesServices.getPlayerName();
-      print(await GamesServices.getPlayerName());
-    }
-    MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
   }
+
+  if (isGoogleGamesSigned) {
+    MainData.localData!.put(KeyUtils.isGoogleGamesSignedInKey, true);
+    MainData.isGoogleGamesSigned = true;
+    bool isSignedIn = await GamesServices.isSignedIn;
+    if (isSignedIn) {
+      MainData.username = await GamesServices.getPlayerName() ?? username;
+      // print(await GamesServices.getPlayerName());
+    }
+  }
+
+  await MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
 
   await fLoadData(context: context);
   BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
@@ -483,6 +500,7 @@ class MainData {
   static List<Data>? notLearnedDatas = [];
   static List<Data>? favDatas = [];
   static Data? dailyData;
+  static bool isGoogleGamesSigned = false;
 
   //! oyunlarla ilgili
   static int? engameGameRecord = 0;

@@ -75,6 +75,8 @@ class KeyUtils {
   static const String isLetterGameRecordChangedKey =
       "isLetterGameRecordChanged";
 
+  static const String isGoogleGamesSignedInKey = "isGoogleGamesSignedIn";
+
   //? Ads
   // static const String canWatchVideoAdKey = "canWatchVideoAd";
   static const String lastWatchedAdTime = "lastWatchedAdTime";
