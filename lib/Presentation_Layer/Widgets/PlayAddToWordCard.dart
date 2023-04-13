@@ -36,14 +36,20 @@ class AddToWordCard extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  title,
-                  style: GoogleFonts.robotoSlab(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
+                child: FittedBox(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.robotoSlab(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
                   ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
+                  fit: BoxFit.scaleDown,
                 ),
               ),
             ],

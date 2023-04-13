@@ -65,6 +65,8 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                 MainData.engameGameRecord!) {
               MainData.engameGameRecord =
                   BlocProvider.of<QuestionCubit>(context).state.point;
+              await MainData.localData!.put(KeyUtils.engameGameRecordKey,
+                  BlocProvider.of<QuestionCubit>(context).state.point);
               widget.showAfterGameDialog(
                   context, true, KeyUtils.engameGameRecordKey, () async {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
@@ -97,10 +99,11 @@ class _EngamePageState extends State<EngamePage> with TickerProviderStateMixin {
                           "." +
                           KeyUtils.engameGameRecordKey:
                       BlocProvider.of<QuestionCubit>(context).state.point,
-                }).then((value) {
-                  MainData.localData!.put(KeyUtils.engameGameRecordKey,
-                      BlocProvider.of<QuestionCubit>(context).state.point);
                 });
+                // .then((value) {
+                //   MainData.localData!.put(KeyUtils.engameGameRecordKey,
+                //       BlocProvider.of<QuestionCubit>(context).state.point);
+                // });
               }
               if (await GamesServices.isSignedIn) {
                 GamesServices.submitScore(

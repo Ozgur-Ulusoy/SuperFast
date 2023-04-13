@@ -72,6 +72,8 @@ class _WordGamePageState extends State<WordGamePage>
               MainData.letterGameRecord!) {
             MainData.letterGameRecord =
                 BlocProvider.of<QuestionCubit>(context).state.point;
+            await MainData.localData!.put(KeyUtils.letterGameRecordKey,
+                BlocProvider.of<QuestionCubit>(context).state.point);
             widget.showAfterGameDialog(
                 context, true, KeyUtils.letterGameRecordKey, () async {
               Navigator.of(context, rootNavigator: true).pop('dialog');
@@ -101,10 +103,11 @@ class _WordGamePageState extends State<WordGamePage>
                   .update({
                 KeyUtils.gameRecordsMapKey + "." + KeyUtils.letterGameRecordKey:
                     BlocProvider.of<QuestionCubit>(context).state.point,
-              }).then((value) {
-                MainData.localData!.put(KeyUtils.letterGameRecordKey,
-                    BlocProvider.of<QuestionCubit>(context).state.point);
               });
+              // .then((value) {
+              //   MainData.localData!.put(KeyUtils.letterGameRecordKey,
+              //       BlocProvider.of<QuestionCubit>(context).state.point);
+              // });
             }
             if (await GamesServices.isSignedIn) {
               GamesServices.submitScore(

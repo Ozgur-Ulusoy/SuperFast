@@ -63,6 +63,8 @@ class _SoundGamePageState extends State<SoundGamePage>
                 MainData.soundGameRecord!) {
               MainData.soundGameRecord =
                   BlocProvider.of<QuestionCubit>(context).state.point;
+              await MainData.localData!.put(KeyUtils.soundGameRecordKey,
+                  BlocProvider.of<QuestionCubit>(context).state.point);
               widget.showAfterGameDialog(
                 context,
                 true,
@@ -97,10 +99,11 @@ class _SoundGamePageState extends State<SoundGamePage>
                           "." +
                           KeyUtils.soundGameRecordKey:
                       BlocProvider.of<QuestionCubit>(context).state.point,
-                }).then((value) {
-                  MainData.localData!.put(KeyUtils.soundGameRecordKey,
-                      BlocProvider.of<QuestionCubit>(context).state.point);
                 });
+                // .then((value) {
+                //   MainData.localData!.put(KeyUtils.soundGameRecordKey,
+                //       BlocProvider.of<QuestionCubit>(context).state.point);
+                // });
               }
 
               if (await GamesServices.isSignedIn) {

@@ -6,8 +6,8 @@ import 'package:engame2/Presentation_Layer/Widgets/PlaySoundCard.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../../Business_Layer/cubit/home_page_selected_word_cubit.dart';
 import '../../Business_Layer/cubit/homepage_notifi_alert_cubit.dart';
@@ -38,14 +38,20 @@ mixin PopUpMixin {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: SvgPicture.asset(
-                          "assets/images/ClosePopUpSvg.svg",
-                          width: ScreenUtil.textScaleFactor * 38,
-                          height: ScreenUtil.textScaleFactor * 38,
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: ScreenUtil.height * 0.01,
+                          right: ScreenUtil.width * 0.01,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            MdiIcons.close,
+                            color: Colors.red,
+                            size: ScreenUtil.textScaleFactor * 40,
+                          ),
                         ),
                       ),
                     ],
@@ -223,14 +229,20 @@ mixin PopUpMixin {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: SvgPicture.asset(
-                              "assets/images/ClosePopUpSvg.svg",
-                              width: ScreenUtil.textScaleFactor * 38,
-                              height: ScreenUtil.textScaleFactor * 38,
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: ScreenUtil.height * 0.01,
+                              right: ScreenUtil.width * 0.01,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                MdiIcons.close,
+                                color: Colors.red,
+                                size: ScreenUtil.textScaleFactor * 40,
+                              ),
                             ),
                           ),
                         ],

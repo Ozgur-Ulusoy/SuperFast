@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:engame2/Data_Layer/Mixins/PopUpMixin.dart';
 import 'package:engame2/Data_Layer/consts.dart';
-import 'package:engame2/Data_Layer/data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../Data_Layer/data.dart';
 import '../../Widgets/GoArrowButtonWidget.dart';
 import '../../Widgets/LogoWidget.dart';
 
@@ -25,8 +25,11 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password)
-          .then((value) {
-        return FirebaseFirestore.instance
+          .then((value) async {
+        print(value.additionalUserInfo!.isNewUser.toString() +
+            " yeni user mi ? ");
+        print("objectt");
+        FirebaseFirestore.instance
             .collection(KeyUtils.usersCollectionKey)
             .doc(value.user!.uid)
             .set({
@@ -39,24 +42,20 @@ class _RegisterPageState extends State<RegisterPage> {
             'letterGameRecord': 0,
           }
         });
-      }).whenComplete(
-        () async {
-          //TODO
-          //! Ana Sayfaya Git
-          if (FirebaseAuth.instance.currentUser != null) {
-            await saveSkipFirstOpen(
-                haveUsername: true,
-                username: emailController.text.split("@").isEmpty
-                    ? ""
-                    : emailController.text.split("@")[0],
-                // username: usernameController.text.trim(),
-                context: context);
-            // await fLoadData();
-            Navigator.of(context).pushNamedAndRemoveUntil(
-                KeyUtils.homePageKey, (Route<dynamic> route) => false);
-          }
-        },
-      );
+        if (FirebaseAuth.instance.currentUser != null) {
+          await saveSkipFirstOpen(
+              haveUsername: true,
+              username: emailController.text.split("@").isEmpty
+                  ? ""
+                  : emailController.text.split("@")[0],
+              isNewUser: value.additionalUserInfo!.isNewUser,
+              // username: usernameController.text.trim(),
+              context: context);
+          // await fLoadData();
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              KeyUtils.homePageKey, (Route<dynamic> route) => false);
+        }
+      });
     } on FirebaseAuthException catch (e) {
       print(e);
       switch (e.code) {

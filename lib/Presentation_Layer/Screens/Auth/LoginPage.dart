@@ -117,7 +117,11 @@ class _LoginPageState extends State<LoginPage> {
         MainData.isGoogleGamesSigned = true;
         await MainData.localData!.put(KeyUtils.isGoogleGamesSignedInKey, true);
         await saveSkipFirstOpen(
-            context: context, haveUsername: false, isGoogleGamesSigned: true);
+          context: context,
+          haveUsername: false,
+          isGoogleGamesSigned: true,
+          isNewUser: result.additionalUserInfo?.isNewUser ?? false,
+        );
         await Navigator.of(context).pushNamedAndRemoveUntil(
             KeyUtils.homePageKey, (Route<dynamic> route) => false);
       }).onError((error, stackTrace) {
@@ -405,7 +409,7 @@ class _LoginPageState extends State<LoginPage> {
                           //   }
                           // });
                         } else {
-                          await FirebaseAuth.instance
+                          var result = await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: username, password: password);
                           if (FirebaseAuth.instance.currentUser != null) {
@@ -416,6 +420,8 @@ class _LoginPageState extends State<LoginPage> {
                                   userNameController.text.split("@").isEmpty
                                       ? ""
                                       : userNameController.text.split("@")[0],
+                              isNewUser:
+                                  result.additionalUserInfo?.isNewUser ?? false,
                               context: context,
                             );
                             // BlocProvider.of<HomePageSelectedWordCubit>(context)

@@ -124,7 +124,7 @@ Future<void> fLoadSvgPictures() async {
   ]);
 }
 
-Future<void> fLoadData({BuildContext? context}) async {
+Future<void> fLoadData({BuildContext? context, bool isNewUser = false}) async {
   // bool isInitial = false,  parametre
   await Hive.initFlutter();
   MainData.localData = await Hive.openBox(KeyUtils.boxName);
@@ -171,25 +171,27 @@ Future<void> fLoadData({BuildContext? context}) async {
     if (FirebaseAuth.instance.currentUser != null &&
         !FirebaseAuth.instance.currentUser!.isAnonymous) {
       if (MainData.isFavListChanged || MainData.isLearnedListChanged) {
-        await FirebaseFirestore.instance
-            .collection(KeyUtils.usersCollectionKey)
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get()
-            .then(
-          (value) {
-            if (MainData.isFavListChanged) {
-              MainData.favList = value[KeyUtils.favListValueKey];
-              MainData.localData!.put('favList', MainData.favList);
-              print("Favlist - Firebaseden çekildi");
-            }
-            if (MainData.isLearnedListChanged) {
-              MainData.learnedList = value[KeyUtils.learnedListValueKey];
-              MainData.localData!
-                  .put(KeyUtils.learnedListValueKey, MainData.learnedList);
-              print("LearnedList - Firebaseden çekildi");
-            }
-          },
-        );
+        if (isNewUser == false) {
+          await FirebaseFirestore.instance
+              .collection(KeyUtils.usersCollectionKey)
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .get()
+              .then(
+            (value) {
+              if (MainData.isFavListChanged) {
+                MainData.favList = value[KeyUtils.favListValueKey];
+                MainData.localData!.put('favList', MainData.favList);
+                print("Favlist - Firebaseden çekildi");
+              }
+              if (MainData.isLearnedListChanged) {
+                MainData.learnedList = value[KeyUtils.learnedListValueKey];
+                MainData.localData!
+                    .put(KeyUtils.learnedListValueKey, MainData.learnedList);
+                print("LearnedList - Firebaseden çekildi");
+              }
+            },
+          );
+        }
 
         if (MainData.isFavListChanged) {
           MainData.isFavListChanged = false;
@@ -284,31 +286,7 @@ Future<void> fLoadData({BuildContext? context}) async {
   try {
     if (FirebaseAuth.instance.currentUser != null &&
         !FirebaseAuth.instance.currentUser!.isAnonymous) {
-      if (MainData.isEngameGameRecordChanged ||
-          MainData.isLetterGameRecordChanged ||
-          MainData.isSoundGameRecordChanged ||
-          MainData.isWordleGameRecordChanged) {
-        Map<String, dynamic> map = await FirebaseFirestore.instance
-            .collection(KeyUtils.usersCollectionKey)
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get()
-            .then(
-              (value) => value[KeyUtils.gameRecordsMapKey],
-            );
-        print(map);
-
-        MainData.engameGameRecord = map[KeyUtils.engameGameRecordKey];
-        MainData.soundGameRecord = map[KeyUtils.soundGameRecordKey];
-        MainData.wordleGameRecord = map[KeyUtils.wordleGameRecordKey];
-        MainData.letterGameRecord = map[KeyUtils.letterGameRecordKey];
-        await MainData.localData!
-            .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
-        await MainData.localData!
-            .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
-        await MainData.localData!
-            .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
-        await MainData.localData!
-            .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
+      if (isNewUser == true) {
         MainData.isEngameGameRecordChanged = false;
         MainData.isSoundGameRecordChanged = false;
         MainData.isWordleGameRecordChanged = false;
@@ -321,6 +299,46 @@ Future<void> fLoadData({BuildContext? context}) async {
             .put(KeyUtils.isWordleGameRecordChangedKey, false);
         await MainData.localData!
             .put(KeyUtils.isLetterGameRecordChangedKey, false);
+      }
+      if (isNewUser = false) {
+        if (MainData.isEngameGameRecordChanged ||
+            MainData.isLetterGameRecordChanged ||
+            MainData.isSoundGameRecordChanged ||
+            MainData.isWordleGameRecordChanged) {
+          Map<String, dynamic> map = await FirebaseFirestore.instance
+              .collection(KeyUtils.usersCollectionKey)
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .get()
+              .then(
+                (value) => value[KeyUtils.gameRecordsMapKey],
+              );
+          print(map);
+
+          MainData.engameGameRecord = map[KeyUtils.engameGameRecordKey];
+          MainData.soundGameRecord = map[KeyUtils.soundGameRecordKey];
+          MainData.wordleGameRecord = map[KeyUtils.wordleGameRecordKey];
+          MainData.letterGameRecord = map[KeyUtils.letterGameRecordKey];
+          await MainData.localData!
+              .put(KeyUtils.engameGameRecordKey, MainData.engameGameRecord);
+          await MainData.localData!
+              .put(KeyUtils.soundGameRecordKey, MainData.soundGameRecord);
+          await MainData.localData!
+              .put(KeyUtils.wordleGameRecordKey, MainData.wordleGameRecord);
+          await MainData.localData!
+              .put(KeyUtils.letterGameRecordKey, MainData.letterGameRecord);
+          MainData.isEngameGameRecordChanged = false;
+          MainData.isSoundGameRecordChanged = false;
+          MainData.isWordleGameRecordChanged = false;
+          MainData.isLetterGameRecordChanged = false;
+          await MainData.localData!
+              .put(KeyUtils.isEngameGameRecordChangedKey, false);
+          await MainData.localData!
+              .put(KeyUtils.isSoundGameRecordChangedKey, false);
+          await MainData.localData!
+              .put(KeyUtils.isWordleGameRecordChangedKey, false);
+          await MainData.localData!
+              .put(KeyUtils.isLetterGameRecordChangedKey, false);
+        }
       }
     }
     MainData.engameGameRecord =
@@ -460,6 +478,7 @@ Future<void> saveSkipFirstOpen(
     {bool haveUsername = false,
     String username = "",
     bool isGoogleGamesSigned = false,
+    bool isNewUser = false,
     required BuildContext context}) async {
   MainData.localData!.put(KeyUtils.isFirstOpenKey, false);
   MainData.localData!
@@ -483,7 +502,7 @@ Future<void> saveSkipFirstOpen(
 
   await MainData.localData!.put(KeyUtils.usernameKey, MainData.username);
 
-  await fLoadData(context: context);
+  await fLoadData(context: context, isNewUser: isNewUser);
   BlocProvider.of<HomePageSelectedWordCubit>(context).StateBuild();
 }
 
@@ -10955,9 +10974,9 @@ List<Data> questionData = [
     id: 1339,
   ),
   Data(
-    english: "Sexuality",
-    turkish: "Cinsellik",
-    level: WordLevel.c1,
+    english: "Star",
+    turkish: "Yıldız",
+    level: WordLevel.b2,
     type: WordType.noun,
     id: 1340,
   ),
